@@ -1,0 +1,31 @@
+# Docker compose for postgres and pgadmin
+
+version: '3.5'
+
+services:
+  api:
+    container_name: ft_api
+    build: .
+    networks:
+    - default
+    - ft_transcendance
+    ports:
+    - 0.0.0.0:3000:3000
+    environment:
+# Default common values
+# Config file containing credentials values
+      CONFIG_FILE: /opt/.env
+      CONFIG_JSON: /app/config.json
+    volumes:
+# Add env config file
+    - ./.env:/opt/.env
+# Mount code to avoid rebuild container to refresh code
+    - ./src:/app/src
+    - ./config.json:/app/config.json
+    healthcheck:
+      disable: false
+    restart: unless-stopped
+
+networks:
+  ft_transcendance:
+    external: true

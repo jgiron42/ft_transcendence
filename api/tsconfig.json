@@ -1,0 +1,112 @@
+{
+	"compilerOptions": {
+		// Output module resolution system, CommonJS is the default Node mode
+		"module": "commonjs",
+
+		"resolveJsonModule": true,
+
+		// ES version of the output code
+		"target": "es2020",
+
+		// List of Javascript features
+		// NB: not defining "DOM" removes browser `document`
+		"lib": ["es2021"],
+
+		// Module resolving mode for the compiler
+		"moduleResolution": "node",
+
+		// Root of the project
+		"sourceRoot": "/",
+
+		// Directory where the output code will live
+		"outDir": "./dist",
+
+		// Base directory to resolve non-absolute module
+		"baseUrl": "./",
+
+		// Specific module import issue fix
+		// https://www.typescriptlang.org/tsconfig#esModuleInterop
+		"esModuleInterop": true,
+
+		// Allows `import Module from "moduleName";` instead of `import * as Module from "moduleName";`
+		// NB: this is already turned on by `esModuleInterop`
+		"allowSyntheticDefaultImports": true,
+
+		// Adds `undefined` type to index signatures undeclared keys
+		"noUncheckedIndexedAccess": true,
+
+		// Reports errors on unused local variables
+		"noUnusedLocals": true,
+
+		// Reports errors on unused method parameters
+		"noUnusedParameters": true,
+
+		// Generates .d.ts files for every TypeScript or JavaScript file
+		"declaration": true,
+
+		// Enables decorators
+		"experimentalDecorators": true,
+
+		// Enables experimental support for emitting type metadata for decorators
+		"emitDecoratorMetadata": true,
+
+		// Forces case sensitive imports
+		"forceConsistentCasingInFileNames": true,
+
+		// Enables faster subsequent builds
+		"incremental": true,
+
+		// Prevents missing `break` statements in `switch`
+		"noFallthroughCasesInSwitch": true,
+
+		// Forces type declaration when missing
+		"noImplicitAny": true,
+
+		// Forces `return` statements in every branche if on branch already has one
+		"noImplicitReturns": true,
+
+		// Allows index signature accessess without bracket notation
+		"noPropertyAccessFromIndexSignature": false,
+
+		// Cleans comments from output code
+		"removeComments": true,
+
+		// Prevents checks of every .d.ts on every recompilation
+		"skipLibCheck": true,
+
+		// Enables the generation of source maps.
+		// NB: Source maps are useful for error logging, it shows source code instead of output code
+		"sourceMap": true,
+
+		// Enables a wide range of type checking behavior
+		"strict": true,
+
+		// Forces the built-in methods `call`, `bind, and `apply` to be invoked with correct arguments
+		"strictBindCallApply": false,
+
+		// Allows `null` and `undefined` on every type
+		"strictNullChecks": false,
+
+		// Paths aliases for shorter imports
+		"paths": {
+			"@src/*": ["src/*"],
+			"@config/*": ["src/config/*"],
+			"@controllers/*": ["src/controllers/*"],
+			"@decorators/*": ["src/decorators/*"],
+			"@entities/*": ["src/entities/*"],
+			"@filters/*": ["src/filters/*"],
+			"@gateways/*": ["src/gateways/*"],
+			"@guards/*": ["src/guards/*"],
+			"@helpers/*": ["src/helpers/*"],
+			"@interceptors/*": ["src/interceptors/*"],
+			"@modules/*": ["src/modules/*"],
+			"@pipes/*": ["src/pipes/*"],
+			"@repositories/*": ["src/repositories/*"],
+			"@services/*": ["src/services/*"],
+			"@dtos/*": ["src/types/dtos/*"],
+			"@enums/*": ["src/types/enums/*"],
+			"@utils/*": ["src/utils/*"],
+			"@test/*": ["test/*"],
+		}
+	}
+}
