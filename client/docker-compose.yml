@@ -1,0 +1,29 @@
+# Docker compose for postgres and pgadmin
+
+version: '3.5'
+
+services:
+  client:
+    container_name: ft_transcendance_client
+    build: .
+    networks:
+    - ft_transcendance
+    ports:
+    - 127.0.0.1:4000:4000
+    environment:
+      TZ: Europe/Paris
+    volumes:
+# Mount code to avoid rebuild container to refresh code
+    - ./components:/app/components
+    - ./config:/app/config
+    - ./pages:/app/pages
+    - ./static:/app/static
+    - ./logs:/app/logs
+    - ./:/app/
+    healthcheck:
+      disable: false
+    restart: unless-stopped
+
+networks:
+  ft_transcendance:
+    external: true

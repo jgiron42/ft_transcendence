@@ -1,0 +1,163 @@
+{
+	"name": "ft-api",
+	"version": "0.0.1",
+	"description": "...",
+	"author": "STATION F",
+	"private": true,
+	"license": "UNLICENSED",
+	"scripts": {
+		"prebuild": "rimraf dist",
+		"build": "nest build",
+		"start": "NODE_ENV=development nest start",
+		"start:dev": "npm run build && NODE_ENV=development nest start --watch",
+		"start:prod": "NODE_ENV=production node dist/src/main",
+		"lint": "eslint -c .eslintrc.js ./",
+		"lint:fix": "eslint '*/**/*.ts' --quiet --fix",
+		"test": "jest --coverage"
+	},
+	"dependencies": {
+		"@nestjs/cli": "^8.2.1",
+		"@nestjs/common": "^7.6.18",
+		"@nestjs/core": "^7.6.18",
+		"@nestjs/platform-express": "^7.6.18",
+		"@nestjs/testing": "^7.6.18",
+		"@types/dotenv-parse-variables": "^2.0.1",
+		"@types/faker": "^5.5.9",
+		"@types/jest": "^27.0.2",
+		"@types/morgan": "^1.9.3",
+		"@types/node": "^16.11.7",
+		"axios": "^0.26.0",
+		"class-transformer": "^0.5.1",
+		"class-validator": "^0.13.1",
+		"dotenv": "^10.0.0",
+		"dotenv-parse-variables": "^2.0.0",
+		"faker": "^5.5.3",
+		"helmet": "^4.6.0",
+		"joi": "^17.4.2",
+		"morgan": "^1.10.0",
+		"nest": "^0.1.6",
+		"nestjs-redis": "^1.3.3",
+		"reflect-metadata": "^0.1.13",
+		"rimraf": "^3.0.2",
+		"winston": "^3.6.0"
+	},
+	"devDependencies": {
+		"@types/supertest": "^2.0.11",
+		"@typescript-eslint/eslint-plugin": "^5.4.0",
+		"@typescript-eslint/parser": "^5.4.0",
+		"eslint": "^8.2.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-import": "^2.25.3",
+		"eslint-plugin-prefer-arrow": "^1.2.3",
+		"eslint-plugin-prettier": "^4.0.0",
+		"jest": "^27.3.1",
+		"prettier": "^2.4.1",
+		"source-map-support": "^0.5.20",
+		"supertest": "^6.1.6",
+		"ts-jest": "^27.0.7",
+		"ts-loader": "^9.2.6",
+		"ts-node": "^10.4.0",
+		"tsconfig-paths": "^3.11.0"
+	},
+	"jest": {
+		"moduleFileExtensions": [
+			"js",
+			"json",
+			"ts"
+		],
+		"moduleNameMapper": {
+			"^@src/(.*)$": [
+				"<rootDir>/src/$1"
+			],
+			"^@config/(.*)$": [
+				"<rootDir>/src/config/$1"
+			],
+			"^@controllers/(.*)$": [
+				"<rootDir>/src/controllers/$1"
+			],
+			"^@decorators/(.*)$": [
+				"<rootDir>/src/decorators/$1"
+			],
+			"^@entities/(.*)$": [
+				"<rootDir>/src/entities/$1"
+			],
+			"^@filters/(.*)$": [
+				"<rootDir>/src/filters/$1"
+			],
+			"^@gateways/(.*)$": [
+				"<rootDir>/src/gateways/$1"
+			],
+			"^@guards/(.*)$": [
+				"<rootDir>/src/guards/$1"
+			],
+			"^@helpers/(.*)$": [
+				"<rootDir>/src/helpers/$1"
+			],
+			"^@interceptors/(.*)$": [
+				"<rootDir>/src/interceptors/$1"
+			],
+			"^@modules/(.*)$": [
+				"<rootDir>/src/modules/$1"
+			],
+			"^@pipes/(.*)$": [
+				"<rootDir>/src/pipes/$1"
+			],
+			"^@repositories/(.*)$": [
+				"<rootDir>/src/repositories/$1"
+			],
+			"^@services/(.*)$": [
+				"<rootDir>/src/services/$1"
+			],
+			"^@dtos/(.*)$": [
+				"<rootDir>/src/types/dtos/$1"
+			],
+			"^@enums/(.*)$": [
+				"<rootDir>/src/types/enums/$1"
+			],
+			"^@utils/(.*)$": [
+				"<rootDir>/src/utils/$1"
+			],
+			"^@test/(.*)$": [
+				"./test/$1"
+			]
+		},
+		"rootDir": "./",
+		"testRegex": ".*\\.spec\\.ts$",
+		"transform": {
+			"^.+\\.(t|j)s$": "ts-jest"
+		},
+		"collectCoverageFrom": [
+			"src/decorators/*.(t|j)s",
+			"src/filters/*.(t|j)s",
+			"src/guards/*.(t|j)s",
+			"src/helpers/*.(t|j)s",
+			"src/interceptors/*.(t|j)s",
+			"src/pipes/*.(t|j)s",
+			"src/repositories/*.(t|j)s",
+			"src/services/*.(t|j)s",
+			"src/utils/*.(t|j)s"
+		],
+		"slowTestThreshold": 10,
+		"coverageDirectory": "./coverage",
+		"testEnvironment": "node"
+	},
+	"_moduleAliases": {
+		"@src": "dist",
+		"@config": "dist/config",
+		"@controllers": "dist/controllers",
+		"@decorators": "dist/decorators",
+		"@entities": "dist/entities",
+		"@filters": "dist/filters",
+		"@gateways": "dist/gateways",
+		"@guards": "dist/guards",
+		"@helpers": "dist/helpers",
+		"@interceptors": "dist/interceptors",
+		"@modules": "dist/modules",
+		"@pipes": "dist/pipes",
+		"@repositories": "dist/repositories",
+		"@services": "dist/services",
+		"@dtos": "dist/types/dtos",
+		"@enums": "dist/types/enums",
+		"@utils": "dist/utils"
+	}
+}

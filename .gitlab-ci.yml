@@ -1,0 +1,109 @@
+stages:
+- build
+- lint
+- deploy
+
+image: node:17.4.0
+
+cache: &global_cache
+  key: "${CI_PIPELINE_IID}-${stage}"
+  paths:
+  - $stage/node_modules/
+  - $stage/dist
+
+before_script:
+- cd $stage
+
+build_api:
+  stage: build
+  variables:
+    stage: api
+  cache:
+    <<: *global_cache
+    policy: push
+  script:
+  - npm install
+  #- cp config-sample.json config.json
+  - npm run build
+
+build_client:
+  stage: build
+  variables:
+    stage: client
+  cache:
+    <<: *global_cache
+    policy: push
+  script:
+  - mv .env-prod .env
+  - npm install
+  - npm run generate
+
+eslint_api:
+  stage: lint
+  cache:
+    <<: *global_cache
+    policy: pull
+  variables:
+    stage: api
+  script:
+  #- cp config-sample.json config.json
+  - npm run lint
+  needs:
+  - build_api
+
+eslint_client:
+  stage: lint
+  cache:
+    <<: *global_cache
+    policy: pull
+  variables:
+    stage: client
+  script:
+  - npm run lint
+  needs:
+  - build_client
+
+deploy_api:
+  stage: deploy
+  cache:
+    <<: *global_cache
+    policy: pull
+  variables:
+    stage: api
+  script:
+  - chmod 600 "$ID_RSA"
+  - echo '' >> "$ID_RSA"
+  - echo "Installing PM2"
+  - npm install pm2
+  - git checkout package.json package-lock.json
+  - git status
+  - echo "[API] Start PM2 Deploy"
+  - ./node_modules/.bin/pm2 deploy pm2.config.js production update
+  - echo "[API] PM2 Deploy finished."
+  - date
+  - echo "Deployment to [PRODUCTION] finished."
+  environment:
+    name: production
+  only:
+  - master
+  when: manual
+
+deploy_client:
+  stage: deploy
+  image: debian:buster
+  cache:
+    <<: *global_cache
+    policy: pull
+  variables:
+    stage: client
+  script:
+  - apt-get update
+  - apt-get install -y rsync ssh
+  - chmod 600 "$ID_RSA"
+  - echo '' >> "$ID_RSA"
+  - rsync --recursive --delete dist/ -e 'ssh -i "'$ID_RSA'" -p 22 -o "StrictHostKeyChecking no"' app@oracle.nollium.com:/var/www/ft_transcendance
+  environment:
+    name: production
+  only:
+  - master
+  when: manual
