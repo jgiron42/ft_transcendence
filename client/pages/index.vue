@@ -4,6 +4,24 @@
 	</div>
 </template>
 
+<script lang="ts">
+export default {
+	name: "Index",
+	methods: {
+		/* Does not compile.
+		getHello(): string
+		{
+			return 'Hello World!';
+		},
+		test() : Number
+		{
+			return this.getHello();
+		}
+	*/
+	},
+};
+</script>
+
 <style>
 html,
 body {
