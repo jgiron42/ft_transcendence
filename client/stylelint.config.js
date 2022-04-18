@@ -23,6 +23,6 @@ module.exports = {
 		"declaration-block-trailing-semicolon": null,
 		"no-descending-specificity": null,
 		"block-no-empty": null,
-		"selector-class-pattern": false, // Turned off CSS class nomenclature
+		"selector-class-pattern": null, // Turned off CSS class nomenclature
 	},
 };
