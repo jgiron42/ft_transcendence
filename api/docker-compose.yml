@@ -21,6 +21,8 @@ services:
     - ./.env:/opt/.env
 # Mount code to avoid rebuild container to refresh code
     - ./src:/app/src
+    - ./tsconfig.json:/app/tsconfig.json
+    - ./tsconfig.build.json:/app/tsconfig.build.json
     - ./config.json:/app/config.json
     healthcheck:
       disable: false
@@ -32,6 +34,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ft_db
     ports:
       - '5432:5432'
     volumes: 

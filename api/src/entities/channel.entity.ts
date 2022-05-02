@@ -1,13 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class chan_connexion {
+export class Channel {
 	@PrimaryGeneratedColumn()
 	id: number;
 
 	@Column()
-	chan_id: number;
+	name: string;
 
 	@Column()
-	client_id: number;
+	chat_type: number;
 }

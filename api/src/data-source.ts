@@ -1,21 +1,21 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { client } from "./entity/client";
-import { relation } from "./entity/relation";
-import { chan_connexion } from "./entity/chan_connexion";
-import { channel } from "./entity/channel";
-import { game } from "./entity/game";
+import { Client } from "@entities/client.entity";
+import { Relation } from "@entities/relation.entity";
+import { ChanConnection } from "@entities/chan_connexion.entity";
+import { Channel } from "@entities/channel.entity";
+import { Game } from "@entities/game.entity";
 
 export const AppDataSource = new DataSource({
 	type: "postgres",
-	host: "localhost",
+	host: "db",
 	port: 5432,
-	username: "test",
-	password: "test",
-	database: "test",
+	username: process.env.POSTGRES_USER,
+	password: process.env.POSTGRES_PASSWORD,
+	database: process.env.POSTGRES_DB,
 	synchronize: true,
-	logging: false,
-	entities: [client, relation, chan_connexion, channel, game],
+	logging: true,
+	entities: [Client, Relation, ChanConnection, Channel, Game],
 	migrations: [],
 	subscribers: [],
 });
