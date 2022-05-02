@@ -1,0 +1,60 @@
+# Docker compose for postgres and pgadmin
+
+version: "3.5"
+
+services:
+    client:
+        container_name: ft_client
+        build: ./client
+        networks:
+            - ft_transcendance
+        ports:
+            - 127.0.0.1:4000:4000
+        environment:
+            TZ: Europe/Paris
+        volumes:
+            # Mount code to avoid rebuild container to refresh code
+            - ./client/components:/app/client/components
+            - ./client/config:/app/client/config
+            - ./client/entrypoint.sh:/app/client/entrypoint.sh
+            - ./client/jsconfig.json:/app/client/jsconfig.json
+            - ./client/logs:/app/client/logs
+            - ./client/nuxt.config.js:/app/client/nuxt.config.js
+            - ./client/package.json:/app/client/package.json
+            - ./client/pages:/app/client/pages
+            - ./client/static:/app/client/static
+            - ./client/store:/app/client/store
+            - ./client/stylelint.config.js:/app/client/stylelint.config.js
+            - ./client/tailwind.config.js:/app/client/tailwind.config.js
+            - ./client/tsconfig.json:/app/client/tsconfig.json
+
+        healthcheck:
+            disable: false
+        restart: unless-stopped
+    
+    api:
+      container_name: ft_api
+      build: ./api
+      networks:
+      - default
+      - ft_transcendance
+      ports:
+      - 0.0.0.0:3000:3000
+      environment:
+  # Default common values
+  # Config file containing credentials values
+        CONFIG_FILE: /opt/.env
+        CONFIG_JSON: /app/api/config.json
+      volumes:
+  # Add env config file
+      - ./api/.env:/opt/.env
+  # Mount code to avoid rebuild container to refresh code
+      - ./api/src:/app/src
+      - ./api/config.json:/app/api/config.json
+      healthcheck:
+        disable: false
+      restart: unless-stopped
+
+networks:
+    ft_transcendance:
+        external: true
