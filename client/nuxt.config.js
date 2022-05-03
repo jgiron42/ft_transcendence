@@ -21,9 +21,6 @@ export default {
 		link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
 	},
 
-	// Global CSS: https://go.nuxtjs.dev/config-css
-	css: [],
-
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
 	plugins: [],
 
@@ -40,8 +37,12 @@ export default {
 		"@nuxtjs/tailwindcss",
 	],
 
+	css: ["~/layouts/global.css"],
+
 	// Modules: https://go.nuxtjs.dev/config-modules
 	modules: [],
+
+	io: {},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
 	build: {},

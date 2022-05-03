@@ -1,34 +1,22 @@
 <template>
-	<div class="bg-gray-100">
-		<p>Hello World!</p>
+	<div>
+		<Header />
+		<WhoAreYou />
+		<SignIn />
 	</div>
 </template>
 
 <script lang="ts">
 export default {
 	name: "Index",
-	methods: {
-		/* Does not compile.
-		getHello(): string
-		{
-			return 'Hello World!';
-		},
-		test() : Number
-		{
-			return this.getHello();
-		}
-	*/
-	},
+	methods: {},
 };
 </script>
 
 <style>
-html,
 body {
 	scroll-behavior: smooth;
-}
-
-.vm--modal {
-	@apply rounded-lg;
+	background-color: bg-design_gray;
+	@apply bg-design_dgray;
 }
 </style>

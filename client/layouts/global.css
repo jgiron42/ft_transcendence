@@ -1,0 +1,8 @@
+@font-face {
+	font-family: BMjapan;
+	src: local("BMjapan"), url("~assets/BMjapan.TTF") format("truetype");
+}
+
+html {
+	font-family: BMjapan, sans-serif;
+}
