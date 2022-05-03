@@ -27,6 +27,8 @@ services:
             - ./stylelint.config.js:/app/stylelint.config.js
             - ./tailwind.config.js:/app/tailwind.config.js
             - ./tsconfig.json:/app/tsconfig.json
+            - ./layouts:/app/layouts
+            - ./assets:/app/assets
 
         healthcheck:
             disable: false
