@@ -1,0 +1,61 @@
+server {
+	listen ${NGINX_HTTP_PORT};
+	listen [::]:${NGINX_HTTP_PORT};
+
+	server_name ${NGINX_PROD_HOST};
+
+	location / {
+		return 301 https://$server_name:${NGINX_HTTPS_PORT}$request_uri;
+	}
+}
+
+server {
+	listen ${NGINX_HTTPS_PORT} ssl;
+	listen [::]:${NGINX_HTTPS_PORT} ssl;
+
+	server_name ${NGINX_PROD_HOST};
+
+	location / {
+		proxy_pass http://${CLIENT_HOST}:${CLIENT_PORT}/;
+	}
+
+	location /api/ {
+		proxy_pass http://${API_HOST}:${API_PORT}/;
+	}
+
+	ssl_certificate ${SSL_CERTIFICATE};
+    ssl_certificate_key ${SSL_CERTIFICATE_KEY};
+    include ${SSL_NGINX_OPTIONS};
+    ssl_dhparam ${SSL_NGINX_DHPARAM};
+}
+
+server {
+	listen ${NGINX_HTTP_PORT};
+	listen [::]:${NGINX_HTTP_PORT};
+
+	server_name ${NGINX_DEV_HOST};
+
+	location / {
+		return 301 https://$server_name:${NGINX_HTTPS_PORT}$request_uri;
+	}
+}
+
+server {
+	listen ${NGINX_HTTPS_PORT} ssl;
+	listen [::]:${NGINX_HTTPS_PORT} ssl;
+
+	server_name ${NGINX_DEV_HOST};
+
+	location / {
+		proxy_pass http://${CLIENT_HOST}:${CLIENT_PORT}/;
+	}
+
+	location /api/ {
+		proxy_pass http://${API_HOST}:${API_PORT}/;
+	}
+
+	ssl_certificate ${SSL_CERTIFICATE};
+    ssl_certificate_key ${SSL_CERTIFICATE_KEY};
+    include ${SSL_NGINX_OPTIONS};
+    ssl_dhparam ${SSL_NGINX_DHPARAM};
+}
