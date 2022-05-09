@@ -30,7 +30,7 @@ services:
 
         healthcheck:
             disable: false
-        restart: unless-stopped
+        restart: always
     
     api:
       container_name: ft_api
@@ -53,7 +53,8 @@ services:
       - ./api/config.json:/app/api/config.json
       healthcheck:
         disable: false
-      restart: unless-stopped
+      restart: always
+
 
     ft_proxy:
         image: nginx
@@ -79,6 +80,7 @@ services:
             - SSL_CERTIFICATE_KEY=/etc/letsencrypt/live/transcendance.nollium.com/privkey.pem
             - SSL_NGINX_OPTIONS=/etc/letsencrypt/options-ssl-nginx.conf
             - SSL_NGINX_DHPARAM=/etc/letsencrypt/ssl-dhparams.pem
+        restart: always
 
 networks:
     ft_transcendance:
