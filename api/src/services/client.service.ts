@@ -1,15 +1,24 @@
-import { Injectable, Inject } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Client } from "@entities/client.entity";
+import { Client } from "@src/entities/client.entity";
 
 @Injectable()
 export class ClientService {
 	constructor(
-		@Inject("CLIENT_REPOSITORY")
-		private clientRepository: Repository<Client>,
+		@InjectRepository(Client)
+		private clientsRepository: Repository<Client>,
 	) {}
 
-	async findAll(): Promise<Client[]> {
-		return this.clientRepository.find();
+	findAll(): Promise<Client[]> {
+		return this.clientsRepository.find();
+	}
+
+	findOne(id: string): Promise<Client> {
+		return this.clientsRepository.findOne(id);
+	}
+
+	async remove(id: string): Promise<void> {
+		await this.clientsRepository.delete(id);
 	}
 }

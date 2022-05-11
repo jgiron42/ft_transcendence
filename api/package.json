@@ -15,11 +15,10 @@
 		"test": "jest --coverage"
 	},
 	"dependencies": {
-		"@nestjs/cli": "^8.2.1",
-		"@nestjs/common": "^7.6.18",
-		"@nestjs/core": "^7.6.18",
-		"@nestjs/platform-express": "^7.6.18",
-		"@nestjs/testing": "^7.6.18",
+		"@nestjs/cli": "^8.2.5",
+		"@nestjs/core": "^8.4.4",
+		"@nestjs/platform-express": "^8.4.4",
+		"@nestjs/typeorm": "^8.0.3",
 		"@types/dotenv-parse-variables": "^2.0.1",
 		"@types/faker": "^5.5.9",
 		"@types/jest": "^27.0.2",
@@ -27,6 +26,7 @@
 		"axios": "^0.26.0",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.13.1",
+		"colors": "^1.4.0",
 		"dotenv": "^10.0.0",
 		"dotenv-parse-variables": "^2.0.0",
 		"faker": "^5.5.3",
@@ -39,7 +39,7 @@
 		"pg": "^8.7.3",
 		"reflect-metadata": "^0.1.13",
 		"rimraf": "^3.0.2",
-		"typeorm": "^0.3.6",
+		"typeorm": "^0.2.45",
 		"winston": "^3.6.0"
 	},
 	"devDependencies": {

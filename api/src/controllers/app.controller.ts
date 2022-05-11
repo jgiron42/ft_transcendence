@@ -1,34 +1,25 @@
 import { Controller, Get } from "@nestjs/common";
 import config from "@config/api.config";
-import { Client } from "@entities/client.entity";
-import { ClientService } from "@services/client.service";
+import { UserService } from "@src/services/user.service";
+import { User } from "@src/entities/user.entity";
+import { randomInt } from "crypto";
 
 @Controller()
 export class AppController {
-	constructor(private clientService: ClientService) {}
+	constructor(private userService: UserService) {}
 
 	@Get()
 	getHealthcheck(): { status: string; env: string; port: number | string } {
 		return { status: "live", env: config.env, port: config.apiPort };
 	}
 	@Get("/db")
-	async testDB(): Promise<Client[]> {
-		/*const userRepository = AppDataSource.getRepository(Client)
-
-		const client = new Client
-		client.pseudo = "prout"
-		client.path_avatar = "lol"
-		client.mdp = "lol"
-		client.mail = "lolé"
-		client.phone = "0635300278"
-		client.nb_game = 0
-		client.nb_win = 0
-		client.OAuth = false
-		client.totp_key = ""
-
-		await userRepository.save(client);
-		*/
-
-		return this.clientService.findAll();
+	async testDB(): Promise<User[]> {
+		const newUser = new User();
+		newUser.id = randomInt(0, 100);
+		newUser.firstName = "John";
+		newUser.lastName = "Doe";
+		newUser.isActive = true;
+		await this.userService.create(newUser);
+		return this.userService.findAll();
 	}
 }
