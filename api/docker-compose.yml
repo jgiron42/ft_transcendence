@@ -16,6 +16,9 @@ services:
 # Config file containing credentials values
       CONFIG_FILE: /opt/.env
       CONFIG_JSON: /app/config.json
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ft_db
     volumes:
 # Add env config file
     - ./.env:/opt/.env
@@ -32,9 +35,9 @@ services:
     image: postgres:14.1-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ft_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ft_db
     ports:
       - '5432:5432'
     volumes: 
