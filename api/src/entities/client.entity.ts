@@ -29,6 +29,12 @@ export class Client {
 	@Column()
 	OAuth: boolean;
 
+	@Column()
+	status: number;
+
 	@Column({ length: 20 })
 	totp_key: string;
+
+	@Column()
+	date_register: Date;
 }

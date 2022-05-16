@@ -1,8 +1,13 @@
 import { AppController } from "@controllers/app.controller";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "@src/entities/user.entity";
-import { UsersModule } from "./users.module";
+import { Client } from "@src/entities/client.entity";
+import { ClientModule } from "@modules/client.module";
+import { Relation } from "@entities/relation.entity";
+import { RelationModule } from "@modules/relation.module";
+import { GameModule } from "@modules/game.module";
+import { Game } from "@entities/game.entity";
+// import { UsersModule } from "./users.module";
 
 @Module({
 	imports: [
@@ -13,10 +18,12 @@ import { UsersModule } from "./users.module";
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.POSTGRES_DB,
-			entities: [User],
+			entities: [Client, Relation, Game],
 			synchronize: true,
 		}),
-		UsersModule,
+		ClientModule,
+		RelationModule,
+		GameModule,
 	],
 	controllers: [AppController],
 })

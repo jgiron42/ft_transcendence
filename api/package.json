@@ -16,6 +16,7 @@
 	},
 	"dependencies": {
 		"@nestjs/cli": "^8.2.5",
+		"@nestjs/common": "^8.4.5",
 		"@nestjs/core": "^8.4.4",
 		"@nestjs/platform-express": "^8.4.4",
 		"@nestjs/typeorm": "^8.0.3",
@@ -40,6 +41,8 @@
 		"reflect-metadata": "^0.1.13",
 		"rimraf": "^3.0.2",
 		"typeorm": "^0.2.45",
+		"typescript": "^4.6.4",
+		"webpack": "^5.72.1",
 		"winston": "^3.6.0"
 	},
 	"devDependencies": {
@@ -47,7 +50,7 @@
 		"@types/supertest": "^2.0.11",
 		"@typescript-eslint/eslint-plugin": "^5.4.0",
 		"@typescript-eslint/parser": "^5.4.0",
-		"eslint": "^8.2.0",
+		"eslint": "^8.15.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.3",
 		"eslint-plugin-prefer-arrow": "^1.2.3",

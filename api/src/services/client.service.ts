@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Client } from "@src/entities/client.entity";
+// import {User} from "@entities/user.entity";
 
 @Injectable()
 export class ClientService {
@@ -20,5 +21,9 @@ export class ClientService {
 
 	async remove(id: string): Promise<void> {
 		await this.clientsRepository.delete(id);
+	}
+
+	async create(client: Client): Promise<Client> {
+		return this.clientsRepository.save(client);
 	}
 }
