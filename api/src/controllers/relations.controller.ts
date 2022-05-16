@@ -12,7 +12,7 @@ export class RelationsController {
 		return Promise.resolve({ foo: "bar" });
 	}
 
-	@Post()
+	@Post(":id")
 	create(@Param("id") _id: string, @Body() _relation: any): Promise<object> {
 		return Promise.resolve({ foo: "bar" });
 	}
