@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { Client } from "@entities/client.entity";
 import { Channel } from "@entities/channel.entity";
+import { User } from "./user.entity";
 
 @Entity()
 export class Message {
@@ -10,8 +10,8 @@ export class Message {
 	@Column()
 	content: string;
 
-	@ManyToOne(() => Client, (send_by) => send_by.id)
-	send_by: Client;
+	@ManyToOne(() => User, (send_by) => send_by.id)
+	send_by: User;
 
 	@Column()
 	date: Date;

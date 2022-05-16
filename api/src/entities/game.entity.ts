@@ -1,16 +1,16 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { Client } from "@entities/client.entity";
+import { User } from "@entities/user.entity";
 
 @Entity()
 export class Game {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => Client, (id_first_player) => id_first_player.id)
-	id_first_player: Client;
+	@ManyToOne(() => User, (id_first_player) => id_first_player.id)
+	id_first_player: User;
 
-	@ManyToOne(() => Client, (id_second_player) => id_second_player.id)
-	id_second_player: Client;
+	@ManyToOne(() => User, (id_second_player) => id_second_player.id)
+	id_second_player: User;
 
 	@Column()
 	score_first_player: number;
@@ -18,8 +18,8 @@ export class Game {
 	@Column()
 	score_second_player: number;
 
-	@ManyToOne(() => Client, (winner) => winner.id)
-	winner: Client;
+	@ManyToOne(() => User, (winner) => winner.id)
+	winner: User;
 
 	@Column()
 	type: number;

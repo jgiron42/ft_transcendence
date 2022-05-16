@@ -4,13 +4,13 @@ version: '3.5'
 
 services:
   api:
-    container_name: ft_api
+#    container_name: ft_api
     build: .
     networks:
     - default
     - ft_transcendance
     ports:
-    - 0.0.0.0:3000:3000
+    - 0.0.0.0:3001:3000
     environment:
 # Default common values
 # Config file containing credentials values

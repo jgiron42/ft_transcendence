@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { Client } from "@entities/client.entity";
+import { User } from "@entities/user.entity";
 
 @Entity()
 export class Channel {
@@ -15,6 +15,6 @@ export class Channel {
 	@Column()
 	mdp: string;
 
-	@ManyToOne(() => Client, (owner) => owner.id)
-	owner: Client;
+	@ManyToOne(() => User, (owner) => owner.id)
+	owner: User;
 }

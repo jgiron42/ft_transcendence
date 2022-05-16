@@ -6,11 +6,35 @@ export class User {
 	id: number;
 
 	@Column()
-	firstName: string;
+	pseudo: string;
 
 	@Column()
-	lastName: string;
+	path_avatar: string;
 
-	@Column({ default: true })
-	isActive: boolean;
+	@Column()
+	mdp: string;
+
+	@Column()
+	mail: string;
+
+	@Column()
+	phone: string;
+
+	@Column()
+	nb_game: number;
+
+	@Column()
+	nb_win: number;
+
+	@Column()
+	OAuth: boolean;
+
+	@Column()
+	status: number;
+
+	@Column({ length: 20 })
+	totp_key: string;
+
+	@Column()
+	date_register: Date;
 }

@@ -1,16 +1,16 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { Client } from "@entities/client.entity";
+import { User } from "@entities/user.entity";
 
 @Entity()
 export class Relation {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => Client, (user_one) => user_one.id)
-	user_one: Client;
+	@ManyToOne(() => User, (user_one) => user_one.id)
+	user_one: User;
 
-	@ManyToOne(() => Client, (user_two) => user_two.id)
-	user_two: Client;
+	@ManyToOne(() => User, (user_two) => user_two.id)
+	user_two: User;
 
 	@Column()
 	relation_type: number;
