@@ -1,7 +1,5 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-// import { UserService } from "@src/services/user.service";
-// import { UserService } from "@services/user.service";
 import { AppController } from "@src/controllers/app.controller";
 import { Relation } from "@src/entities/relation.entity";
 import { RelationService } from "@services/relation.service";

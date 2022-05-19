@@ -16,8 +16,6 @@ import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
 
-// import { UsersModule } from "./users.module";
-
 @Module({
 	imports: [
 		TypeOrmModule.forRoot({

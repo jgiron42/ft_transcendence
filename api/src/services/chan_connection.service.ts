@@ -3,8 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ChanConnection } from "@entities/chan_connection.entity";
 
-// import {User} from "@entities/user.entity";
-
 @Injectable()
 export class ChanConnectionService {
 	constructor(
