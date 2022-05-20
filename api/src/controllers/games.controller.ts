@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { GameExistGuard } from "@src/guards/game-exist.guard";
 
 @Controller("games")
 export class GamesController {
@@ -8,17 +9,13 @@ export class GamesController {
 	}
 
 	@Get(":id")
+	@UseGuards(GameExistGuard)
 	getOne(@Param("id") _id: string): Promise<object> {
 		return Promise.resolve({ foo: "bar" });
 	}
 
-	@Post(":id")
-	create(@Param("id") _id: string, @Body() _game: any): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
-	}
-
-	@Put(":id")
-	update(@Param("id") _id: string, @Body() _update: any): Promise<object> {
+	@Post()
+	create(@Body() _game: any): Promise<object> {
 		return Promise.resolve({ foo: "bar" });
 	}
 }

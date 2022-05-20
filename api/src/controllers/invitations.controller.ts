@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param } from "@nestjs/common";
 
 @Controller("users")
-export class UsersController {
+export class InvitationsController {
 	@Get()
 	getAll(): Promise<object> {
 		return Promise.resolve({ foo: "bar" });
