@@ -1,4 +1,5 @@
-import { Controller, Delete, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { MessageExistGuard } from "@src/guards/message-exist.guard";
 
 @Controller("messages")
 export class MessagesController {
@@ -8,12 +9,8 @@ export class MessagesController {
 	}
 
 	@Get(":id")
+	@UseGuards(MessageExistGuard)
 	getOne(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
-	}
-
-	@Delete(":id")
-	removeInvitation(@Param("id") _id: string): Promise<object> {
 		return Promise.resolve({ foo: "bar" });
 	}
 }
