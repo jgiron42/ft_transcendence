@@ -150,8 +150,6 @@ test_e2e_client:
   variables:
     stage: client
   script:
-#  - sed -i s/disable:\ false/disable:\ true/g docker-compose.yml
-#  - docker network create scheduler
   - cd ..
   - apk add docker-compose
   - docker-compose up -d client # db
@@ -177,8 +175,8 @@ deploy_api:
   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh api"
   environment:
     name: production
-  # only:
-  # - main
+  only:
+   - main
   when: manual
 
 deploy_client:
@@ -191,8 +189,8 @@ deploy_client:
   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh client"
   environment:
     name: production
-  # only:
-  # - main
+  only:
+  - main
   when: manual
 
 deploy_db:
@@ -205,8 +203,8 @@ deploy_db:
   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh db"
   environment:
     name: production
-  # only:
-  # - main
+  only:
+   - main
   when: manual
 
 deploy_proxy:
@@ -219,6 +217,6 @@ deploy_proxy:
   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh ft_proxy"
   environment:
     name: production
-#  only:
-#  - main
+  only:
+  - main
   when: manual
