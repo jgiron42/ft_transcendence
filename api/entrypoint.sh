@@ -1,9 +1,11 @@
 #! /bin/bash
 
 # Check if config file is set & export to environment
-if [ $CONFIG_FILE ]
+# https://gist.github.com/mihow/9c7f559807069a03e302605691f85572
+if ! [ -z "$CONFIG_FILE" ]
 then
-	export $(cat $CONFIG_FILE) >/dev/null
+	set -o allexport
+	source "$CONFIG_FILE" set +o allexport
 fi
 
 # Set useful env values
@@ -24,6 +26,11 @@ then
 		export "RUN_SCRIPT=start:dev"
 	fi
 fi
+
+echo NPM VERSION: $(npm --version)
+echo NODE VERSION: $(node --version)
+echo NODE_ENV: $NODE_ENV
+echo RUN_SCRIPT: $RUN_SCRIPT
 
 # Check if another command is provided & execute them
 if [[ ! -z "$@" ]]

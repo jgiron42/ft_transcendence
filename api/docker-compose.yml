@@ -1,5 +1,3 @@
-# Docker compose for postgres and pgadmin
-
 version: '3.5'
 
 services:
@@ -12,20 +10,21 @@ services:
     ports:
     - 0.0.0.0:3000:3000
     environment:
-# Default common values
+# Values from parent shell, overriden by values from .env
+    - INTRA42_UID=${INTRA42_UID}
+    - INTRA42_SECRET=${INTRA42_SECRET}
 # Config file containing credentials values
-      CONFIG_FILE: /opt/.env
-      CONFIG_JSON: /app/config.json
+    - CONFIG_FILE="/opt/.env"
     volumes:
 # Add env config file
     - ./.env:/opt/.env
 # Mount code to avoid rebuild container to refresh code
     - ./src:/app/src
-    - ./config.json:/app/config.json
+    - ./entrypoint.sh:/app/entrypoint.sh
     healthcheck:
       disable: false
     restart: unless-stopped
 
 networks:
   ft_transcendance:
-    external: true
+    external: false

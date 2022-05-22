@@ -120,8 +120,6 @@ test_e2e_api:
   variables:
     stage: api
   script:
-#  - sed -i s/disable:\ false/disable:\ true/g docker-compose.yml
-#  - docker network create scheduler
   - cd ..
   - apk add docker-compose
   - docker-compose up -d api # db

@@ -101,6 +101,7 @@
 			"@interceptors/*": ["src/interceptors/*"],
 			"@modules/*": ["src/modules/*"],
 			"@pipes/*": ["src/pipes/*"],
+			"@strategies/*": ["src/strategies/*"],
 			"@repositories/*": ["src/repositories/*"],
 			"@services/*": ["src/services/*"],
 			"@dtos/*": ["src/types/dtos/*"],
@@ -108,5 +109,5 @@
 			"@utils/*": ["src/utils/*"],
 			"@test/*": ["test/*"],
 		}
-	}
+	},
 }

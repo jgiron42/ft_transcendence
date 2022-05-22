@@ -36,4 +36,4 @@ services:
 
 networks:
     ft_transcendance:
-        external: true
+        external: false
