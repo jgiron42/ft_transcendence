@@ -41,10 +41,11 @@ services:
       ports:
       - 0.0.0.0:3000:3000
       environment:
-  # Default common values
-  # Config file containing credentials values
-        CONFIG_FILE: /opt/.env
-        CONFIG_JSON: /app/api/config.json
+    # Values from parent shell, overriden by values from .env
+        - INTRA42_UID=${INTRA42_UID}
+        - INTRA42_SECRET=${INTRA42_SECRET}
+    # Config file containing credentials values
+        - CONFIG_FILE="/opt/.env"
       volumes:
   # Add env config file
       - ./api/.env:/opt/.env

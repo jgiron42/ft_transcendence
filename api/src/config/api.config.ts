@@ -1,9 +1,7 @@
-import config from "config.json";
-
-const apiConfig = config.api || ({} as config.Api);
-
 export default {
-	apiPort: apiConfig.port || 3000,
+	apiPort: Number(process.env.API_PORT) || 3000,
 	env: process.env.NODE_ENV || "development",
-	cors: apiConfig.cors || { origin: "*" },
+	cors: { origin: process.env.API_CORS || "*" },
+	sessionTimeout: Number(process.env.API_SESSION_TIMEOUT) || 60000,
+	baseUrl: process.env.API_BASE_URL || "http://localhost:3000",
 };

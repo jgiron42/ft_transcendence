@@ -6,6 +6,7 @@ declare module "config.json" {
 	export interface Api {
 		port: number;
 		cors: Cors;
+		sessionTimeout: number;
 	}
 
 	const api: Api;
