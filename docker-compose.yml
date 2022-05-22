@@ -45,7 +45,7 @@ services:
         - INTRA42_UID=${INTRA42_UID}
         - INTRA42_SECRET=${INTRA42_SECRET}
     # Config file containing credentials values
-        - CONFIG_FILE="/opt/.env"
+        - CONFIG_FILE=/opt/.env
       volumes:
   # Add env config file
       - ./api/.env:/opt/.env
