@@ -11,7 +11,7 @@ export class AppController {
 	getHealthcheck(): { status: string; env: string; port: number | string } {
 		return { status: "live", env: config.env, port: config.apiPort };
 	}
-	@Get("/db")
+	@Get("/newUserExample")
 	async testDB(): Promise<User[]> {
 		const newUser = new User();
 		newUser.pseudo = "John";
