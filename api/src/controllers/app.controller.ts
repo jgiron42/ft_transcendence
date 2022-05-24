@@ -16,4 +16,14 @@ export class AppController {
 	test() {
 		return "user is correctly authenticated";
 	}
+	
+	@Get("/newUserExample")
+	async testDB(): Promise<User[]> {
+		const newUser = new User();
+		newUser.pseudo = "John";
+		newUser.mail = "Doe";
+		newUser.OAuth = true;
+		await this.userService.create(newUser);
+		return this.userService.findAll();
+	}
 }

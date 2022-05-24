@@ -2,28 +2,44 @@ version: '3.5'
 
 services:
   api:
-    container_name: ft_api
+#    container_name: ft_api
     build: .
     networks:
     - default
     - ft_transcendance
     ports:
-    - 0.0.0.0:3000:3000
+    - 0.0.0.0:3001:3000
     environment:
 # Values from parent shell, overriden by values from .env
     - INTRA42_UID=${INTRA42_UID}
     - INTRA42_SECRET=${INTRA42_SECRET}
 # Config file containing credentials values
-    - CONFIG_FILE=/opt/.env
+      CONFIG_FILE: /opt/.env
+      CONFIG_JSON: /app/config.json
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ft_db
     volumes:
 # Add env config file
     - ./.env:/opt/.env
 # Mount code to avoid rebuild container to refresh code
     - ./src:/app/src
-    - ./entrypoint.sh:/app/entrypoint.sh
+    - ./tsconfig.json:/app/tsconfig.json
+    - ./tsconfig.build.json:/app/tsconfig.build.json
+    - ./config.json:/app/config.json
     healthcheck:
       disable: false
     restart: unless-stopped
+  
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ft_db
+    ports:
+      - '5432:5432'
 
 networks:
   ft_transcendance:

@@ -104,6 +104,7 @@
 			"@strategies/*": ["src/strategies/*"],
 			"@repositories/*": ["src/repositories/*"],
 			"@services/*": ["src/services/*"],
+			"@providers/*": ["src/providers/*"],
 			"@dtos/*": ["src/types/dtos/*"],
 			"@enums/*": ["src/types/enums/*"],
 			"@utils/*": ["src/utils/*"],

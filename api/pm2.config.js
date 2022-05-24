@@ -8,7 +8,7 @@ module.exports = {
 	apps: [
 		// First application
 		{
-			name: "mapper-api",
+			name: "ft_transcendance-api",
 			script: "npm run start:prod",
 			min_uptime: "5s",
 			env_production: {
