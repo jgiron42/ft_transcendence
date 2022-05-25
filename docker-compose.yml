@@ -46,6 +46,9 @@ services:
         - INTRA42_SECRET=${INTRA42_SECRET}
     # Config file containing credentials values
         - CONFIG_FILE=/opt/.env
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=ft_db
       volumes:
   # Add env config file
       - ./api/.env:/opt/.env
@@ -55,7 +58,16 @@ services:
       healthcheck:
         disable: false
       restart: always
-
+  
+    db:
+        image: postgres:14.1-alpine
+        restart: always
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=ft_db
+        ports:
+            - '5432:5432'
 
     ft_proxy:
         image: nginx
