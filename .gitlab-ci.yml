@@ -122,7 +122,7 @@ test_e2e_api:
   script:
   - cd ..
   - apk add docker-compose
-  - docker-compose up -d api # db
+  - docker-compose up -d api db  # db
   # Waiting for service to be up
   - |
     for i in $(seq 0 120)
