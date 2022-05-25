@@ -5,9 +5,10 @@ import { Game } from "@src/entities/game.entity";
 import { GameService } from "@services/game.service";
 import { UserService } from "@services/user.service";
 import { User } from "@entities/user.entity";
+import { AuthModule } from "./auth.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Game, User])],
+	imports: [TypeOrmModule.forFeature([Game, User]), AuthModule],
 	providers: [GameService, UserService],
 	controllers: [AppController],
 	exports: [GameService, UserService],

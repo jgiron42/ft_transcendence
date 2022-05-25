@@ -10,15 +10,15 @@ services:
     ports:
     - 0.0.0.0:3001:3000
     environment:
-# Values from parent shell, overriden by values from .env
-    - INTRA42_UID=${INTRA42_UID}
-    - INTRA42_SECRET=${INTRA42_SECRET}
-# Config file containing credentials values
-      CONFIG_FILE: /opt/.env
-      CONFIG_JSON: /app/config.json
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ft_db
+    # Values from parent shell, overriden by values from .env
+      - INTRA42_UID=${INTRA42_UID}
+      - INTRA42_SECRET=${INTRA42_SECRET}
+    # Config file containing credentials values
+      - CONFIG_FILE=/opt/.env
+      - CONFIG_JSON=/app/config.json
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ft_db
     volumes:
 # Add env config file
     - ./.env:/opt/.env
@@ -35,9 +35,9 @@ services:
     image: postgres:14.1-alpine
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ft_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ft_db
     ports:
       - '5432:5432'
 

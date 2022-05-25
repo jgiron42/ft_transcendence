@@ -18,7 +18,7 @@ import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
 
 @Module({
-	imports: [ AuthModule, 
+	imports: [
 		TypeOrmModule.forRoot({
 			type: "postgres",
 			host: "db",
@@ -36,6 +36,7 @@ import { ChanInvitationModule } from "@modules/chan_invitation.module";
 		MessageModule,
 		ChanConnectionModule,
 		ChanInvitationModule,
+		AuthModule,
 	],
 	controllers: [AppController],
 })

@@ -7,9 +7,10 @@ import { Channel } from "@entities/channel.entity";
 import { Message } from "@entities/message.entity";
 import { MessageService } from "@services/message.service";
 import { ChannelService } from "@services/channel.service";
+import { AuthModule } from "./auth.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Message, User, Channel])],
+	imports: [TypeOrmModule.forFeature([Message, User, Channel]), AuthModule],
 	providers: [MessageService, UserService, ChannelService],
 	controllers: [AppController],
 	exports: [MessageService, UserService, ChannelService],

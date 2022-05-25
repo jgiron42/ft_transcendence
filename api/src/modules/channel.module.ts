@@ -5,9 +5,10 @@ import { UserService } from "@services/user.service";
 import { User } from "@entities/user.entity";
 import { Channel } from "@entities/channel.entity";
 import { ChannelService } from "@services/channel.service";
+import { AuthModule } from "./auth.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Channel, User])],
+	imports: [TypeOrmModule.forFeature([Channel, User]), AuthModule],
 	providers: [ChannelService, UserService],
 	controllers: [AppController],
 	exports: [ChannelService, UserService],
