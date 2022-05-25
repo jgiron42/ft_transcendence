@@ -28,6 +28,7 @@ import { ChanInvitationModule } from "@modules/chan_invitation.module";
 			database: process.env.POSTGRES_DB,
 			entities: [User, Relation, Game, Channel, Message, ChanConnection, ChanInvitation],
 			synchronize: true,
+			dropSchema: true,
 		}),
 		UserModule,
 		RelationModule,

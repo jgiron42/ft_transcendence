@@ -23,10 +23,19 @@ export class AppController {
 
 	@Get("/newUserExample")
 	async testDB(): Promise<User[]> {
-		const newUser = new User();
-		newUser.pseudo = "John";
-		newUser.mail = "Doe";
-		newUser.OAuth = true;
+		const newUser = {
+			pseudo: "test",
+			path_avatar: "test",
+			mdp: "test",
+			mail: "test",
+			phone: "test",
+			nb_game: 0,
+			nb_win: 0,
+			OAuth: false,
+			status: 0,
+			totp_key: "test",
+			date_register: new Date(),
+		} as User;
 		await this.userService.create(newUser);
 		return this.userService.findAll();
 	}
