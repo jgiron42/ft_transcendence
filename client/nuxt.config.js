@@ -23,7 +23,7 @@ export default {
 			{
 				src: "https://cdn.socket.io/4.3.2/socket.io.min.js",
 				integrity: "sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs",
-				crossorigin: "anonymous"
+				crossorigin: "anonymous",
 			},
 		],
 	},
