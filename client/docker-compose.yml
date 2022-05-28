@@ -9,7 +9,7 @@ services:
         networks:
             - ft_transcendance
         ports:
-            - 127.0.0.1:4000:4000
+            - 4000:4000
         environment:
             TZ: Europe/Paris
         volumes:
