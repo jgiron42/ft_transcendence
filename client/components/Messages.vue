@@ -1,12 +1,12 @@
 <template>
 	<div id="messages">
-		<div class="message-content" v-for="message of this.$parent.messages" :key="message.id"> 
+		<div v-for="message of $parent.messages" :key="message.id" class="message-content">
 			<div class="message-header">
-				<span class="message-author" v-if="message.name.length > 0">{{ message.name }}:</span>
+				<span v-if="message.name.length > 0" class="message-author">{{ message.name }}:</span>
 			</div>
 			<div class="message-text break-all">
 				<div class="items-center w-95">
-				{{ message.text }}
+					{{ message.text }}
 				</div>
 			</div>
 		</div>
@@ -14,14 +14,14 @@
 </template>
 
 <style>
-#messages{
- height: fit-content;
- width: 97%;
+#messages {
+	height: fit-content;
+	width: 97%;
 }
 
 .message-text {
 	color: white;
-	font: 1em 'Open Sans', sans-serif;
+	font: 1em "Open Sans", sans-serif;
 	width: fit-content;
 	height: fit-content;
 	padding: 10px;

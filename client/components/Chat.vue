@@ -1,15 +1,18 @@
 <template>
 	<div id="chat-box" class="w-full h-full flex flex-col">
 		<h1 id="chat-title" class="text-center">Chat</h1>
-		<br>
-		<input type="text" v-model="name" id="username" class="form-control" placeholder="Enter name...">
+		<input id="username" v-model="name" class="form-control" type="text" placeholder="Enter name..." />
 		<div id="chat-content" class="flex flex-col-reverse items-center">
-			<br>
-				<Messages />
-			<br>
+			<Messages />
 		</div>
 		<div id="msgBar" class="flex justify-end">
-			<textarea id="textarea" class="resize-none min-w-0 flex-auto" v-model="text" @keydown.enter.prevent="sendMessage" placeholder="Enter message..."></textarea>
+			<textarea
+				id="textarea"
+				v-model="text"
+				class="resize-none min-w-0 flex-auto"
+				placeholder="Enter message..."
+				@keydown.enter.prevent="sendMessage"
+			/>
 			<button id="send" class="btn pb-1" @click.prevent="sendMessage">Send</button>
 		</div>
 	</div>
@@ -17,38 +20,38 @@
 
 <script>
 export default {
-	name: 'chat',
+	name: "Chat",
 	data() {
 		return {
-			title: 'Chat',
-			name: '',
-			text: '',
+			title: "Chat",
+			name: "",
+			text: "",
 			messages: [],
-			socket: null
-		}
+			socket: null,
+		};
+	},
+	mounted() {
+		this.socket = io(process.env.apiBaseUrl);
+		this.socket.on("msgToClient", (message) => {
+			this.receivedMessage(message);
+		});
+		this.messages = [];
 	},
 	methods: {
 		sendMessage() {
 			if (this.text.length > 0) {
-				this.socket.emit('msgToServer', {
+				this.socket.emit("msgToServer", {
 					name: this.name,
-					text: this.text
+					text: this.text,
 				});
-				this.text = '';
+				this.text = "";
 			}
 		},
 		receivedMessage(data) {
 			this.messages.push(data);
-		}
+		},
 	},
-	mounted() {
-		this.socket = io(process.env.apiBaseUrl);
-		this.socket.on('msgToClient', (message) => {
-			this.receivedMessage(message)
-		});
-		this.messages = [];
-	},
-}
+};
 </script>
 
 <style>
@@ -61,22 +64,3 @@ export default {
 	overflow-y: scroll;
 }
 </style>
-
-<!--style>
-
-#chat {
-	background-color: #f5f5f5;
-	width: 100%;
-}
-
-.chat-box
-{
-	width: 32vw;
-}
-
-.chatTitle {
-	font-size: 2rem;
-	font-weight: bold;
-	color: #f5f5f5;
-}
-</style-->
