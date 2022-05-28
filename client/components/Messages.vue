@@ -74,15 +74,5 @@ export default Vue.extend({
 	margin-left: auto;
 	margin-right: 0;
 	color: #032644;
-=======
-	background-color: #1b1b1b;
-}
-
-.mine {
-	background-color: #bac1cc;
-	margin-left: auto;
-	margin-right: 0;
-	color: #1b1b1b;
->>>>>>> refactor(client-chat): Adapt chatbox to fit the "Message" entity.
 }
 </style>
