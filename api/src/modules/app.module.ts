@@ -16,6 +16,7 @@ import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
+import { ChatModule } from "@modules/chat.module";
 
 @Module({
 	imports: [
@@ -38,6 +39,7 @@ import { ChanInvitationModule } from "@modules/chan_invitation.module";
 		ChanConnectionModule,
 		ChanInvitationModule,
 		AuthModule,
+		ChatModule,
 	],
 	controllers: [AppController],
 })
