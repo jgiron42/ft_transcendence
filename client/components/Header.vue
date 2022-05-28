@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="w-full">
 		<div class="bg-design_black text-design_white">
 			<Logo />
 		</div>
