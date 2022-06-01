@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { Channel } from "@entities/channel.entity";
-import { User } from "./user.entity";
 
 // this entity exist to stock all the message
 
@@ -14,8 +13,10 @@ export class Message {
 	content: string;
 
 	// user who send the message
-	@ManyToOne(() => User, (send_by) => send_by.id)
-	send_by: User;
+	// @ManyToOne(() => User, (send_by) => send_by.id)
+	// send_by: User;
+	@Column()
+	send_by: string;
 
 	// date of the message
 	@Column()
@@ -24,4 +25,6 @@ export class Message {
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
 	dest_channel: Channel;
+
+	mine: boolean;
 }
