@@ -1,9 +1,9 @@
 import { Logger } from "@nestjs/common";
-import { SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
+import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Message } from "@entities/message.entity";
 import { MessageService } from "@services/message.service";
 import { SocketService } from "@services/socket.service";
-import { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 
 @WebSocketGateway({
 	namespace: "appSocket",
@@ -12,11 +12,10 @@ import { Socket } from "socket.io";
 	},
 })
 export class ChatGateway {
-	constructor(private readonly messageService: MessageService, private readonly socketService: SocketService) {
-		void this.messageService;
-		void this.socketService;
-	}
+	constructor(private readonly messageService: MessageService, private readonly socketService: SocketService) {}
 
+	// Morbius
+	@WebSocketServer() server: Server;
 	private logger: Logger = new Logger("ChatGateway");
 
 	@SubscribeMessage("msgToServer")
@@ -28,18 +27,9 @@ export class ChatGateway {
 			message.content = payload.text;
 			message.date = new Date();
 			await this.messageService.create(message);
-			this.socketService.sendMessage(u, message);
+			this.socketService.sendMessage(message, "realm");
 		} else {
 			this.logger.error("User not found");
 		}
-	}
-
-	sendMessageToClient(client: Socket, data: Message): void {
-		const payload = {
-			name: data.send_by,
-			text: data.content,
-			mine: client.id === data.send_by,
-		};
-		client.emit("msgToClient", payload);
 	}
 }

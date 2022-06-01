@@ -34,6 +34,11 @@ export default {
 		return {
 			title: "Chat",
 			name: "",
+			me: {
+				id: 0,
+				pseudo: "",
+				avatar: "",
+			},
 			text: "",
 			messages: [],
 			socket: null,
@@ -41,6 +46,9 @@ export default {
 	},
 	mounted() {
 		this.socket = io(process.env.apiBaseUrl + "/appSocket");
+		this.socket.on("whoAmI", (message) => {
+			this.whoAmI(message);
+		});
 		this.socket.on("msgToClient", (message) => {
 			this.receivedMessage(message);
 		});
@@ -64,6 +72,12 @@ export default {
 		},
 		receivedMessage(data) {
 			this.messages.push(data);
+		},
+		whoAmI(data) {
+			this.me.id = data.id;
+			this.me.pseudo = data.pseudo;
+			this.me.avatar = data.avatar;
+			this.messages = [];
 		},
 	},
 };

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@entities/user.entity";
-import { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 import { Message } from "@entities/message.entity";
 import { MessageService } from "@services/message.service";
 
@@ -8,21 +8,10 @@ import { MessageService } from "@services/message.service";
 export class SocketService {
 	constructor(private readonly messageService: MessageService) {
 		this.clientMap = new Map<string, User>();
-		this.socketMap = new Map<string, Socket[]>();
-		void this.socketMap;
 	}
 
+	server: Server;
 	private clientMap: Map<string, User>;
-	private socketMap: Map<string, Socket[]>;
-
-	addClient(user: User, socket: Socket) {
-		this.clientMap.set(socket.id, user);
-		if (!this.socketMap.has(user.pseudo)) {
-			this.socketMap.set(user.pseudo, [socket]);
-		} else {
-			this.socketMap.get(user.pseudo).push(socket);
-		}
-	}
 
 	getClientSize(): number {
 		return this.clientMap.size;
@@ -32,44 +21,34 @@ export class SocketService {
 		return this.clientMap.get(socket.id);
 	}
 
-	sendMessageExceptSender(data: Message) {
-		data.mine = false;
-		for (const [key, value] of this.clientMap) {
-			if (value.pseudo !== data.send_by) {
-				const s = this.socketMap.get(value.pseudo);
-				for (const socket of s) {
-					if (socket.id === key) socket.emit("msgToClient", data);
-				}
-			}
-		}
+	getClientBySocketId(socketId: string): User {
+		return this.clientMap.get(socketId);
 	}
 
-	sendMessageToUser(user: User, data: Message) {
-		const s = this.socketMap.get(data.send_by);
-		data.mine = user.pseudo === data.send_by;
-		s.forEach((socket) => {
-			socket.emit("msgToClient", data);
-		});
+	whoAmI(socket: Socket): User {
+		const u = this.getClient(socket);
+		socket.emit("whoAmI", u);
+		return u;
 	}
 
-	sendMessage(user: User, data: Message) {
-		this.sendMessageToUser(user, data);
-		this.sendMessageExceptSender(data);
+	addClient(socket: Socket, user: User) {
+		this.clientMap.set(socket.id, user);
 	}
 
-	async initChat(client: Socket, user: User) {
+	removeClient(socket: Socket) {
+		this.clientMap.delete(socket.id);
+	}
+
+	async initChat(client: Socket) {
 		const messages = await this.messageService.findAll();
 		for (const message of messages) {
-			message.mine = user.pseudo === message.send_by;
 			client.emit("msgToClient", message);
 		}
 	}
 
-	getSocketsByUid(user: User): Socket[] {
-		return this.socketMap.get(user.pseudo);
-	}
-
-	getUserBySocketId(socketId: string): User {
-		return this.clientMap.get(socketId);
+	sendMessage(message: Message, room: string = undefined) {
+		if (room) {
+			this.server.to(room).emit("msgToClient", message);
+		}
 	}
 }
