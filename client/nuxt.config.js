@@ -47,7 +47,7 @@ export default {
 	css: ["~/layouts/global.css"],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
-	modules: [],
+	modules: ["cookie-universal-nuxt"],
 
 	io: {},
 
