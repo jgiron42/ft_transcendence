@@ -5,6 +5,7 @@ import { UserService } from "@src/services/user.service";
 import { User } from "@entities/user.entity";
 
 @Controller()
+@UseGuards(...SessionGuard)
 export class AppController {
 	constructor(private userService: UserService) {}
 
@@ -24,16 +25,14 @@ export class AppController {
 	@Get("/newUserExample")
 	async testDB(): Promise<User[]> {
 		const newUser = {
-			id: "foo",
-			username: "test",
 			pseudo: "test",
-			image_url: "test",
+			path_avatar: "test",
 			nb_game: 0,
 			nb_win: 0,
-			totp_enabled: false,
+			OAuth: false,
 			status: 0,
 			totp_key: "test",
-			created_at: new Date(),
+			date_register: new Date(),
 		} as User;
 		await this.userService.create(newUser);
 		return this.userService.findAll();

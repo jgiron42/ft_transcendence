@@ -1,36 +1,66 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import {
+	ClassSerializerInterceptor,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+	UseGuards,
+	UseInterceptors,
+	UsePipes,
+} from "@nestjs/common";
 import { ChannelOwnerGuard } from "@src/guards/channel-owner.guard";
 import { IsOnChannelGuard } from "@guards/is-on-channel.guard";
 import { ChannelExistGuard } from "@guards/channel-exist.guard";
 import { ChannelVisibleGuard } from "@src/guards/channel-visible.guard";
+// import { SessionGuard } from "@guards/session.guard";
+import { ChannelService } from "@services/channel.service";
+import { ChanConnectionService } from "@services/chan_connection.service";
+import { MessageService } from "@services/message.service";
+import { ChanInvitationService } from "@services/chan_invitation.service";
+import {Channel} from "@entities/channel.entity";
+import {RequestPipeDecorator} from "@utils/requestPipeDecorator";
+import {EditResourcePipe} from "@pipes/edit-resource-pipe.service";
+import {getValidationPipe} from "@utils/getValidationPipe";
+import {getPostPipe} from "@utils/getPostPipe";
 
 @Controller("channels")
+// @UseGuards(...SessionGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 export class ChannelsController {
+	constructor(
+		private channelService: ChannelService,
+		private chanConnectionService: ChanConnectionService,
+		private messageService: MessageService,
+		private chanInvitationService: ChanInvitationService,
+	) {}
 	/**
 	 * return all channels visible by the user
 	 */
 	@Get()
 	getAll(): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+		return this.channelService.findAll();
 	}
 
 	/**
 	 * return a channel if the user can see it
-	 * @param _id
+	 * @param id
 	 */
 	@Get(":id")
-	@UseGuards(ChannelExistGuard, ChannelVisibleGuard)
-	getOne(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	@UseGuards(ChannelVisibleGuard)
+	getOne(@Param("id") id: string): Promise<object> {
+		return this.channelService.findOne(id);
 	}
 
 	/**
 	 * create a channel
-	 * @param _channel
+	 * @param channel
 	 */
 	@Post()
-	create(@Body() _channel: any): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	@UsePipes(getValidationPipe(Channel))
+	create(@RequestPipeDecorator(...getPostPipe(Channel)) channel:Channel): Promise<object> {
+		return this.channelService.create(channel);
 	}
 
 	/**
@@ -40,38 +70,38 @@ export class ChannelsController {
 	 */
 	@UseGuards(ChannelExistGuard, ChannelOwnerGuard)
 	@Put(":id")
-	update(@Param("id") _id: string, @Body() _update: any): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	update(@RequestPipeDecorator(new EditResourcePipe(Channel, ChannelService)) channel: Channel): Promise<object> {
+		return this.channelService.create(channel);
 	}
 
 	/**
 	 * delete a channel if the user is the owner
-	 * @param _id
+	 * @param id
 	 */
 	@Delete(":id")
 	@UseGuards(ChannelExistGuard, ChannelOwnerGuard)
-	remove(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	remove(@Param("id") id: string): Promise<void> {
+		return this.channelService.remove(id);
 	}
 
 	/**
 	 * return all chan_connection from a channel if the user is on this channel
-	 * @param _id
+	 * @param id
 	 */
 	@Get(":id/chan_connections")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	getConnections(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	getConnections(@Param("id") id: number): Promise<object> {
+		return this.chanConnectionService.findByChannel(id);
 	}
 
 	/**
 	 * return all messages from a channel if the user is on this channel
-	 * @param _id
+	 * @param id
 	 */
 	@Get(":id/messages")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	getMessage(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	getMessage(@Param("id") id: number): Promise<object> {
+		return this.messageService.findByChannel(id);
 	}
 
 	/**
@@ -86,12 +116,12 @@ export class ChannelsController {
 
 	/**
 	 * return all invitations for a channel if the user is on this channel
-	 * @param _id
+	 * @param id
 	 */
 	@Get(":id/invitations")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	getInvitation(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	getInvitation(@Param("id") id: number): Promise<object> {
+		return this.chanInvitationService.findByChannel(id);
 	}
 
 	/**
