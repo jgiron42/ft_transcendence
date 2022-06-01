@@ -14,8 +14,8 @@ export class ChanInvitationService {
 		return this.ChanInvitationRepository.find();
 	}
 
-	findOne(id: string): Promise<ChanInvitation> {
-		return this.ChanInvitationRepository.findOne(id);
+	findOne(id: number): Promise<ChanInvitation> {
+		return this.ChanInvitationRepository.findOne({ where: { id } });
 	}
 
 	async remove(id: string): Promise<void> {

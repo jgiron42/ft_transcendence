@@ -14,8 +14,8 @@ export class GameService {
 		return this.GameRepository.find();
 	}
 
-	findOne(id: string): Promise<Game> {
-		return this.GameRepository.findOne(id);
+	findOne(id: number): Promise<Game> {
+		return this.GameRepository.findOne({ where: { id } });
 	}
 
 	async remove(id: string): Promise<void> {

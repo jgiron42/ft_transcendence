@@ -14,12 +14,12 @@ export class UserService {
 		return this.usersRepository.find();
 	}
 
-	findOne(id: string): Promise<User> {
-		return this.usersRepository.findOne(id);
+	findOne(id: number): Promise<User> {
+		return this.usersRepository.findOne({ where: { id } });
 	}
 
-	async findByUid(id: string): Promise<User> {
-		return (await this.usersRepository.find({ where: { pseudo: id } }))[0];
+	async findByUid(uid: string): Promise<User> {
+		return (await this.usersRepository.find({ where: { pseudo: uid } }))[0];
 	}
 
 	async remove(id: string): Promise<void> {
@@ -32,6 +32,6 @@ export class UserService {
 
 	async update(id: number, user: User): Promise<User> {
 		await this.usersRepository.update(id, user);
-		return this.usersRepository.findOne(id);
+		return this.usersRepository.findOne({ where: { id } });
 	}
 }

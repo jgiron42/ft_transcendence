@@ -14,8 +14,8 @@ export class RelationService {
 		return this.RelationRepository.find();
 	}
 
-	findOne(id: string): Promise<Relation> {
-		return this.RelationRepository.findOne(id);
+	findOne(id: number): Promise<Relation> {
+		return this.RelationRepository.findOne({ where: { id } });
 	}
 
 	async remove(id: string): Promise<void> {

@@ -14,8 +14,8 @@ export class ChanConnectionService {
 		return this.ChanConnectionRepository.find();
 	}
 
-	findOne(id: string): Promise<ChanConnection> {
-		return this.ChanConnectionRepository.findOne(id);
+	findOne(id: number): Promise<ChanConnection> {
+		return this.ChanConnectionRepository.findOne({ where: { id } });
 	}
 
 	async remove(id: string): Promise<void> {

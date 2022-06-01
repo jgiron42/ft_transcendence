@@ -14,8 +14,8 @@ export class ChannelService {
 		return this.ChannelRepository.find();
 	}
 
-	findOne(id: string): Promise<Channel> {
-		return this.ChannelRepository.findOne(id);
+	findOne(id: number): Promise<Channel> {
+		return this.ChannelRepository.findOne({ where: { id } });
 	}
 
 	async remove(id: string): Promise<void> {
