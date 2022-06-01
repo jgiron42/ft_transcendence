@@ -30,8 +30,8 @@ export class UserService implements resourceService<User> {
 		return this.getQuery().getOne(id);
 	}
 
-	async findByUid(id: string): Promise<User> {
-		return (await this.usersRepository.find({ where: { pseudo: id } }))[0];
+	async findByUid(uid: string): Promise<User> {
+		return (await this.usersRepository.find({ where: { pseudo: uid } }))[0];
 	}
 
 	async remove(id: string): Promise<void> {
@@ -54,6 +54,6 @@ export class UserService implements resourceService<User> {
 
 	async update(id: number, user: User): Promise<User> {
 		await this.usersRepository.update(id, user);
-		return this.usersRepository.findOne(id);
+		return this.usersRepository.findOne({ where: { id } });
 	}
 }
