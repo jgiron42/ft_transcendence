@@ -33,6 +33,7 @@ export default {
 	data() {
 		return {
 			title: "Chat",
+			name: "",
 			text: "",
 			messages: [],
 			socket: null,
