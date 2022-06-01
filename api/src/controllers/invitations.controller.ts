@@ -1,6 +1,8 @@
-import { Controller, Delete, Get, Param } from "@nestjs/common";
+import {Controller, Delete, Get, Param, UseGuards} from "@nestjs/common";
+import {SessionGuard} from "@guards/session.guard";
 
 @Controller("users")
+@UseGuards(...SessionGuard)
 export class InvitationsController {
 	@Get()
 	getAll(): Promise<object> {

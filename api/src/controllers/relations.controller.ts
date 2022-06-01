@@ -1,6 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, UseGuards} from "@nestjs/common";
+import {SessionGuard} from "@guards/session.guard";
 
 @Controller("relations")
+@UseGuards(...SessionGuard)
 export class RelationsController {
 	@Get()
 	getAll(): Promise<object> {

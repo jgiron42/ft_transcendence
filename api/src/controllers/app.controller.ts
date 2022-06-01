@@ -5,6 +5,7 @@ import { UserService } from "@src/services/user.service";
 import { User } from "@entities/user.entity";
 
 @Controller()
+@UseGuards(...SessionGuard)
 export class AppController {
 	constructor(private userService: UserService) {}
 
@@ -26,9 +27,6 @@ export class AppController {
 		const newUser = {
 			pseudo: "test",
 			path_avatar: "test",
-			mdp: "test",
-			mail: "test",
-			phone: "test",
 			nb_game: 0,
 			nb_win: 0,
 			OAuth: false,

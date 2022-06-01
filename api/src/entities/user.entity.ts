@@ -1,53 +1,52 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Exclude, Expose } from "class-transformer";
 
 // this entity is use to describe the users
 
 @Entity()
+@Exclude()
 export class User {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryColumn()
+	@Expose({ toPlainOnly: true })
+	id: string;
 
 	// pseudo of the user
-	@Column()
+	@Column({ unique: true })
+	@Expose() // class-transformer
 	pseudo: string;
 
 	// path to the avatar of the user
 	@Column()
+	@Expose() // class-transformer
 	path_avatar: string;
-
-	// password of the user
-	@Column()
-	mdp: string;
-
-	// mail of the user
-	@Column()
-	mail: string;
-
-	// phone of the user
-	@Column()
-	phone: string;
 
 	// number of game played by the user
 	@Column()
+	@Expose({ toPlainOnly: true }) // class-transformer
 	nb_game: number;
 
 	//  number of game played by the user
 	@Column()
+	@Expose({ toPlainOnly: true }) // class-transformer
 	nb_win: number;
 
 	// say if the user use OAuth or not
 	@Column()
+	@Expose({groups:['private']}) // class-transformer
 	OAuth: boolean;
 
 	// status of the user
 	@Column()
+	@Expose() // class-transformer
 	status: number;
 
 	// totp key of the user
 	@Column({ length: 20 })
+	@Expose({ toClassOnly: true }) // class-transformer
 	totp_key: string;
 
 	// date of registration of the user
 	@Column()
+	@Expose({ toPlainOnly: true }) // class-transformer
 	date_register: Date;
 }

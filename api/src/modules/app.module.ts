@@ -1,9 +1,5 @@
 import { AppController } from "@controllers/app.controller";
 import { Module } from "@nestjs/common";
-import { UsersController } from "@controllers/users.controller";
-import { RelationsController } from "@controllers/relations.controller";
-import { MessagesController } from "@controllers/messages.controller";
-import { ChannelsController } from "@controllers/channels.controller";
 import { AuthModule } from "@modules/auth.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "@entities/user.entity";
@@ -20,10 +16,10 @@ import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
-import { UsersController } from "@controllers/users.controller";
 import { RelationsController } from "@controllers/relations.controller";
 import { MessagesController } from "@controllers/messages.controller";
 import { ChannelsController } from "@controllers/channels.controller";
+import { GamesController } from "@controllers/games.controller";
 
 @Module({
 	imports: [
@@ -47,6 +43,12 @@ import { ChannelsController } from "@controllers/channels.controller";
 		ChanInvitationModule,
 		AuthModule,
 	],
-	controllers: [AppController, UsersController, RelationsController, MessagesController, ChannelsController],
+	controllers: [
+		AppController,
+		RelationsController,
+		MessagesController,
+		ChannelsController,
+		GamesController,
+	],
 })
 export class AppModule {}
