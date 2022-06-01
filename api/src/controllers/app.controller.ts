@@ -48,4 +48,23 @@ export class AppController {
 		ses.user = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
 		return this.userService.findAll();
 	}
+
+	@Post("/newUserExample")
+	async testDBPost(@Query() data: { pseudo: string }): Promise<User[]> {
+		const usr = {
+			pseudo: data.pseudo,
+			path_avatar: "test",
+			mdp: "test",
+			mail: "test",
+			phone: "test",
+			nb_game: 0,
+			nb_win: 0,
+			OAuth: false,
+			status: 0,
+			totp_key: "test",
+			date_register: new Date(),
+		} as User;
+		await this.userService.create(usr);
+		return this.userService.findAll();
+	}
 }
