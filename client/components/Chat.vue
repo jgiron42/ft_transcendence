@@ -47,7 +47,7 @@ export default {
 		};
 	},
 	mounted() {
-		this.socket = io(process.env.apiBaseUrl + "/appSocket");
+		this.socket = this.$nuxtSocket({ name: "app", channel: "/appSocket" });
 		this.socket.on("whoAmI", (message) => {
 			this.whoAmI(message);
 		});
