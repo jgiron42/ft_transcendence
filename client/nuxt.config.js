@@ -19,13 +19,6 @@ export default {
 			{ name: "format-detection", content: "telephone=no" },
 		],
 		link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
-		script: [
-			{
-				src: "https://cdn.socket.io/4.3.2/socket.io.min.js",
-				integrity: "sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs",
-				crossorigin: "anonymous",
-			},
-		],
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
