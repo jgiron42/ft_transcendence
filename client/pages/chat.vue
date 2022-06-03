@@ -15,13 +15,6 @@ body {
 	@apply bg-design_dgray;
 }
 
-.test {
-	width: 20%;
-	height: 100%;
-	min-width: 20%;
-	background-color: white;
-}
-
 #container-test {
 	width: 100%;
 	height: 100%;

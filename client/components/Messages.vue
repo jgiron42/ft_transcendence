@@ -30,7 +30,7 @@
 }
 
 .message-text {
-	color: white;
+	color: #95b5df;
 	font: 1em "Open Sans", sans-serif;
 	width: fit-content;
 	max-width: 85%;
@@ -38,13 +38,13 @@
 	padding: 10px;
 	border-radius: 15px;
 	margin-bottom: 10px;
-	background-color: #1b1b1b;
+	background-color: #364157;
 }
 
 .mine {
-	background-color: #bac1cc;
+	background-color: #97a6bd;
 	margin-left: auto;
 	margin-right: 0;
-	color: #1b1b1b;
+	color: #032644;
 }
 </style>
