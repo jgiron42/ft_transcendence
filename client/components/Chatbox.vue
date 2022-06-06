@@ -1,7 +1,6 @@
 <template>
 	<div id="chat-box" class="w-full h-full flex flex-col">
-		<!--h1 id="chat-title" class="text-center">Chat</h1-->
-		<button id="chat-title" class="btn pr-3 pl-3" @click.prevent="joinRealm">Chat</button>
+		<h1 id="chat-title" class="text-center">Chat</h1>
 		<div id="chat-content" class="flex flex-col-reverse items-center">
 			<Messages :messages="messages" :user="me" />
 		</div>
@@ -57,6 +56,11 @@ export default {
 			if (!this.name) this.name = "riblanc";
 			this.joinRealm();
 		}
+		this.socket.on("connect", () => {
+			this.name = this.$cookies.get("name");
+			if (!this.name) this.name = "riblanc";
+			this.joinRealm();
+		});
 		this.socket.on("whoAmI", (message) => {
 			this.onWhoAmI(message);
 		});
