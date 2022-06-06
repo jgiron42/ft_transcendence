@@ -27,12 +27,14 @@ export class SocketService {
 
 	whoAmI(socket: Socket): User {
 		const u = this.getClient(socket);
-		socket.emit("whoAmI", u);
+		if (u) socket.emit("whoAmI", u);
 		return u;
 	}
 
 	addClient(socket: Socket, user: User) {
-		this.clientMap.set(socket.id, user);
+		if (!this.clientMap.has(socket.id)) {
+			this.clientMap.set(socket.id, user);
+		}
 	}
 
 	removeClient(socket: Socket) {
@@ -41,14 +43,12 @@ export class SocketService {
 
 	async initChat(client: Socket) {
 		const messages = await this.messageService.findAll();
-		for (const message of messages) {
-			client.emit("msgToClient", message);
-		}
+		client.emit("msgToClient", messages);
 	}
 
 	sendMessage(message: Message, room: string = undefined) {
 		if (room) {
-			this.server.to(room).emit("msgToClient", message);
+			this.server.to(room).emit("msgToClient", [message]);
 		}
 	}
 }
