@@ -79,6 +79,7 @@ dist
 
 # IDE / Editor
 .idea
+Session.vim
 
 # Service worker
 sw.*

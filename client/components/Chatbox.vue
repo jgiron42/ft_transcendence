@@ -30,14 +30,17 @@
 </template>
 
 <script>
-import Messages from "@/components/Messages.vue";
-
 export default {
-	name: "Chat",
-	components: { Messages },
+	name: "Chatbox",
+	props: {
+		socket: {
+			type: Object,
+			default: () => {},
+		},
+	},
 	data() {
 		return {
-			title: "Chat",
+			title: "ChatBox",
 			name: "",
 			me: {
 				id: 0,
@@ -46,23 +49,26 @@ export default {
 			},
 			text: "",
 			messages: [],
-			socket: null,
 		};
 	},
 	mounted() {
-		this.socket = this.$nuxtSocket({ name: "app", channel: "/appSocket" });
+		if (this.socket.connected) {
+			this.name = this.$cookies.get("name");
+			if (!this.name) this.name = "riblanc";
+			this.joinRealm();
+		}
 		this.socket.on("whoAmI", (message) => {
-			this.whoAmI(message);
+			this.onWhoAmI(message);
 		});
 		this.socket.on("msgToClient", (message) => {
 			this.receivedMessage(message);
 		});
-		this.messages = [];
 		this.name = this.$cookies.get("name");
 		if (!this.name) this.name = "riblanc";
 	},
 	methods: {
 		joinRealm() {
+			this.clearMessages();
 			this.socket.emit("joinRealm", {
 				uid: this.name,
 			});
@@ -70,20 +76,27 @@ export default {
 		sendMessage() {
 			if (this.text.length > 0) {
 				this.socket.emit("msgToServer", {
-					name: this.name,
+					name: this.me.pseudo,
 					text: this.text,
 				});
 				this.text = "";
 			}
 		},
 		receivedMessage(data) {
-			this.messages.push(data);
+			for (const d of data) {
+				this.messages.push(d);
+			}
 		},
-		whoAmI(data) {
+		clearMessages() {
+			this.messages = [];
+		},
+		whoAmI() {
+			this.socket.emit("whoAmI");
+		},
+		onWhoAmI(data) {
 			this.me.id = data.id;
 			this.me.pseudo = data.pseudo;
 			this.me.avatar = data.avatar;
-			this.messages = [];
 		},
 	},
 };

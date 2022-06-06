@@ -1,8 +1,19 @@
 <template>
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-		<Chat />
+		<Chatbox :socket="socket" />
 	</div>
 </template>
+
+<script>
+export default {
+	name: "Chat",
+	data() {
+		return {
+			socket: io.connect(process.env.apiBaseUrl + "/chat", { reconnection: true }),
+		};
+	},
+};
+</script>
 
 <style>
 body {
