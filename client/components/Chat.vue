@@ -3,7 +3,7 @@
 		<!--h1 id="chat-title" class="text-center">Chat</h1-->
 		<button id="chat-title" class="btn pr-3 pl-3" @click.prevent="joinRealm">Chat</button>
 		<div id="chat-content" class="flex flex-col-reverse items-center">
-			<Messages />
+			<Messages :messages="messages" :user="me" />
 		</div>
 		<div id="msgBar" class="flex p-2">
 			<div class="txt-msg-bg w-full h-full min-w-0 p-2">
@@ -30,8 +30,11 @@
 </template>
 
 <script>
+import Messages from "@/components/Messages.vue";
+
 export default {
 	name: "Chat",
+	components: { Messages },
 	data() {
 		return {
 			title: "Chat",
