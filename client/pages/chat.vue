@@ -43,6 +43,7 @@ import { Message } from "@/models/Message";
 
 export default Vue.extend({
 	name: "Chat",
+	components: { ChatSelection },
 	data() {
 		return {
 			socket: this.$nuxtSocket({
