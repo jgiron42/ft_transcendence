@@ -18,13 +18,13 @@ import { ChannelService } from "@services/channel.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { MessageService } from "@services/message.service";
 import { ChanInvitationService } from "@services/chan_invitation.service";
-import {Channel} from "@entities/channel.entity";
-import {RequestPipeDecorator} from "@utils/requestPipeDecorator";
-import {EditResourcePipe} from "@pipes/edit-resource-pipe.service";
-import {getValidationPipe} from "@utils/getValidationPipe";
-import {getPostPipe} from "@utils/getPostPipe";
+import { Channel } from "@entities/channel.entity";
+import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
+import { EditResourcePipe } from "@pipes/edit-resource-pipe.service";
+import { getValidationPipe } from "@utils/getValidationPipe";
+import { getPostPipe } from "@utils/getPostPipe";
 import { Message } from "@src/entities/message.entity";
-import {ChanInvitation} from "@entities/chan_invitation.entity";
+import { ChanInvitation } from "@entities/chan_invitation.entity";
 // import { SessionGuard } from "@guards/session.guard";
 
 @Controller("channels")
@@ -61,7 +61,7 @@ export class ChannelsController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
-	create(@RequestPipeDecorator(...getPostPipe(Channel)) channel:Channel): Promise<object> {
+	create(@RequestPipeDecorator(...getPostPipe(Channel)) channel: Channel): Promise<object> {
 		return this.channelService.create(channel);
 	}
 
@@ -113,7 +113,10 @@ export class ChannelsController {
 	@Post(":id/messages")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
 	@UsePipes(getValidationPipe(Message))
-	async sendMessage(@RequestPipeDecorator(...getPostPipe(Message)) message : Message, @Param("id") id: string): Promise<object> {
+	async sendMessage(
+		@RequestPipeDecorator(...getPostPipe(Message)) message: Message,
+		@Param("id") id: string,
+	): Promise<object> {
 		message.dest_channel = await this.channelService.findOne(id);
 		return this.messageService.create(message);
 	}
@@ -136,7 +139,10 @@ export class ChannelsController {
 	@Post(":id/invitations")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
 	@UsePipes(getValidationPipe(ChanInvitation))
-	async sendInvitations(@RequestPipeDecorator(...getPostPipe(ChanInvitation)) chanInvitation : ChanInvitation, @Param("id") id: string): Promise<object> {
+	async sendInvitations(
+		@RequestPipeDecorator(...getPostPipe(ChanInvitation)) chanInvitation: ChanInvitation,
+		@Param("id") id: string,
+	): Promise<object> {
 		chanInvitation.invite_where = await this.channelService.findOne(id);
 		return this.chanInvitationService.create(chanInvitation);
 	}

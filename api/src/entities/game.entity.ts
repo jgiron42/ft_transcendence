@@ -1,10 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
-import {Allow, Validate} from "class-validator";
-import {UserExistsRule} from "@src/validators/userExist.validator";
-import {setService} from "@utils/setFinalType.decorator";
-import {UserService} from "@services/user.service";
-import {SetMode} from "@utils/set-mode";
+import { Allow, Validate } from "class-validator";
+import { UserExistsRule } from "@src/validators/userExist.validator";
+import { setService } from "@utils/setFinalType.decorator";
+import { UserService } from "@services/user.service";
+import { SetMode } from "@utils/set-mode";
 
 // this entity is use to stock all the game
 

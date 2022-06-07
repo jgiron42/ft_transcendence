@@ -1,8 +1,8 @@
-import {ArgumentMetadata, BadRequestException,  Injectable, PipeTransform} from "@nestjs/common";
+import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
 import { Request } from "@src/types/request";
-import {ClassConstructor, plainToInstance} from "class-transformer";
+import { ClassConstructor, plainToInstance } from "class-transformer";
 import { InvalidField } from "@src/exceptions/InvalidField";
-import {Container} from "typedi";
+import { Container } from "typedi";
 
 /**
  * edit a resource by finding the previous version id in serviceClass and update it with the body of the request using
@@ -10,12 +10,14 @@ import {Container} from "typedi";
  */
 @Injectable()
 export class EditResourcePipe<T, TService> implements PipeTransform {
-	constructor(private ressourceClass: ClassConstructor<T>, private serviceClass: ClassConstructor<TService> ) {}
+	constructor(private ressourceClass: ClassConstructor<T>, private serviceClass: ClassConstructor<TService>) {}
 	async transform(req: Request, _metadata: ArgumentMetadata): Promise<T> {
-		let service = Container.get(this.serviceClass)
+		const service = Container.get(this.serviceClass);
 		const id: string = req.params.id;
 		if (!id) throw new InvalidField("id", id);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 		const ressource: T = await service.findOne(id);
 		if (!ressource) throw new BadRequestException(`user ${id} does not exist`);
 		const ressourceCreation = plainToInstance(this.ressourceClass, req.body, {
@@ -23,6 +25,7 @@ export class EditResourcePipe<T, TService> implements PipeTransform {
 			exposeUnsetFields: false,
 		});
 		Object.keys(ressourceCreation).forEach((key) => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
 			(ressource as any)[key] = (ressourceCreation as any)[key];
 		});
 		return ressource;

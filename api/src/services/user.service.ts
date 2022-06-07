@@ -3,15 +3,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "@entities/user.entity";
 import { UserCreation } from "@dtos/userCreation.dto";
-import {Container} from "typedi";
-import {TransformFnParams} from "class-transformer";
+import { Container } from "typedi";
+import { TransformFnParams } from "class-transformer";
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-	) {Container.set(this.constructor, this)}
+	) {
+		Container.set(this.constructor, this);
+	}
 
 	findAll(): Promise<User[]> {
 		return this.usersRepository.find();
@@ -21,10 +23,9 @@ export class UserService {
 		return this.usersRepository.findOne(id);
 	}
 
-	static findOne({value}: TransformFnParams): Promise<User>
-	{
-		if (!value)
-			return undefined;
+	static findOne({ value }: TransformFnParams): Promise<User> {
+		if (!value) return undefined;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		return Container.get(UserService).findOne(value);
 	}
 

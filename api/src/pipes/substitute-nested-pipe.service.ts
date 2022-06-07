@@ -1,7 +1,7 @@
-import {Injectable, PipeTransform} from "@nestjs/common";
-import {ClassConstructor, plainToInstance} from "class-transformer";
-import {Container} from "typedi";
-import {InexistantRessourceException} from "@src/exceptions/inexistantRessourceException";
+import { Injectable, PipeTransform } from "@nestjs/common";
+import { ClassConstructor, plainToInstance } from "class-transformer";
+import { Container } from "typedi";
+import { InexistantRessourceException } from "@src/exceptions/inexistantRessourceException";
 import { Request } from "@src/types/request";
 
 /**
@@ -16,17 +16,25 @@ export class SubstituteNestedPipe<T> implements PipeTransform {
 			excludeExtraneousValues: true,
 			exposeUnsetFields: false,
 		});
-		let ressource = new this.ressourceClass;
-		for (let key of Object.keys(ressourceCreation)) {
-			if (Reflect.getMetadata("ftTypeService", ressource, key))
-			{
+		const ressource = new this.ressourceClass();
+		for (const key of Object.keys(ressourceCreation)) {
+			if (Reflect.getMetadata("ftTypeService", ressource, key)) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				(ressource as any)[key] = await Container.get(Reflect.getMetadata("ftTypeService", ressource, key)).findOne(<string>(ressourceCreation as any)[key]);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/ban-ts-comment
+				(ressource as any)[key] = await Container.get(
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+					Reflect.getMetadata("ftTypeService", ressource, key),
+					// eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/consistent-type-assertions
+				).findOne(<string>(ressourceCreation as any)[key]);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				if (!(ressource as any)[key])
-					throw new InexistantRessourceException(key, <string>(ressourceCreation as any)[key])
-			}
-			else
-				(ressource as any)[key] = (ressourceCreation as any)[key];
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/consistent-type-assertions
+					throw new InexistantRessourceException(key, <string>(ressourceCreation as any)[key]);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+			} else (ressource as any)[key] = (ressourceCreation as any)[key];
 		}
 		return ressource;
 	}
