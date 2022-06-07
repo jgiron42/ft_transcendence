@@ -2,14 +2,16 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
-import {Container} from "typedi";
+import { Container } from "typedi";
 
 @Injectable()
 export class ChanInvitationService {
 	constructor(
 		@InjectRepository(ChanInvitation)
 		private ChanInvitationRepository: Repository<ChanInvitation>,
-	) {Container.set(this.constructor, this)}
+	) {
+		Container.set(this.constructor, this);
+	}
 
 	findAll(): Promise<ChanInvitation[]> {
 		return this.ChanInvitationRepository.find();

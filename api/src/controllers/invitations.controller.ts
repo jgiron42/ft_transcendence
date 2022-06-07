@@ -1,12 +1,13 @@
-import {Controller, Delete, Get, Param, UseGuards} from "@nestjs/common";
-import {SessionGuard} from "@guards/session.guard";
+import { Controller, Delete, Get, Param, UseGuards } from "@nestjs/common";
+import { SessionGuard } from "@guards/session.guard";
+import { ChanConnectionService } from "@services/chan_connection.service";
 
 @Controller("users")
 @UseGuards(...SessionGuard)
 export class InvitationsController {
 	@Get()
 	getAll(): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+		return this.chanConnectionService.findAll();
 	}
 
 	@Get(":id")

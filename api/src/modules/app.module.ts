@@ -43,12 +43,6 @@ import { GamesController } from "@controllers/games.controller";
 		ChanInvitationModule,
 		AuthModule,
 	],
-	controllers: [
-		AppController,
-		RelationsController,
-		MessagesController,
-		ChannelsController,
-		GamesController,
-	],
+	controllers: [AppController, RelationsController, MessagesController, ChannelsController, GamesController],
 })
 export class AppModule {}

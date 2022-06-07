@@ -3,7 +3,8 @@ import {
 	Controller,
 	Get,
 	Param,
-	Post, SerializeOptions,
+	Post,
+	SerializeOptions,
 	UseGuards,
 	UseInterceptors,
 	UsePipes,
@@ -19,8 +20,7 @@ import { getPostPipe } from "@utils/getPostPipe";
 @Controller("games")
 // @UseGuards(...SessionGuard)
 @UseInterceptors(ClassSerializerInterceptor)
-@SerializeOptions({
-})
+@SerializeOptions({})
 export class GamesController {
 	constructor(private gameService: GameService) {}
 	@Get()

@@ -1,5 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
+import { setService } from "@utils/setFinalType.decorator";
+import { UserService } from "@services/user.service";
+import { SetMode } from "@utils/set-mode";
 
 // this entity is use to know the relation between the user
 
