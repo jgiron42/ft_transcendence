@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
-import { Exclude, Expose } from "class-transformer";
+import { Exclude } from "class-transformer";
+import {SetMode} from "@utils/set-mode";
 
 // this entity is use to describe the users
 
@@ -7,46 +8,46 @@ import { Exclude, Expose } from "class-transformer";
 @Exclude()
 export class User {
 	@PrimaryColumn()
-	@Expose({ toPlainOnly: true })
+	@SetMode("r")
 	id: string;
 
 	// pseudo of the user
 	@Column({ unique: true })
-	@Expose() // class-transformer
+	@SetMode("rw")
 	pseudo: string;
 
 	// path to the avatar of the user
 	@Column()
-	@Expose() // class-transformer
+	@SetMode("rw")
 	path_avatar: string;
 
 	// number of game played by the user
 	@Column()
-	@Expose({ toPlainOnly: true }) // class-transformer
+	@SetMode("r")
 	nb_game: number;
 
 	//  number of game played by the user
 	@Column()
-	@Expose({ toPlainOnly: true }) // class-transformer
+	@SetMode("r")
 	nb_win: number;
 
 	// say if the user use OAuth or not
 	@Column()
-	@Expose({groups:['private']}) // class-transformer
+	@SetMode("rw", {groups:['private']}) // class-transformer
 	OAuth: boolean;
 
 	// status of the user
 	@Column()
-	@Expose() // class-transformer
+	@SetMode("rw")
 	status: number;
 
 	// totp key of the user
 	@Column({ length: 20 })
-	@Expose({ toClassOnly: true }) // class-transformer
+	@SetMode("w")
 	totp_key: string;
 
 	// date of registration of the user
 	@Column()
-	@Expose({ toPlainOnly: true }) // class-transformer
+	@SetMode("r")
 	date_register: Date;
 }

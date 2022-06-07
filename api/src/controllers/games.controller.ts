@@ -1,5 +1,4 @@
 import {
-	Body,
 	ClassSerializerInterceptor,
 	Controller,
 	Get,
@@ -8,14 +7,14 @@ import {
 	UseGuards,
 	UseInterceptors,
 	UsePipes,
-	ValidationPipe,
 } from "@nestjs/common";
 import { GameExistGuard } from "@src/guards/game-exist.guard";
 import { GameService } from "@services/game.service";
 // import { SessionGuard } from "@guards/session.guard";
-import { CreateGamePipe } from "@pipes/create-game.pipe";
 import { Game } from "@entities/game.entity";
-import {DefaultPipe} from "@pipes/default.pipe";
+import { getValidationPipe } from "@utils/getValidationPipe";
+import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
+import { getPostPipe } from "@utils/getPostPipe";
 
 @Controller("games")
 // @UseGuards(...SessionGuard)
@@ -36,8 +35,8 @@ export class GamesController {
 	}
 
 	@Post()
-	@UsePipes(new ValidationPipe({ whitelist: true , transform: true, expectedType: Game, transformOptions: {	excludeExtraneousValues: true, exposeUnsetFields: false}}), new DefaultPipe(new Game), CreateGamePipe)
-	async create(@Body() game: Game): Promise<object> {
+	@UsePipes(getValidationPipe(Game))
+	async create(@RequestPipeDecorator(...getPostPipe(Game)) game: Game): Promise<object> {
 		return this.gameService.create(game);
 	}
 }

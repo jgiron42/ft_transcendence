@@ -6,6 +6,7 @@ import { User } from "@entities/user.entity";
 @Entity()
 export class Relation {
 	@PrimaryGeneratedColumn()
+	@SetMode("r")
 	id: number;
 
 	// user one is the user who owned the relation
@@ -18,5 +19,6 @@ export class Relation {
 
 	// type of relation
 	@Column()
+	@SetMode("rw")
 	relation_type: number;
 }

@@ -14,7 +14,6 @@ import { ChannelOwnerGuard } from "@src/guards/channel-owner.guard";
 import { IsOnChannelGuard } from "@guards/is-on-channel.guard";
 import { ChannelExistGuard } from "@guards/channel-exist.guard";
 import { ChannelVisibleGuard } from "@src/guards/channel-visible.guard";
-// import { SessionGuard } from "@guards/session.guard";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { MessageService } from "@services/message.service";
@@ -24,6 +23,9 @@ import {RequestPipeDecorator} from "@utils/requestPipeDecorator";
 import {EditResourcePipe} from "@pipes/edit-resource-pipe.service";
 import {getValidationPipe} from "@utils/getValidationPipe";
 import {getPostPipe} from "@utils/getPostPipe";
+import { Message } from "@src/entities/message.entity";
+import {ChanInvitation} from "@entities/chan_invitation.entity";
+// import { SessionGuard } from "@guards/session.guard";
 
 @Controller("channels")
 // @UseGuards(...SessionGuard)
@@ -65,8 +67,7 @@ export class ChannelsController {
 
 	/**
 	 * update a channel if the user is the owner
-	 * @param _id
-	 * @param _update
+	 * @param channel
 	 */
 	@UseGuards(ChannelExistGuard, ChannelOwnerGuard)
 	@Put(":id")
@@ -106,12 +107,15 @@ export class ChannelsController {
 
 	/**
 	 * resend a message to a channel if the user is on this channel
-	 * @param _id
+	 * @param id
+	 * @param message
 	 */
 	@Post(":id/messages")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	sendMessage(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	@UsePipes(getValidationPipe(Message))
+	async sendMessage(@RequestPipeDecorator(...getPostPipe(Message)) message : Message, @Param("id") id: string): Promise<object> {
+		message.dest_channel = await this.channelService.findOne(id);
+		return this.messageService.create(message);
 	}
 
 	/**
@@ -126,11 +130,14 @@ export class ChannelsController {
 
 	/**
 	 * create an invitation for a channel if the user is on this channel
-	 * @param _id
+	 * @param id
+	 * @param chanInvitation
 	 */
 	@Post(":id/invitations")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	sendInvitations(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	@UsePipes(getValidationPipe(ChanInvitation))
+	async sendInvitations(@RequestPipeDecorator(...getPostPipe(ChanInvitation)) chanInvitation : ChanInvitation, @Param("id") id: string): Promise<object> {
+		chanInvitation.invite_where = await this.channelService.findOne(id);
+		return this.chanInvitationService.create(chanInvitation);
 	}
 }

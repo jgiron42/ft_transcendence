@@ -5,12 +5,15 @@ import { User } from "./user.entity";
 // entity use to manage the channel invitation
 
 @Entity()
+@Exclude()
 export class ChanInvitation {
 	@PrimaryGeneratedColumn()
+	@SetMode("r")
 	id: number;
 
 	// date of invitation
 	@Column()
+	@SetMode("r")
 	date: Date;
 
 	// who invite a user to join a channel
