@@ -11,6 +11,7 @@ import { UserService } from "@services/user.service";
 import { MessageService } from "@services/message.service";
 import { SocketService } from "@services/socket.service";
 import { Socket, Server } from "socket.io";
+import { Channel } from "@entities/channel.entity";
 
 @WebSocketGateway({
 	namespace: "chat",
@@ -64,6 +65,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 			await this.socketService.initChat(client);
 			this.logger.log(`sockets[] size: ${this.socketService.getClientSize()}`);
 		}
+	}
+
+	@SubscribeMessage("getChannels")
+	getChannels(client: Socket) {
+		const usr = this.socketService.getClient(client);
+		const chan = new Channel();
+		const ch = new Array<Channel>();
+		chan.name = "test";
+		for (let i = 0; i < 10; i++) {
+			ch.push(chan);
+		}
+		if (usr) client.emit("getChannels", ch);
+		// if (usr) {
+		// 	await client.emit("getChannels", await this.channelService.findAll());
+		// }
 	}
 
 	handleDisconnect(client: Socket) {

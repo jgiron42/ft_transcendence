@@ -1,12 +1,15 @@
 <template>
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
 		<Chatbox :socket="socket" />
+		<chat-selection :socket="socket" />
 	</div>
 </template>
 
 <script>
+import ChatSelection from "~/components/Chat_selection";
 export default {
 	name: "Chat",
+	components: { ChatSelection },
 	data() {
 		return {
 			socket: io.connect(process.env.apiBaseUrl + "/chat", { reconnection: true }),

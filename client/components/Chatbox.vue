@@ -87,9 +87,7 @@ export default {
 			}
 		},
 		receivedMessage(data) {
-			for (const d of data) {
-				this.messages.push(d);
-			}
+			this.messages = data;
 		},
 		clearMessages() {
 			this.messages = [];
