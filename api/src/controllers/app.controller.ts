@@ -5,7 +5,6 @@ import { UserService } from "@src/services/user.service";
 import { User } from "@entities/user.entity";
 
 @Controller()
-@UseGuards(...SessionGuard)
 export class AppController {
 	constructor(private userService: UserService) {}
 
