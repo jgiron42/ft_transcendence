@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
 import { Exclude } from "class-transformer";
-import {SetMode} from "@utils/set-mode";
+import { SetMode } from "@utils/set-mode";
 
 // this entity is use to describe the users
 
@@ -33,7 +33,7 @@ export class User {
 
 	// say if the user use OAuth or not
 	@Column()
-	@SetMode("rw", {groups:['private']}) // class-transformer
+	@SetMode("rw", { groups: ["private"] }) // class-transformer
 	OAuth: boolean;
 
 	// status of the user

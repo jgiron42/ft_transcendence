@@ -2,14 +2,16 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Relation } from "@src/entities/relation.entity";
-import {Container} from "typedi";
+import { Container } from "typedi";
 
 @Injectable()
 export class RelationService {
 	constructor(
 		@InjectRepository(Relation)
 		private RelationRepository: Repository<Relation>,
-	) {Container.set(this.constructor, this)}
+	) {
+		Container.set(this.constructor, this);
+	}
 
 	findAll(): Promise<Relation[]> {
 		return this.RelationRepository.find();

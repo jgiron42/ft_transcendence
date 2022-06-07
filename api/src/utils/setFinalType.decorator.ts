@@ -1,11 +1,7 @@
-import {ClassConstructor} from "class-transformer";
+import { ClassConstructor } from "class-transformer";
 
-export function setFinalType<T>(classType: ClassConstructor<T>)
-{
-    return Reflect.metadata("ftFinalType", classType);
-}
-
-export function setService<T>(classType: ClassConstructor<T>)
-{
-    return Reflect.metadata("ftTypeService", classType);
-}
+/**
+ * set the service metadata for later substitution by SubstituteNestedPipe
+ * @param service the service class used to retrieve the entity
+ */
+export const setService = <T>(service: ClassConstructor<T>) => Reflect.metadata("ftTypeService", service);

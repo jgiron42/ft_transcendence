@@ -3,7 +3,8 @@ import {
 	Controller,
 	Get,
 	Param,
-	Post, SerializeOptions,
+	Post,
+	SerializeOptions,
 	UseGuards,
 	UseInterceptors,
 	UsePipes,
@@ -19,21 +20,32 @@ import { getPostPipe } from "@utils/getPostPipe";
 @Controller("games")
 // @UseGuards(...SessionGuard)
 @UseInterceptors(ClassSerializerInterceptor)
-@SerializeOptions({
-})
+@SerializeOptions({})
 export class GamesController {
 	constructor(private gameService: GameService) {}
+
+	/**
+	 * get all games
+	 */
 	@Get()
 	getAll(): Promise<object> {
 		return this.gameService.findAll();
 	}
 
+	/**
+	 * get the game designated by id
+	 * @param id the game id
+	 */
 	@Get(":id")
 	@UseGuards(GameExistGuard)
 	getOne(@Param("id") id: string): Promise<object> {
 		return this.gameService.findOne(id);
 	}
 
+	/**
+	 * create a new Game
+	 * @param game the json object game
+	 */
 	@Post()
 	@UsePipes(getValidationPipe(Game))
 	async create(@RequestPipeDecorator(...getPostPipe(Game)) game: Game): Promise<object> {

@@ -1,10 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
-import {Allow, Validate} from "class-validator";
-import {UserExistsRule} from "@src/validators/userExist.validator";
-import {setService} from "@utils/setFinalType.decorator";
-import {UserService} from "@services/user.service";
-import {SetMode} from "@utils/set-mode";
+import { Allow, Validate } from "class-validator";
+import { UserExistsRule } from "@src/validators/userExist.validator";
+import { setService } from "@utils/setFinalType.decorator";
+import { UserService } from "@services/user.service";
+import { SetMode } from "@utils/set-mode";
 
 // this entity is use to stock all the game
 
@@ -24,16 +24,13 @@ export class Game {
 	id: number;
 
 	// first player id
-	// @Transform(UserService.findOne, {toClassOnly: true}) // class-transformer
-	@Validate(UserExistsRule)
-	@Expose()
+	@Validate(UserExistsRule) // class-validator
 	@ManyToOne(() => User, (user) => user.id, { eager: true })
 	@setService(UserService)
 	@SetMode("rw")
 	first_player: User | string;
 
 	// second player id
-	// @Transform(UserService.findOne, {toClassOnly: true}) // class-transformer
 	@Validate(UserExistsRule)
 	@ManyToOne(() => User, (user) => user.id, { eager: true })
 	@setService(UserService)
@@ -52,7 +49,8 @@ export class Game {
 
 	// winner of the game
 	@ManyToOne(() => User, (winner) => winner.id, { nullable: true })
-	winner: User;
+	@SetMode("r")
+	winner: User | string;
 
 	// type of game
 	@Column()

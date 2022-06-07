@@ -1,15 +1,17 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { Channel } from "@entities/channel.entity";
+import { setService } from "@utils/setFinalType.decorator";
+import { UserService } from "@services/user.service";
+import { SetMode } from "@utils/set-mode";
 import { User } from "./user.entity";
-import {setService} from "@utils/setFinalType.decorator";
-import {UserService} from "@services/user.service";
-import {SetMode} from "@utils/set-mode";
 
 // this entity exist to stock all the message
 
 @Entity()
 export class Message {
-	cosntructor(){this.date = new Date();}
+	cosntructor() {
+		this.date = new Date();
+	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -32,5 +34,6 @@ export class Message {
 
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
-	dest_channel: Channel;
+	@SetMode("rw")
+	dest_channel: Channel | number;
 }

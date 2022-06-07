@@ -2,14 +2,16 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Game } from "@src/entities/game.entity";
-import {Container} from "typedi";
+import { Container } from "typedi";
 
 @Injectable()
 export class GameService {
 	constructor(
 		@InjectRepository(Game)
 		private GameRepository: Repository<Game>,
-	) {Container.set(this.constructor, this)}
+	) {
+		Container.set(this.constructor, this);
+	}
 
 	findAll(): Promise<Game[]> {
 		return this.GameRepository.find();

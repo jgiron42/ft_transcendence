@@ -46,7 +46,7 @@ export class AuthController {
 	@Post("42")
 	@UseGuards(AuthGuard("42"))
 	@Redirect("/auth")
-	ftAuth( ) {
+	ftAuth() {
 		return "not reached";
 	}
 

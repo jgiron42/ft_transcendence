@@ -1,4 +1,4 @@
-import { IsBase64, IsBoolean, IsString, IsUrl} from "class-validator";
+import { IsBase64, IsBoolean, IsString, IsUrl } from "class-validator";
 
 export class UserEdition {
 	@IsString()
