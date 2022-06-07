@@ -16,21 +16,34 @@ export class RelationsController {
 	 */
 	@Get()
 	getAll(): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+		return this.relationService.findAll(); // TODO: protect
 	}
 
+	/**
+	 * get the relation designated by id
+	 * @param id
+	 */
 	@Get(":id")
 	getOne(@Param("id") id: string): Promise<object> {
 		return this.relationService.findOne(id); // TODO: protect
 	}
 
+	/**
+	 * create the relation designated by id
+	 * @param relation
+	 */
 	@Post()
-	create(@Param("id") _id: string, @Body() _relation: any): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	@UsePipes(getValidationPipe(Relation))
+	create(@RequestPipeDecorator(...getPostPipe(Relation)) relation: Relation): Promise<object> {
+		return this.relationService.create(relation); // TODO: protect
 	}
 
+	/**
+	 * delete the relation designated by id
+	 * @param id
+	 */
 	@Delete(":id")
-	remove(@Param("id") _id: string): Promise<object> {
-		return Promise.resolve({ foo: "bar" });
+	remove(@Param("id") id: string): Promise<void> {
+		return this.relationService.remove(id); // TODO: protect
 	}
 }

@@ -1,10 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
-import {Exclude} from "class-transformer";
-import {Validate} from "class-validator";
-import {UserExistsRule} from "@src/validators/userExist.validator";
-import {setFinalType, setService} from "@utils/setFinalType.decorator";
-import {UserService} from "@services/user.service";
+import { Exclude } from "class-transformer";
+import { Validate } from "class-validator";
+import { UserExistsRule } from "@src/validators/userExist.validator";
+import { setService } from "@utils/setFinalType.decorator";
+import { UserService } from "@services/user.service";
+import { SetMode } from "@utils/set-mode";
 
 // entity use to describe the channel
 
@@ -35,9 +36,8 @@ export class Channel {
 	mdp: string;
 
 	// owner  (and creator) of the channel
-	@ManyToOne(() => User, (owner) => owner.id, {eager: true})
+	@ManyToOne(() => User, (owner) => owner.id, { eager: true })
 	@Validate(UserExistsRule) // class-validator
-	@setFinalType(User)
 	@setService(UserService)
 	@SetMode("rw")
 	owner: User | string;

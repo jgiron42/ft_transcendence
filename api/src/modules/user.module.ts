@@ -4,7 +4,6 @@ import { AppController } from "@src/controllers/app.controller";
 import { User } from "@entities/user.entity";
 import { UserService } from "@services/user.service";
 import { UserExistsRule } from "@src/validators/userExist.validator";
-import { UserValidationPipe } from "@pipes/user-validation.pipe";
 import { UsersController } from "@controllers/users.controller";
 import { GameModule } from "@modules/game.module";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
@@ -21,7 +20,7 @@ import { AuthModule } from "./auth.module";
 		RelationModule,
 		MessageModule,
 	],
-	providers: [UserService, UserExistsRule, UserValidationPipe],
+	providers: [UserService, UserExistsRule],
 	controllers: [AppController, UsersController],
 	exports: [UserService],
 })

@@ -16,6 +16,10 @@ export class MessagesController {
 		return this.messageService.findAll(); // TODO: protect
 	}
 
+	/**
+	 * get the message designated by id
+	 * @param id the message id
+	 */
 	@Get(":id")
 	@UseGuards(MessageExistGuard)
 	getOne(@Param("id") id: string): Promise<object> {

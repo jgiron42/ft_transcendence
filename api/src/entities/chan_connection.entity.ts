@@ -1,12 +1,17 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Channel } from "@entities/channel.entity";
+import { Exclude, Expose } from "class-transformer";
+import { SetMode } from "@utils/set-mode";
 
 //    This entity is use in order to know who have access to which channel
 
 @Entity()
+@Expose() // class-transformer
 export class ChanConnection {
 	@PrimaryGeneratedColumn()
+	@Exclude() // class-transformer
+	@SetMode("r")
 	id: number;
 
 	// Id of the channel
@@ -31,5 +36,7 @@ export class ChanConnection {
 
 	// date to know the end of the mute
 	@Column()
+	@Exclude() // class-transformer
+	@SetMode("r")
 	date_end_mute: Date;
 }
