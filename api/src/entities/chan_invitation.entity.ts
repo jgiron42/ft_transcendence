@@ -5,23 +5,26 @@ import { User } from "./user.entity";
 // entity use to manage the channel invitation
 
 @Entity()
+@Exclude()
 export class ChanInvitation {
 	@PrimaryGeneratedColumn()
+	@SetMode("r")
 	id: number;
-
-	// who is invited to join the channel
-	@ManyToOne(() => User, (invited) => invited.id)
-	user: User;
-
-	// who invite a user to join a channel
-	@ManyToOne(() => User, (invite_by) => invite_by.id)
-	invited_by: User;
-
-	/// channel where the user is invite
-	@ManyToOne(() => Channel, (invite_where) => invite_where.id)
-	channel: Channel;
 
 	// date of invitation
 	@Column()
-	created_at: Date;
+	@SetMode("r")
+	date: Date;
+
+	// who invite a user to join a channel
+	@ManyToOne(() => User, (invite_by) => invite_by.id)
+	invite_by: User;
+
+	// who is invited to join the channel
+	@ManyToOne(() => User, (invited) => invited.id)
+	invited: User;
+
+	/// channel where the user is invite
+	@ManyToOne(() => Channel, (invite_where) => invite_where.id)
+	invite_where: Channel;
 }

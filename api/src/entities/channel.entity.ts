@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
-import {Exclude, Expose} from "class-transformer";
+import {Exclude} from "class-transformer";
 import {Validate} from "class-validator";
 import {UserExistsRule} from "@src/validators/userExist.validator";
 import {setFinalType, setService} from "@utils/setFinalType.decorator";
@@ -16,29 +16,29 @@ export class Channel {
 		this.owner = new User();
 	}
 	@PrimaryGeneratedColumn()
-	@Expose({ toPlainOnly: true })
+	@SetMode("r")
 	id: number;
 
 	// name of the channel
 	@Column()
-	@Expose() // class-transformer
+	@SetMode("rw")
 	name: string;
 
 	// type of channel
 	@Column()
-	@Expose() // class-transformer
+	@SetMode("rw")
 	chat_type: number;
 
 	// password to access to the channnel
 	@Column()
-	@Expose({toClassOnly: true}) // class-transformer
+	@SetMode("rw")
 	mdp: string;
 
 	// owner  (and creator) of the channel
 	@ManyToOne(() => User, (owner) => owner.id, {eager: true})
-	@Expose() // class-transformer
 	@Validate(UserExistsRule) // class-validator
 	@setFinalType(User)
 	@setService(UserService)
+	@SetMode("rw")
 	owner: User | string;
 }
