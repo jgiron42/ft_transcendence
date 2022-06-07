@@ -25,6 +25,4 @@ export class Message {
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
 	dest_channel: Channel;
-
-	mine: boolean;
 }
