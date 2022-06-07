@@ -40,6 +40,7 @@ export class UsersController {
 	@Get(":id")
 	@UseGuards()
 	async getOne(@Param("id") id: string, @Session() ses: SessionT): Promise<object> {
+		// return the private version if the current user is id
 		if (ses.user && id === ses.user.id)
 			return instanceToPlain(await this.userService.findOne(id), { groups: ["private"] });
 		return instanceToPlain(await this.userService.findOne(id));
