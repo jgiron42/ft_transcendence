@@ -4,20 +4,24 @@ import { ClassConstructor, plainToInstance } from "class-transformer";
 import { InvalidField } from "@src/exceptions/InvalidField";
 import { Container } from "typedi";
 
+interface resourceService<Resource> {
+	findOne: (id: string) => Promise<Resource>;
+}
+
 /**
  * edit a resource by finding the previous version id in serviceClass and update it with the body of the request using
  * class-transformer::plainToInstance
  */
 @Injectable()
-export class EditResourcePipe<T, TService> implements PipeTransform {
-	constructor(private ressourceClass: ClassConstructor<T>, private serviceClass: ClassConstructor<TService>) {}
+export class EditResourcePipe<T> implements PipeTransform {
+	constructor(
+		private ressourceClass: ClassConstructor<T>,
+		private serviceClass: ClassConstructor<resourceService<T>>,
+	) {}
 	async transform(req: Request, _metadata: ArgumentMetadata): Promise<T> {
 		const service = Container.get(this.serviceClass);
 		const id: string = req.params.id;
 		if (!id) throw new InvalidField("id", id);
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
 		const ressource: T = await service.findOne(id);
 		if (!ressource) throw new BadRequestException(`user ${id} does not exist`);
 		const ressourceCreation = plainToInstance(this.ressourceClass, req.body, {
