@@ -87,6 +87,11 @@ export default {
 			}
 		},
 		receivedMessage(data) {
+			for (const d of data) {
+				this.messages.push(d);
+			}
+		},
+		initRoom(data) {
 			this.messages = data;
 		},
 		clearMessages() {
