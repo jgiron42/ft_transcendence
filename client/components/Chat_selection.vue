@@ -3,10 +3,12 @@
 		<div v-for="(chan, index) of channels" :key="index">le chan[{{ index }}] est = {{ chan.name }}</div>
 	</div>
 </template>
->
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue";
+import { Channel } from "@/models/Channel";
+
+export default Vue.extend({
 	name: "ChatSelection",
 	props: {
 		socket: {
@@ -16,15 +18,14 @@ export default {
 	},
 	data() {
 		return {
-			channels: [],
+			channels: [] as Channel[],
 		};
 	},
-
 	mounted() {
-		this.socket.on("connect", () => {
+		this.socket.on("joinRealm", () => {
 			this.getChannels();
 		});
-		this.socket.on("getChannels", (chans) => {
+		this.socket.on("getChannels", (chans: Channel[]) => {
 			this.fillChannels(chans);
 		});
 	},
@@ -32,9 +33,9 @@ export default {
 		getChannels() {
 			this.socket.emit("getChannels");
 		},
-		fillChannels(chans) {
+		fillChannels(chans: Channel[]) {
 			this.channels = chans;
 		},
 	},
-};
+});
 </script>
