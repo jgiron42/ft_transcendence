@@ -22,7 +22,7 @@ export const SetMode = (mode: string, options?: ExposeOptions): PropertyDecorato
 			return Exclude();
 		default:
 			// eslint-disable-next-line no-throw-literal
-			throw "Invalid argument for SetMode decorator";
+			throw new Error("Invalid argument for SetMode decorator");
 	}
 	return Expose(options);
 };
