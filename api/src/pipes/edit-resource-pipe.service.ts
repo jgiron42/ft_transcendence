@@ -1,4 +1,4 @@
-import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
+import { BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
 import { Request } from "@src/types/request";
 import { ClassConstructor, plainToInstance } from "class-transformer";
 import { InvalidField } from "@src/exceptions/InvalidField";
@@ -18,7 +18,7 @@ export class EditResourcePipe<T> implements PipeTransform {
 		private ressourceClass: ClassConstructor<T>,
 		private serviceClass: ClassConstructor<resourceService<T>>,
 	) {}
-	async transform(req: Request, _metadata: ArgumentMetadata): Promise<T> {
+	async transform(req: Request): Promise<T> {
 		const service = Container.get(this.serviceClass);
 		const id: string = req.params.id;
 		if (!id) throw new InvalidField("id", id);
