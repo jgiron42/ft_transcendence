@@ -26,9 +26,6 @@ export class AppController {
 		const newUser = {
 			pseudo: "test",
 			path_avatar: "test",
-			mdp: "test",
-			mail: "test",
-			phone: "test",
 			nb_game: 0,
 			nb_win: 0,
 			OAuth: false,
