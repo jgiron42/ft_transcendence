@@ -2,7 +2,7 @@
 	<div id="chat-box" class="w-full h-full flex flex-col">
 		<h1 id="chat-title" class="text-center">Chat</h1>
 		<div id="chat-content" class="flex flex-col-reverse items-center">
-			<Messages :messages="messages" :user="me" />
+			<Messages :messages="messages" :user="user" />
 		</div>
 		<div id="msgBar" class="flex p-2">
 			<div class="txt-msg-bg w-full h-full min-w-0 p-2">
@@ -28,8 +28,12 @@
 	</div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue";
+import { Message } from "@/models/Message";
+import { User } from "@/models/User";
+
+export default Vue.extend({
 	name: "Chatbox",
 	props: {
 		socket: {
@@ -41,13 +45,9 @@ export default {
 		return {
 			title: "ChatBox",
 			name: "",
-			me: {
-				id: 0,
-				pseudo: "",
-				avatar: "",
-			},
+			user: new User(),
 			text: "",
-			messages: [],
+			messages: [] as Message[],
 		};
 	},
 	mounted() {
@@ -61,11 +61,11 @@ export default {
 			if (!this.name) this.name = "riblanc";
 			this.joinRealm();
 		});
-		this.socket.on("whoAmI", (message) => {
-			this.onWhoAmI(message);
+		this.socket.on("whoAmI", (user: User) => {
+			this.onWhoAmI(user);
 		});
-		this.socket.on("msgToClient", (message) => {
-			this.receivedMessage(message);
+		this.socket.on("msgToClient", (messages: Message[]) => {
+			this.receivedMessage(messages);
 		});
 		this.name = this.$cookies.get("name");
 		if (!this.name) this.name = "riblanc";
@@ -80,19 +80,19 @@ export default {
 		sendMessage() {
 			if (this.text.length > 0) {
 				this.socket.emit("msgToServer", {
-					name: this.me.pseudo,
+					name: this.user.pseudo,
 					text: this.text,
 				});
 				this.text = "";
 			}
 		},
-		receivedMessage(data) {
-			for (const d of data) {
-				this.messages.push(d);
+		receivedMessage(messages: Message[]) {
+			for (const m of messages) {
+				this.messages.push(m);
 			}
 		},
-		initRoom(data) {
-			this.messages = data;
+		initRoom(messages: Message[]) {
+			this.messages = messages;
 		},
 		clearMessages() {
 			this.messages = [];
@@ -100,13 +100,13 @@ export default {
 		whoAmI() {
 			this.socket.emit("whoAmI");
 		},
-		onWhoAmI(data) {
-			this.me.id = data.id;
-			this.me.pseudo = data.pseudo;
-			this.me.avatar = data.avatar;
+		onWhoAmI(user: User) {
+			this.user.id = user.id;
+			this.user.pseudo = user.pseudo;
+			this.user.path_avatar = user.path_avatar;
 		},
 	},
-};
+});
 </script>
 
 <style>

@@ -18,20 +18,25 @@
 	</div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue";
+import { User } from "@/models/User";
+
+export default Vue.extend({
 	name: "Messages",
 	props: {
 		messages: {
 			type: Array,
-			default: () => {},
+			default: () => [],
 		},
 		user: {
-			type: Object,
-			default: () => {},
+			type: User,
+			default: () => {
+				return new User();
+			},
 		},
 	},
-};
+});
 </script>
 
 <style>

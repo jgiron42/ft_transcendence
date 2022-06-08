@@ -19,13 +19,6 @@ export default {
 			{ name: "format-detection", content: "telephone=no" },
 		],
 		link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
-		script: [
-			{
-				src: "https://cdn.socket.io/4.3.2/socket.io.min.js",
-				integrity: "sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs",
-				crossorigin: "anonymous",
-			},
-		],
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -47,7 +40,17 @@ export default {
 	css: ["~/layouts/global.css"],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
-	modules: ["cookie-universal-nuxt"],
+	modules: ["cookie-universal-nuxt", "nuxt-socket-io"],
+
+	io: {
+		sockets: [
+			{
+				name: "chat",
+				url: process.env.API_BASE_URL || "http://localhost:3000",
+				default: true,
+			},
+		],
+	},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
 	build: {},

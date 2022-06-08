@@ -5,17 +5,32 @@
 	</div>
 </template>
 
-<script>
-import ChatSelection from "~/components/Chat_selection";
-export default {
+<script lang="ts">
+import Vue from "vue";
+
+export default Vue.extend({
 	name: "Chat",
-	components: { ChatSelection },
 	data() {
 		return {
-			socket: io.connect(process.env.apiBaseUrl + "/chat", { reconnection: true }),
+			socket: this.$nuxtSocket({
+				name: "chat",
+				channel: "/chat",
+				reconnection: true,
+				reconnectionAttempts: Infinity,
+				reconnectionDelay: 1000,
+				reconnectionDelayMax: 5000,
+				timeout: 10000,
+				autoConnect: true,
+				transports: ["websocket"],
+				teardown: false,
+				forceNew: false,
+			}),
 		};
 	},
-};
+	mounted() {
+		window.socket = this.socket;
+	},
+});
 </script>
 
 <style>
