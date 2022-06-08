@@ -28,10 +28,7 @@ export class EditResourcePipe<T> implements PipeTransform {
 			excludeExtraneousValues: true,
 			exposeUnsetFields: false,
 		});
-		Object.keys(ressourceCreation).forEach((key) => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-			(ressource as any)[key] = (ressourceCreation as any)[key];
-		});
+		Object.assign(ressource, ressourceCreation);
 		return ressource;
 	}
 }
