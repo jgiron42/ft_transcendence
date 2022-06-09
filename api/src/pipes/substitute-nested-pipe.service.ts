@@ -29,7 +29,7 @@ export class SubstituteNestedPipe<T> implements PipeTransform {
 				if (!(ressource as any as Record<string, T>)[key])
 					throw new InexistantRessourceException(
 						key,
-						(ressourceCreation as any as Record<string, string | number>)[key].toString(),
+						(ressourceCreation as any as Record<string, string | number>)[key],
 					);
 			} else (ressource as Record<string, unknown>)[key] = (ressourceCreation as Record<string, unknown>)[key];
 		}
