@@ -3,4 +3,6 @@ const intra_credentials = {
 	secret: process.env.INTRA42_SECRET,
 };
 
+console.log("intra_credentials:", intra_credentials);
+
 export default intra_credentials;

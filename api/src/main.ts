@@ -1,11 +1,9 @@
-import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@modules/app.module";
 import helmet from "helmet";
 import morgan from "morgan";
 import config from "@config/api.config";
 import session from "express-session";
-import { useContainer } from "class-validator";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
@@ -29,9 +27,6 @@ import { useContainer } from "class-validator";
 
 	// Enable morgan for clean logs
 	app.use(morgan("combined"));
-
-	//	class-validator
-	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	// Start server and listen for requests
 	await app.listen(config.apiPort);
