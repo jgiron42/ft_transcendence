@@ -13,15 +13,12 @@ export class SubstituteNestedPipe<T> implements PipeTransform {
 	async transform(req: Request<T>) {
 		for (const key of Object.keys(req.value)) {
 			if (Reflect.hasMetadata("ftTypeService", req.value, key)) {
-				(req.body as unknown as Record<string, T>)[key] = await Container.get<resourceService<T>>(
+				(req.value as unknown as Record<string, T>)[key] = await Container.get<resourceService<T>>(
 					Reflect.getMetadata("ftTypeService", req.value, key) as Constructable<resourceService<T>>,
 				).findOne((req.value as Record<string, unknown>)[key]); // TODO stronger typing
-				if (!(req.body as Record<string, T>)[key])
-					throw new InexistantRessourceException(
-						key,
-						(req.body as Record<string, string | number>)[key].toString(),
-					);
-			} else (req.body as Record<string, unknown>)[key] = (req.body as Record<string, unknown>)[key];
+				if (!(req.value as Record<string, unknown>)[key])
+					throw new InexistantRessourceException(key, (req.value as Record<string, unknown>)[key].toString());
+			} else (req.value as Record<string, unknown>)[key] = (req.value as Record<string, unknown>)[key];
 		}
 		return req;
 	}
