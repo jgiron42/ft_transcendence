@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { CanActivate, Injectable } from "@nestjs/common";
 import { Observable } from "rxjs";
 
 /**
@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
  */
 @Injectable()
 export class IsUserGuard implements CanActivate {
-	canActivate(_context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+	canActivate(): boolean | Promise<boolean> | Observable<boolean> {
 		return true;
 	}
 }

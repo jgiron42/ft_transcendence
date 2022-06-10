@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ValidatorConstraintInterface, ValidatorConstraint, ValidationArguments } from "class-validator";
+import { ValidatorConstraintInterface, ValidatorConstraint } from "class-validator";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "@entities/user.entity";
 import { Repository } from "typeorm";
@@ -23,7 +23,7 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 		}
 		return true;
 	}
-	defaultMessage(_args: ValidationArguments) {
+	defaultMessage() {
 		return `User doesn't exist`;
 	}
 }
