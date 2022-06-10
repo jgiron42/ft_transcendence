@@ -3,10 +3,7 @@ import { Request } from "@src/types/request";
 import { ClassConstructor, plainToInstance } from "class-transformer";
 import { InvalidField } from "@src/exceptions/InvalidField";
 import { Container } from "typedi";
-
-interface resourceService<Resource> {
-	findOne: (id: string) => Promise<Resource>;
-}
+import { resourceService } from "@src/types/resource-service";
 
 /**
  * edit a resource by finding the previous version id in serviceClass and update it with the body of the request using
@@ -24,7 +21,7 @@ export class EditResourcePipe<T> implements PipeTransform {
 		if (!id) throw new InvalidField("id", id);
 		const ressource: T = await service.findOne(id);
 		if (!ressource) throw new BadRequestException(`user ${id} does not exist`);
-		const ressourceCreation = plainToInstance(this.ressourceClass, req.body, {
+		const ressourceCreation = plainToInstance(this.ressourceClass, req.value, {
 			excludeExtraneousValues: true,
 			exposeUnsetFields: false,
 		});

@@ -6,7 +6,8 @@ import { SessionT } from "@src/types/session";
  * Express request type extended with a session attribute.
  * Type given by Nest's @Request decorator
  */
-export declare type Request = express.Request & {
+export declare type Request<T = any> = express.Request & {
 	user: sessionUser;
 	session: SessionT;
+	value: T;
 };

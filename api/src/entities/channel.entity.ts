@@ -22,23 +22,23 @@ export class Channel {
 
 	// name of the channel
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	name: string;
 
 	// type of channel
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	chat_type: number;
 
 	// password to access to the channnel
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	mdp: string;
 
 	// owner  (and creator) of the channel
 	@ManyToOne(() => User, (owner) => owner.id, { eager: true })
 	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
-	@SetMode("rw")
+	@SetMode("cru")
 	owner: User | string;
 }

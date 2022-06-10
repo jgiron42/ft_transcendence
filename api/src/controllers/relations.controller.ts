@@ -1,13 +1,15 @@
-import { Controller, Delete, Get, Param, Post, UseGuards, UsePipes } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, UseGuards, UseInterceptors, UsePipes } from "@nestjs/common";
 import { SessionGuard } from "@guards/session.guard";
 import { RelationService } from "@services/relation.service";
 import { getValidationPipe } from "@utils/getValidationPipe";
 import { Relation } from "@entities/relation.entity";
 import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
-import { getPostPipe } from "@utils/getPostPipe";
+import { getPostPipeline } from "@utils/getPostPipeline";
+import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 
 @Controller("relations")
 @UseGuards(...SessionGuard)
+@UseInterceptors(CrudFilterInterceptor)
 export class RelationsController {
 	constructor(private relationService: RelationService) {}
 
@@ -34,7 +36,7 @@ export class RelationsController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Relation))
-	create(@RequestPipeDecorator(...getPostPipe(Relation)) relation: Relation): Promise<object> {
+	create(@RequestPipeDecorator(...getPostPipeline(Relation)) relation: Relation): Promise<object> {
 		return this.relationService.create(relation); // TODO: protect
 	}
 

@@ -1,28 +1,21 @@
-import { ExposeOptions } from "class-transformer/types/interfaces";
-import { Exclude, Expose } from "class-transformer";
+const checkMode = (mode: string): string => {
+	for (const c of mode) {
+		if (!"crud".includes(c)) throw new Error("invalid permission in mode string");
+	}
+	return mode;
+};
 
 /**
  * decorator used to set authorization for access to an entity properties in the api
  */
-export const SetMode = (mode: string, options?: ExposeOptions): PropertyDecorator & ClassDecorator => {
-	if (!options) options = {};
-	options.toClassOnly = false;
-	options.toPlainOnly = false;
-	switch (mode) {
-		case "r":
-			options.toPlainOnly = true;
-			break;
-		case "w":
-			options.toClassOnly = true;
-			break;
-		case "rw":
-		case "wr":
-			break;
-		case "":
-			return Exclude();
-		default:
-			// eslint-disable-next-line no-throw-literal
-			throw new Error("Invalid argument for SetMode decorator");
+export const SetMode = (conf: ([string, string] | string)[] | string) => {
+	const m = new Map();
+	if (typeof conf == "string") m.set("default", checkMode(conf));
+	else {
+		for (const confItem of conf) {
+			if (typeof confItem == "string") m.set("default", checkMode(confItem));
+			else m.set(confItem[0], checkMode(confItem[1]));
+		}
 	}
-	return Expose(options);
+	return Reflect.metadata("crudFilter", m);
 };

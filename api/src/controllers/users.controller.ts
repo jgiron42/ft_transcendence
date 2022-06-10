@@ -1,21 +1,23 @@
-import { Body, Controller, Get, Param, Put, UseGuards, Session, Post } from "@nestjs/common";
+import { Controller, Get, Param, Put, UseGuards, Session, Post, UseInterceptors } from "@nestjs/common";
 import { IsUserGuard } from "@guards/is-user.guard";
 import { UserService } from "@services/user.service";
 import { SessionT } from "@src/types/session";
-// import { SessionGuard } from "@guards/session.guard";
 import { DevelopmentGuard } from "@src/guards/development.guard";
-import { UserCreation } from "@dtos/userCreation.dto";
 import { GameService } from "@services/game.service";
 import { RelationService } from "@services/relation.service";
 import { MessageService } from "@services/message.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { User } from "@entities/user.entity";
-import { EditResourcePipe } from "@pipes/edit-resource-pipe.service";
 import { RequestPipeDecorator } from "@src/utils/requestPipeDecorator";
-import { instanceToPlain } from "class-transformer";
+import { CrudClassFilter } from "@utils/crud-class-filter";
+import { getPutPipeline } from "@utils/getPutPipeline";
+import { getPostPipeline } from "@utils/getPostPipeline";
+import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
+// import { SessionGuard } from "@guards/session.guard";
 
 @Controller("users")
 // @UseGuards(...SessionGuard)
+@UseInterceptors(CrudFilterInterceptor)
 export class UsersController {
 	constructor(
 		private userService: UserService,
@@ -42,8 +44,8 @@ export class UsersController {
 	async getOne(@Param("id") id: string, @Session() ses: SessionT): Promise<object> {
 		// return the private version if the current user is id
 		if (ses.user && id === ses.user.id)
-			return instanceToPlain(await this.userService.findOne(id), { groups: ["private"] });
-		return instanceToPlain(await this.userService.findOne(id));
+			return CrudClassFilter(await this.userService.findOne(id), "r", ["private"]);
+		return CrudClassFilter(await this.userService.findOne(id), "r");
 	}
 
 	/**
@@ -52,7 +54,7 @@ export class UsersController {
 	 */
 	@Put(":id")
 	@UseGuards(IsUserGuard)
-	update(@RequestPipeDecorator(new EditResourcePipe(User, UserService)) user: User): Promise<object> {
+	update(@RequestPipeDecorator(...getPutPipeline(User, UserService)) user: User): Promise<object> {
 		return this.userService.create(user);
 	}
 
@@ -63,7 +65,7 @@ export class UsersController {
 	 */
 	@Post()
 	@UseGuards(DevelopmentGuard)
-	create(@Body() user: UserCreation): Promise<object> {
+	create(@RequestPipeDecorator(...getPostPipeline(User)) user: User): Promise<object> {
 		return this.userService.create(user);
 	}
 

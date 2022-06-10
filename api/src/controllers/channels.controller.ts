@@ -1,15 +1,4 @@
-import {
-	ClassSerializerInterceptor,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Post,
-	Put,
-	UseGuards,
-	UseInterceptors,
-	UsePipes,
-} from "@nestjs/common";
+import { Controller, Delete, Get, Param, Post, Put, UseGuards, UseInterceptors, UsePipes } from "@nestjs/common";
 import { ChannelOwnerGuard } from "@src/guards/channel-owner.guard";
 import { IsOnChannelGuard } from "@guards/is-on-channel.guard";
 import { ChannelExistGuard } from "@guards/channel-exist.guard";
@@ -20,16 +9,17 @@ import { MessageService } from "@services/message.service";
 import { ChanInvitationService } from "@services/chan_invitation.service";
 import { Channel } from "@entities/channel.entity";
 import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
-import { EditResourcePipe } from "@pipes/edit-resource-pipe.service";
 import { getValidationPipe } from "@utils/getValidationPipe";
-import { getPostPipe } from "@utils/getPostPipe";
+import { getPostPipeline } from "@utils/getPostPipeline";
 import { Message } from "@src/entities/message.entity";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
+import { getPutPipeline } from "@utils/getPutPipeline";
+import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 // import { SessionGuard } from "@guards/session.guard";
 
 @Controller("channels")
 // @UseGuards(...SessionGuard)
-@UseInterceptors(ClassSerializerInterceptor)
+@UseInterceptors(CrudFilterInterceptor)
 export class ChannelsController {
 	constructor(
 		private channelService: ChannelService,
@@ -61,7 +51,7 @@ export class ChannelsController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
-	create(@RequestPipeDecorator(...getPostPipe(Channel)) channel: Channel): Promise<object> {
+	create(@RequestPipeDecorator(...getPostPipeline(Channel)) channel: Channel): Promise<object> {
 		return this.channelService.create(channel);
 	}
 
@@ -71,7 +61,7 @@ export class ChannelsController {
 	 */
 	@UseGuards(ChannelExistGuard, ChannelOwnerGuard)
 	@Put(":id")
-	update(@RequestPipeDecorator(new EditResourcePipe(Channel, ChannelService)) channel: Channel): Promise<object> {
+	update(@RequestPipeDecorator(...getPutPipeline(Channel, ChannelService)) channel: Channel): Promise<object> {
 		return this.channelService.create(channel);
 	}
 
@@ -114,7 +104,7 @@ export class ChannelsController {
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
 	@UsePipes(getValidationPipe(Message))
 	async sendMessage(
-		@RequestPipeDecorator(...getPostPipe(Message)) message: Message,
+		@RequestPipeDecorator(...getPostPipeline(Message)) message: Message,
 		@Param("id") id: string,
 	): Promise<object> {
 		message.dest_channel = await this.channelService.findOne(id);
@@ -140,7 +130,7 @@ export class ChannelsController {
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
 	@UsePipes(getValidationPipe(ChanInvitation))
 	async sendInvitations(
-		@RequestPipeDecorator(...getPostPipe(ChanInvitation)) chanInvitation: ChanInvitation,
+		@RequestPipeDecorator(...getPostPipeline(ChanInvitation)) chanInvitation: ChanInvitation,
 		@Param("id") id: string,
 	): Promise<object> {
 		chanInvitation.invite_where = await this.channelService.findOne(id);

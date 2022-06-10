@@ -4,10 +4,10 @@ import { Repository } from "typeorm";
 import { User } from "@entities/user.entity";
 import { UserCreation } from "@dtos/userCreation.dto";
 import { Container } from "typedi";
-import { TransformFnParams } from "class-transformer";
+import { resourceService } from "@src/types/resource-service";
 
 @Injectable()
-export class UserService {
+export class UserService implements resourceService<User> {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
@@ -21,12 +21,6 @@ export class UserService {
 
 	findOne(id: string): Promise<User> {
 		return this.usersRepository.findOne(id);
-	}
-
-	static findOne({ value }: TransformFnParams): Promise<User> {
-		if (!value) return undefined;
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		return Container.get(UserService).findOne(value);
 	}
 
 	async remove(id: string): Promise<void> {
