@@ -1,26 +1,16 @@
-import {
-	ClassSerializerInterceptor,
-	Controller,
-	Get,
-	Param,
-	Post,
-	SerializeOptions,
-	UseGuards,
-	UseInterceptors,
-	UsePipes,
-} from "@nestjs/common";
+import { Controller, Get, Param, Post, UseGuards, UseInterceptors, UsePipes } from "@nestjs/common";
 import { GameExistGuard } from "@src/guards/game-exist.guard";
 import { GameService } from "@services/game.service";
-// import { SessionGuard } from "@guards/session.guard";
 import { Game } from "@entities/game.entity";
 import { getValidationPipe } from "@utils/getValidationPipe";
+import { getPostPipeline } from "@utils/getPostPipeline";
 import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
-import { getPostPipe } from "@utils/getPostPipe";
+import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
+// import { SessionGuard } from "@guards/session.guard";
 
 @Controller("games")
 // @UseGuards(...SessionGuard)
-@UseInterceptors(ClassSerializerInterceptor)
-@SerializeOptions({})
+@UseInterceptors(CrudFilterInterceptor)
 export class GamesController {
 	constructor(private gameService: GameService) {}
 
@@ -48,7 +38,7 @@ export class GamesController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Game))
-	async create(@RequestPipeDecorator(...getPostPipe(Game)) game: Game): Promise<object> {
+	async create(@RequestPipeDecorator(...getPostPipeline(Game)) game: Game): Promise<object> {
 		return this.gameService.create(game);
 	}
 }

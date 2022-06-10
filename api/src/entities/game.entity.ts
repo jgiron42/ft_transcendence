@@ -16,6 +16,7 @@ export class Game {
 		this.first_player = new User();
 		this.second_player = new User();
 		this.status = false;
+		this.type = 0;
 		this.date = new Date();
 	}
 
@@ -27,14 +28,14 @@ export class Game {
 	@Validate(UserExistsRule) // class-validator
 	@ManyToOne(() => User, (user) => user.id, { eager: true })
 	@setService(UserService)
-	@SetMode("rw")
+	@SetMode("cru")
 	first_player: User | string;
 
 	// second player id
 	@Validate(UserExistsRule)
 	@ManyToOne(() => User, (user) => user.id, { eager: true })
 	@setService(UserService)
-	@SetMode("rw")
+	@SetMode("cru")
 	second_player: User | string;
 
 	// score of the first player
@@ -55,14 +56,16 @@ export class Game {
 	// type of game
 	@Column()
 	@Allow() // class-validator
-	@SetMode("rw")
+	@SetMode("cru")
 	type: number;
 
 	// status of the game
 	@Column()
+	@SetMode("r")
 	status: boolean;
 
 	// date begin of game
 	@Column()
+	@SetMode("r")
 	date: Date;
 }

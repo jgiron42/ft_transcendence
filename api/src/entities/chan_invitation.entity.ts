@@ -4,13 +4,13 @@ import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
 import { ChannelService } from "@services/channel.service";
 import { SetMode } from "@utils/set-mode";
-import { Exclude } from "class-transformer";
+import { Expose } from "class-transformer";
 import { User } from "./user.entity";
 
 // entity use to manage the channel invitation
 
 @Entity()
-@Exclude()
+@Expose() // class-transformer
 export class ChanInvitation {
 	constructor() {
 		this.date = new Date();
@@ -33,12 +33,12 @@ export class ChanInvitation {
 	// who is invited to join the channel
 	@ManyToOne(() => User, (invited) => invited.id)
 	@setService(UserService)
-	@SetMode("rw")
+	@SetMode("rcu")
 	invited: User;
 
 	/// channel where the user is invite
 	@ManyToOne(() => Channel, (invite_where) => invite_where.id)
 	@setService(ChannelService)
-	@SetMode("rw")
+	@SetMode("rcu")
 	invite_where: Channel;
 }

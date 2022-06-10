@@ -18,7 +18,7 @@ export class Message {
 
 	// content of the messsage
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	content: string;
 
 	// user who send the message
@@ -34,6 +34,6 @@ export class Message {
 
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
-	@SetMode("rw")
+	@SetMode("cru")
 	dest_channel: Channel | number;
 }

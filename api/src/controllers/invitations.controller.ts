@@ -1,9 +1,11 @@
-import { Controller, Delete, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Param, UseGuards, UseInterceptors } from "@nestjs/common";
 import { SessionGuard } from "@guards/session.guard";
 import { ChanConnectionService } from "@services/chan_connection.service";
+import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 
 @Controller("users")
 @UseGuards(...SessionGuard)
+@UseInterceptors(CrudFilterInterceptor)
 export class InvitationsController {
 	constructor(private chanConnectionService: ChanConnectionService) {}
 

@@ -15,17 +15,17 @@ export class Relation {
 	// user one is the user who owned the relation
 	@ManyToOne(() => User, (user_one) => user_one.id)
 	@setService(UserService)
-	@SetMode("rw")
+	@SetMode("cru")
 	user_one: User;
 
 	// user two is the user which the user one have a relation
 	@ManyToOne(() => User, (user_two) => user_two.id)
 	@setService(UserService)
-	@SetMode("rw")
+	@SetMode("cru")
 	user_two: User;
 
 	// type of relation
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	relation_type: number;
 }

@@ -7,18 +7,29 @@ import { SetMode } from "@utils/set-mode";
 @Entity()
 @Exclude()
 export class User {
+	constructor() {
+		this.id = undefined;
+		this.pseudo = undefined;
+		this.path_avatar = ""; // may be a default avatar path
+		this.nb_game = 0;
+		this.nb_win = 0;
+		this.OAuth = false;
+		this.totp_key = "";
+		this.status = 0;
+		this.date_register = new Date();
+	}
 	@PrimaryColumn()
-	@SetMode("r")
+	@SetMode("cr")
 	id: string;
 
 	// pseudo of the user
 	@Column({ unique: true })
-	@SetMode("rw")
+	@SetMode("cru")
 	pseudo: string;
 
 	// path to the avatar of the user
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	path_avatar: string;
 
 	// number of game played by the user
@@ -33,17 +44,17 @@ export class User {
 
 	// say if the user use OAuth or not
 	@Column()
-	@SetMode("rw", { groups: ["private"] }) // class-transformer
+	@SetMode([["private", "cru"], "r"]) // class-transformer
 	OAuth: boolean;
 
 	// status of the user
 	@Column()
-	@SetMode("rw")
+	@SetMode("cru")
 	status: number;
 
 	// totp key of the user
 	@Column({ length: 20 })
-	@SetMode("w")
+	@SetMode("cu")
 	totp_key: string;
 
 	// date of registration of the user
