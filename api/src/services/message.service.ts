@@ -54,8 +54,4 @@ export class MessageService {
 	async findByUser(id: string): Promise<Message[]> {
 		return this.getQuery().user(id).getMany();
 	}
-
-	async findByChannel(id: number): Promise<Message[]> {
-		return this.getQuery().channel(id).getMany();
-	}
 }

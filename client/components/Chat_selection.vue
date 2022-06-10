@@ -1,6 +1,12 @@
 <template>
 	<div id="chat-selection" class="w-1/4 h-full flex flex-col">
-		<div v-for="(chan, index) of channels" :key="index">le chan[{{ index }}] est = {{ chan.name }}</div>
+		<button class="btn pr-3 pl-3" @click="$modal.show('my-modal')">Open modal</button>
+		<Popup />
+		<div v-for="(chan, index) of channels" :key="index">
+			<button class="btn pr-3 pl-3" @click="JC(chan.name)">
+				{{ chan.name }}
+			</button>
+		</div>
 	</div>
 </template>
 
@@ -22,18 +28,24 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.socket.on("joinRealm", () => {
+		if (this.socket.connected) {
+			this.getChannels();
+		}
+		this.socket.on("GAI", () => {
 			this.getChannels();
 		});
-		this.socket.on("getChannels", (chans: Channel[]) => {
-			this.fillChannels(chans);
+		this.socket.on("GC", (chans: Channel[]) => {
+			this.onGC(chans);
 		});
 	},
 	methods: {
-		getChannels() {
-			this.socket.emit("getChannels");
+		JC(chan: string) {
+			this.socket.emit("JC", chan);
 		},
-		fillChannels(chans: Channel[]) {
+		getChannels() {
+			this.socket.emit("GC");
+		},
+		onGC(chans: Channel[]) {
 			this.channels = chans;
 		},
 	},

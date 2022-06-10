@@ -8,12 +8,13 @@ import { ChannelService } from "@services/channel.service";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { SocketService } from "@services/socket.service";
+import { MessageService } from "@services/message.service";
 import { AuthModule } from "./auth.module";
 
 @Module({
 	imports: [TypeOrmModule.forFeature([ChanConnection, Channel, User]), AuthModule, ChanConnectionModule],
 	providers: [ChannelService, UserService, SocketService],
 	controllers: [AppController],
-	exports: [ChannelService, UserService],
+	exports: [ChannelService, UserService, MessageService],
 })
 export class ChannelModule {}
