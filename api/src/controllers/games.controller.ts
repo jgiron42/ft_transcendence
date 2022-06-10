@@ -4,7 +4,7 @@ import { GameService } from "@services/game.service";
 import { Game } from "@entities/game.entity";
 import { getValidationPipe } from "@utils/getValidationPipe";
 import { getPostPipeline } from "@utils/getPostPipeline";
-import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
+import { MyRequestPipe } from "@utils/myRequestPipe";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 // import { SessionGuard } from "@guards/session.guard";
 
@@ -38,7 +38,7 @@ export class GamesController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Game))
-	async create(@RequestPipeDecorator(...getPostPipeline(Game)) game: Game): Promise<object> {
+	async create(@MyRequestPipe(...getPostPipeline(Game)) game: Game): Promise<object> {
 		return this.gameService.create(game);
 	}
 }

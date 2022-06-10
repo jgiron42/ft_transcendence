@@ -44,7 +44,7 @@ export class User {
 
 	// say if the user use OAuth or not
 	@Column()
-	@SetMode([["private", "cru"], "r"]) // class-transformer
+	@SetMode([["own_user", "cru"], "r"]) // class-transformer
 	OAuth: boolean;
 
 	// status of the user
@@ -54,7 +54,7 @@ export class User {
 
 	// totp key of the user
 	@Column({ length: 20 })
-	@SetMode("cu")
+	@SetMode([["own_user", "cur"]])
 	totp_key: string;
 
 	// date of registration of the user

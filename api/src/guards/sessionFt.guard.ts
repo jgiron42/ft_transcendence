@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "@services/auth.service";
 import { Request } from "@src/types/request";
+import config from "@config/api.config";
 
 /**
  * Allows access to the guarded route if the session is authenticated with 42 OAuth
@@ -14,6 +15,16 @@ export class SessionGuardFt implements CanActivate {
 		const req: Request = context.switchToHttp().getRequest();
 		// Get the session in the request
 		const ses = req.session;
+		if (config.env === "development") {
+			req.user = {
+				id: "jgiron",
+				accessToken: "12",
+				refreshToken: "42",
+				firstName: "ad",
+				lastName: "min",
+			};
+			return true;
+		}
 		// Allow access if the user is authenticated
 		if (this.authservice.isFtLogged(ses)) {
 			// Put the user object in the session
