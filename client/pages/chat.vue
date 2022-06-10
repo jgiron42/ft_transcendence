@@ -27,9 +27,6 @@ export default Vue.extend({
 			}),
 		};
 	},
-	mounted() {
-		window.socket = this.socket;
-	},
 });
 </script>
 

@@ -8,7 +8,7 @@
 			<div class="txt-msg-bg w-full h-full min-w-0 p-2">
 				<textarea
 					id="textarea"
-					v-model="text"
+					v-model="msgContent"
 					maxlength="1000"
 					class="message-txt bg-transparent border-none outline-none resize-none w-full flex-auto"
 					placeholder="Enter message..."
@@ -32,6 +32,7 @@
 import Vue from "vue";
 import { Message } from "@/models/Message";
 import { User } from "@/models/User";
+import { Channel } from "@/models/Channel";
 
 export default Vue.extend({
 	name: "Chatbox",
@@ -46,64 +47,83 @@ export default Vue.extend({
 			title: "ChatBox",
 			name: "",
 			user: new User(),
-			text: "",
+			channel: new Channel(),
+			msgContent: "",
 			messages: [] as Message[],
 		};
 	},
 	mounted() {
+		this.clearMessages();
 		if (this.socket.connected) {
-			this.name = this.$cookies.get("name");
-			if (!this.name) this.name = "riblanc";
-			this.joinRealm();
+			this.helloConnection();
 		}
 		this.socket.on("connect", () => {
-			this.name = this.$cookies.get("name");
-			if (!this.name) this.name = "riblanc";
-			this.joinRealm();
+			this.helloConnection();
 		});
-		this.socket.on("whoAmI", (user: User) => {
-			this.onWhoAmI(user);
+
+		this.socket.on("GAI", (user: User) => {
+			this.onGAI(user);
 		});
-		this.socket.on("msgToClient", (messages: Message[]) => {
-			this.receivedMessage(messages);
+		this.socket.on("JC", (payload = { channel: Channel, messages: [] as Message[] }) => {
+			this.onJC(payload.channel, payload.messages);
 		});
-		this.name = this.$cookies.get("name");
-		if (!this.name) this.name = "riblanc";
+		this.socket.on("MSG", (message: Message) => {
+			this.onMSG(message);
+		});
 	},
 	methods: {
-		joinRealm() {
-			this.clearMessages();
-			this.socket.emit("joinRealm", {
-				uid: this.name,
-			});
-		},
-		sendMessage() {
-			if (this.text.length > 0) {
-				this.socket.emit("msgToServer", {
-					name: this.user.pseudo,
-					text: this.text,
-				});
-				this.text = "";
-			}
-		},
-		receivedMessage(messages: Message[]) {
-			for (const m of messages) {
-				this.messages.push(m);
-			}
-		},
-		initRoom(messages: Message[]) {
-			this.messages = messages;
-		},
 		clearMessages() {
 			this.messages = [];
 		},
-		whoAmI() {
-			this.socket.emit("whoAmI");
+
+		initChat() {
+			this.getAccountInformation();
+			this.joinChannel("realm");
 		},
-		onWhoAmI(user: User) {
-			this.user.id = user.id;
-			this.user.pseudo = user.pseudo;
-			this.user.path_avatar = user.path_avatar;
+
+		helloConnection() {
+			this.name = this.$cookies.get("name");
+			if (!this.name) this.name = "riblanc";
+			this.socket.emit("HC", {
+				name: this.name,
+			});
+		},
+
+		// Get the account information from the server
+		getAccountInformation() {
+			this.socket.emit("GAI", {
+				uid: this.name,
+			});
+		},
+		onGAI(user: User) {
+			this.user = user;
+		},
+
+		/*
+		 * Join a channel
+		 * @param channelName
+		 */
+		joinChannel(channelName: string) {
+			this.socket.emit("JC", {
+				chanName: channelName,
+			});
+		},
+		onJC(channel: unknown, messages: Message[]) {
+			this.messages = messages;
+			this.channel = channel as Channel;
+		},
+
+		// Send a message to server
+		sendMessage() {
+			if (!(this.msgContent.length > 0)) return;
+
+			this.socket.emit("MSG", {
+				content: this.msgContent,
+			});
+			this.msgContent = "";
+		},
+		onMSG(message: Message) {
+			this.messages.push(message);
 		},
 	},
 });

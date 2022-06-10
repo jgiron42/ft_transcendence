@@ -9,9 +9,9 @@ import {
 import { Message } from "@entities/message.entity";
 import { UserService } from "@services/user.service";
 import { MessageService } from "@services/message.service";
+import { ChannelService } from "@services/channel.service";
 import { SocketService } from "@services/socket.service";
 import { Socket, Server } from "socket.io";
-import { Channel } from "@entities/channel.entity";
 
 @WebSocketGateway({
 	namespace: "chat",
@@ -24,6 +24,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 		private readonly userService: UserService,
 		private readonly messageService: MessageService,
 		private readonly socketService: SocketService,
+		private readonly channelService: ChannelService,
 	) {}
 
 	@WebSocketServer() server: Server;
@@ -34,52 +35,77 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 		this.logger.log("Gateway initialized.");
 	}
 
-	@SubscribeMessage("msgToServer")
-	async handleMessage(client: Socket, payload: { name: string; text: string; mine: boolean }): Promise<void> {
+	@SubscribeMessage("HC")
+	async onHelloConnection(client: Socket, payload: { name: string }) {
+		const usr = await this.userService.findByUid(payload.name);
+		try {
+			if (usr) {
+				this.socketService.addClient(client, usr);
+				this.onGAI(client);
+				await this.channelService.joinChannel(client, "realm");
+			} else {
+				throw new Error("User not found");
+			}
+		} catch (e) {
+			this.logger.error(e);
+			this.socketService.sendError(client, e as Error);
+		}
+	}
+
+	@SubscribeMessage("MSG")
+	async onMSG(client: Socket, payload: { content: string }): Promise<void> {
 		const u = this.socketService.getClient(client);
-		if (u) {
-			const message = new Message();
-			message.send_by = u.pseudo;
-			message.content = payload.text;
-			message.date = new Date();
-			await this.messageService.create(message);
-			this.socketService.sendMessage(message, "realm");
-		} else {
-			this.logger.error("User not found");
+		try {
+			if (u) {
+				const chan = await this.channelService.getChannelBySocketId(client.id);
+				if (chan) {
+					const message = new Message(payload.content, u.pseudo, chan);
+					await this.messageService.create(message);
+					this.socketService.sendMessage(message, chan.name);
+				} else {
+					throw new Error("Channel not found");
+				}
+			} else {
+				throw new Error("User not found");
+			}
+		} catch (e) {
+			this.logger.error(e);
+			this.socketService.sendError(client, e as Error);
 		}
 	}
 
-	@SubscribeMessage("whoAmI")
-	onWhoAmI(client: Socket) {
-		this.socketService.whoAmI(client);
+	@SubscribeMessage("GAI")
+	onGAI(client: Socket) {
+		this.socketService.getAccountInformation(client);
 	}
 
-	@SubscribeMessage("joinRealm")
-	async joinRealm(client: Socket, payload: { uid: string }) {
-		const usr = await this.userService.findByUid(payload.uid);
-		if (usr) {
-			client.emit("joinRealm", true);
-			await client.join("realm");
-			this.socketService.addClient(client, usr);
-			this.socketService.whoAmI(client);
-			await this.socketService.initChat(client);
-			this.logger.log(`sockets[] size: ${this.socketService.getClientSize()}`);
-		}
-	}
-
-	@SubscribeMessage("getChannels")
-	getChannels(client: Socket) {
+	// NOT MY PART
+	@SubscribeMessage("GC")
+	async onGC(client: Socket): Promise<void> {
 		const usr = this.socketService.getClient(client);
-		const chan = new Channel();
-		const ch = new Array<Channel>();
-		chan.name = "test";
-		for (let i = 0; i < 10; i++) {
-			ch.push(chan);
+		try {
+			if (usr) {
+				client.emit("GC", await this.channelService.findAll());
+			}
+		} catch (e) {
+			this.logger.error(e);
+			this.socketService.sendError(client, e as Error);
 		}
-		if (usr) client.emit("getChannels", ch);
-		// if (usr) {
-		// 	await client.emit("getChannels", await this.channelService.findAll());
-		// }
+	}
+
+	@SubscribeMessage("JC")
+	async onJC(client: Socket, payload: string): Promise<void> {
+		const usr = this.socketService.getClient(client);
+		try {
+			if (usr) {
+				await this.channelService.joinChannel(client, payload);
+			} else {
+				throw new Error("User not found");
+			}
+		} catch (e) {
+			this.logger.error(e);
+			this.socketService.sendError(client, e as Error);
+		}
 	}
 
 	handleDisconnect(client: Socket) {

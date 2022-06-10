@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Message } from "@src/entities/message.entity";
+import { Channel } from "@src/entities/channel.entity";
 
 @Injectable()
 export class MessageService {
@@ -16,6 +17,10 @@ export class MessageService {
 
 	findOne(id: number): Promise<Message> {
 		return this.MessageRepository.findOne({ where: { id } });
+	}
+
+	findByChannel(channel: Channel): Promise<Message[]> {
+		return this.MessageRepository.find({ where: { dest_channel: channel } });
 	}
 
 	async remove(id: string): Promise<void> {

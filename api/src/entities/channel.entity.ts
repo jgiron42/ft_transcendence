@@ -9,7 +9,7 @@ export class Channel {
 	id: number;
 
 	// name of the channel
-	@Column()
+	@Column({ unique: true })
 	name: string;
 
 	// type of channel
@@ -23,4 +23,11 @@ export class Channel {
 	// owner  (and creator) of the channel
 	@ManyToOne(() => User, (owner) => owner.id)
 	owner: User;
+
+	constructor(name: string, owner: User, chat_type = 0, mdp = "") {
+		this.name = name;
+		this.owner = owner;
+		this.chat_type = chat_type;
+		this.mdp = mdp;
+	}
 }

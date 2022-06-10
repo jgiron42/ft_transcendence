@@ -25,4 +25,11 @@ export class Message {
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
 	dest_channel: Channel;
+
+	constructor(content: string, send_by: string, dest_channel: Channel, date = new Date()) {
+		this.content = content;
+		this.send_by = send_by;
+		this.dest_channel = dest_channel;
+		this.date = date;
+	}
 }

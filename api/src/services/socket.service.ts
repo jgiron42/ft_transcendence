@@ -25,9 +25,9 @@ export class SocketService {
 		return this.clientMap.get(socketId);
 	}
 
-	whoAmI(socket: Socket): User {
+	getAccountInformation(socket: Socket): User {
 		const u = this.getClient(socket);
-		if (u) socket.emit("whoAmI", u);
+		if (u) socket.emit("GAI", u);
 		return u;
 	}
 
@@ -48,7 +48,11 @@ export class SocketService {
 
 	sendMessage(message: Message, room: string = undefined) {
 		if (room) {
-			this.server.to(room).emit("msgToClient", [message]);
+			this.server.to(room).emit("MSG", message);
 		}
+	}
+
+	sendError(client: Socket, error: Error) {
+		client.emit("ERR", error.message);
 	}
 }
