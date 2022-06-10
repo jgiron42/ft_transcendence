@@ -3,7 +3,7 @@ import { SessionGuard } from "@guards/session.guard";
 import { RelationService } from "@services/relation.service";
 import { getValidationPipe } from "@utils/getValidationPipe";
 import { Relation } from "@entities/relation.entity";
-import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
+import { MyRequestPipe } from "@utils/myRequestPipe";
 import { getPostPipeline } from "@utils/getPostPipeline";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 
@@ -36,7 +36,7 @@ export class RelationsController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Relation))
-	create(@RequestPipeDecorator(...getPostPipeline(Relation)) relation: Relation): Promise<object> {
+	create(@MyRequestPipe(...getPostPipeline(Relation)) relation: Relation): Promise<object> {
 		return this.relationService.create(relation); // TODO: protect
 	}
 

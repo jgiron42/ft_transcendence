@@ -7,9 +7,12 @@ import { Request } from "@src/types/request";
  */
 @Injectable()
 export class CrudFilterPipe<T> implements PipeTransform {
-	constructor(private accessType: string, private groups?: [string]) {}
+	constructor(private accessType: string, private groups?: string[]) {}
 	transform(req: Request<T>) {
-		req.value = CrudClassFilter(req.value, this.accessType, this.groups);
+		let groups: string[] = [];
+		if (this.groups) groups = groups.concat(this.groups);
+		if (req.groups) groups = groups.concat(req.groups);
+		req.value = CrudClassFilter(req.value, this.accessType, groups);
 		return req;
 	}
 }

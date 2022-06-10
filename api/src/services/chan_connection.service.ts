@@ -36,4 +36,8 @@ export class ChanConnectionService {
 	async findByChannel(id: number): Promise<ChanConnection[]> {
 		return this.ChanConnectionRepository.find({ where: [{ chan_id: id }] });
 	}
+
+	async isOnChannel(userId: string, channelId: number): Promise<boolean> {
+		return !!(await this.ChanConnectionRepository.findOne({ where: [{ chan_id: channelId, user_id: userId }] }));
+	}
 }

@@ -1,4 +1,15 @@
-import { Controller, Delete, Get, Param, Post, Put, UseGuards, UseInterceptors, UsePipes } from "@nestjs/common";
+import {
+	Controller,
+	Delete,
+	Get,
+	Param,
+	ParseIntPipe,
+	Post,
+	Put,
+	UseGuards,
+	UseInterceptors,
+	UsePipes,
+} from "@nestjs/common";
 import { ChannelOwnerGuard } from "@src/guards/channel-owner.guard";
 import { IsOnChannelGuard } from "@guards/is-on-channel.guard";
 import { ChannelExistGuard } from "@guards/channel-exist.guard";
@@ -8,18 +19,39 @@ import { ChanConnectionService } from "@services/chan_connection.service";
 import { MessageService } from "@services/message.service";
 import { ChanInvitationService } from "@services/chan_invitation.service";
 import { Channel } from "@entities/channel.entity";
-import { RequestPipeDecorator } from "@utils/requestPipeDecorator";
+import { MyRequestPipe } from "@utils/myRequestPipe";
 import { getValidationPipe } from "@utils/getValidationPipe";
 import { getPostPipeline } from "@utils/getPostPipeline";
 import { Message } from "@src/entities/message.entity";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { getPutPipeline } from "@utils/getPutPipeline";
+import { Container } from "typedi";
+import { MapGroupInterceptor } from "@interceptors/map-group.interceptor";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
+import { Request } from "@src/types/request";
 // import { SessionGuard } from "@guards/session.guard";
 
 @Controller("channels")
 // @UseGuards(...SessionGuard)
-@UseInterceptors(CrudFilterInterceptor)
+@UseInterceptors(
+	CrudFilterInterceptor,
+	new MapGroupInterceptor("on_channel", async (req: Request<Channel>) => {
+		const service = Container.get(ChanConnectionService);
+		const id = Number(req.params.id);
+		if (!Number.isSafeInteger(id)) return false;
+		return await service.isOnChannel(req.user.id, id);
+	}),
+	new MapGroupInterceptor("see_channel", (req: Request<Channel>) => {
+		void req;
+		return true; // TODO: channel type
+	}),
+	new MapGroupInterceptor("channel_owner", async (req: Request<Channel>) => {
+		const service = Container.get(ChannelService);
+		const id = Number(req.params.id);
+		if (!Number.isSafeInteger(id)) return false;
+		return req.user.id && (await service.findOne(id))?.owner === req.user.id;
+	}),
+)
 export class ChannelsController {
 	constructor(
 		private channelService: ChannelService,
@@ -41,7 +73,7 @@ export class ChannelsController {
 	 */
 	@Get(":id")
 	@UseGuards(ChannelVisibleGuard)
-	getOne(@Param("id") id: string): Promise<object> {
+	getOne(@Param("id", ParseIntPipe) id: number): Promise<object> {
 		return this.channelService.findOne(id);
 	}
 
@@ -51,17 +83,22 @@ export class ChannelsController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
-	create(@RequestPipeDecorator(...getPostPipeline(Channel)) channel: Channel): Promise<object> {
+	create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel): Promise<object> {
 		return this.channelService.create(channel);
 	}
 
 	/**
 	 * update a channel if the user is the owner
 	 * @param channel
+	 * @param id the channel id
 	 */
 	@UseGuards(ChannelExistGuard, ChannelOwnerGuard)
 	@Put(":id")
-	update(@RequestPipeDecorator(...getPutPipeline(Channel, ChannelService)) channel: Channel): Promise<object> {
+	update(
+		@Param("id", ParseIntPipe) id: number,
+		@MyRequestPipe(...getPutPipeline(Channel, ChannelService)) channel: Channel,
+	): Promise<object> {
+		void id;
 		return this.channelService.create(channel);
 	}
 
@@ -71,7 +108,7 @@ export class ChannelsController {
 	 */
 	@Delete(":id")
 	@UseGuards(ChannelExistGuard, ChannelOwnerGuard)
-	remove(@Param("id") id: string): Promise<void> {
+	remove(@Param("id", ParseIntPipe) id: number): Promise<void> {
 		return this.channelService.remove(id);
 	}
 
@@ -81,7 +118,7 @@ export class ChannelsController {
 	 */
 	@Get(":id/chan_connections")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	getConnections(@Param("id") id: number): Promise<object> {
+	getConnections(@Param("id", ParseIntPipe) id: number): Promise<object> {
 		return this.chanConnectionService.findByChannel(id);
 	}
 
@@ -91,7 +128,7 @@ export class ChannelsController {
 	 */
 	@Get(":id/messages")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	getMessage(@Param("id") id: number): Promise<object> {
+	getMessage(@Param("id", ParseIntPipe) id: number): Promise<object> {
 		return this.messageService.findByChannel(id);
 	}
 
@@ -104,8 +141,8 @@ export class ChannelsController {
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
 	@UsePipes(getValidationPipe(Message))
 	async sendMessage(
-		@RequestPipeDecorator(...getPostPipeline(Message)) message: Message,
-		@Param("id") id: string,
+		@MyRequestPipe(...getPostPipeline(Message)) message: Message,
+		@Param("id", ParseIntPipe) id: number,
 	): Promise<object> {
 		message.dest_channel = await this.channelService.findOne(id);
 		return this.messageService.create(message);
@@ -117,7 +154,7 @@ export class ChannelsController {
 	 */
 	@Get(":id/invitations")
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
-	getInvitation(@Param("id") id: number): Promise<object> {
+	getInvitation(@Param("id", ParseIntPipe) id: number): Promise<object> {
 		return this.chanInvitationService.findByChannel(id);
 	}
 
@@ -130,8 +167,8 @@ export class ChannelsController {
 	@UseGuards(ChannelExistGuard, IsOnChannelGuard)
 	@UsePipes(getValidationPipe(ChanInvitation))
 	async sendInvitations(
-		@RequestPipeDecorator(...getPostPipeline(ChanInvitation)) chanInvitation: ChanInvitation,
-		@Param("id") id: string,
+		@MyRequestPipe(...getPostPipeline(ChanInvitation)) chanInvitation: ChanInvitation,
+		@Param("id", ParseIntPipe) id: number,
 	): Promise<object> {
 		chanInvitation.invite_where = await this.channelService.findOne(id);
 		return this.chanInvitationService.create(chanInvitation);

@@ -17,11 +17,11 @@ export class ChannelService {
 		return this.ChannelRepository.find();
 	}
 
-	findOne(id: string): Promise<Channel> {
+	findOne(id: number): Promise<Channel> {
 		return this.ChannelRepository.findOne(id);
 	}
 
-	async remove(id: string): Promise<void> {
+	async remove(id: number): Promise<void> {
 		await this.ChannelRepository.delete(id);
 	}
 

@@ -10,4 +10,5 @@ export declare type Request<T = any> = express.Request & {
 	user: sessionUser;
 	session: SessionT;
 	value: T;
+	groups: string[];
 };
