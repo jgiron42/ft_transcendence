@@ -20,23 +20,17 @@ export class Channel {
 
 	// name of the channel
 	@Column()
-	@SetMode([
-		["channel_owner", "cru"],
-		["see_channel", "r"],
-	])
+	@SetMode([["channel_owner", "u"], ["see_channel", "r"], "c"])
 	name: string;
 
 	// type of channel
 	@Column()
-	@SetMode([
-		["channel_owner", "cru"],
-		["see_channel", "r"],
-	])
+	@SetMode([["channel_owner", "u"], ["see_channel", "r"], "c"])
 	chat_type: number;
 
 	// password to access to the channnel
 	@Column()
-	@SetMode([["channel_owner", "cu"]])
+	@SetMode([["channel_owner", "u"], "c"])
 	mdp: string;
 
 	// owner  (and creator) of the channel
@@ -44,7 +38,7 @@ export class Channel {
 	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
 	@SetMode([
-		["channel_owner", "cru"],
+		["channel_owner", "u"],
 		["see_channel", "r"],
 	])
 	owner: User | string;
