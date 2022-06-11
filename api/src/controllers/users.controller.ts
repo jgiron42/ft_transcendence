@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Put, UseGuards, Post, UseInterceptors } from "@nestjs/common";
-import { IsUserGuard } from "@guards/is-user.guard";
 import { UserService } from "@services/user.service";
 import { DevelopmentGuard } from "@src/guards/development.guard";
 import { GameService } from "@services/game.service";
@@ -14,13 +13,15 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { SessionGuard } from "@guards/session.guard";
 import { Request as MyRequest } from "@src/types/request";
 import { MapGroupInterceptor } from "@interceptors/map-group.interceptor";
+import { SetGroupMappers } from "@utils/setGroupMappers";
+import { Groups } from "@utils/groupsDecorator";
 
 @Controller("users")
 @UseGuards(...SessionGuard)
-@UseInterceptors(
-	CrudFilterInterceptor,
-	new MapGroupInterceptor("own_user", (req: MyRequest<User>) => req.params?.id && req.user?.id === req.params?.id),
-)
+@UseInterceptors(CrudFilterInterceptor)
+@SetGroupMappers({
+	own_user: (req: MyRequest<User>) => req.params?.id && req.user?.id === req.params?.id,
+})
 export class UsersController {
 	constructor(
 		private userService: UserService,
@@ -43,7 +44,6 @@ export class UsersController {
 	 * @param id
 	 */
 	@Get(":id")
-	@UseGuards()
 	@UseInterceptors(new MapGroupInterceptor("own_user", (req: MyRequest<User>) => req.user.id === req.params.id))
 	async getOne(@Param("id") id: string): Promise<object> {
 		return await this.userService.findOne(id);
@@ -54,7 +54,7 @@ export class UsersController {
 	 * @param user
 	 */
 	@Put(":id")
-	// @UseGuards(IsUserGuard)
+	@Groups("own_user")
 	update(@MyRequestPipe(...getPutPipeline(User, UserService)) user: User): Promise<object> {
 		return this.userService.create(user);
 	}
@@ -75,7 +75,6 @@ export class UsersController {
 	 * @param id the user's id
 	 */
 	@Get(":id/games")
-	@UseGuards()
 	getGames(@Param("id") id: string): Promise<object> {
 		return this.gameService.findByUser(id);
 	}
@@ -85,7 +84,7 @@ export class UsersController {
 	 * @param id the user's id
 	 */
 	@Get(":id/relations")
-	@UseGuards(IsUserGuard)
+	@Groups("own_user")
 	getRelations(@Param("id") id: string): Promise<object> {
 		return this.relationService.findByUser(id);
 	}
@@ -95,7 +94,7 @@ export class UsersController {
 	 * @param id the user's id
 	 */
 	@Get(":id/chan_connections")
-	@UseGuards(IsUserGuard)
+	@Groups("own_user")
 	getChanConnections(@Param("id") id: string): Promise<object> {
 		return this.chanConnectionService.findByUser(id);
 	}
@@ -105,7 +104,7 @@ export class UsersController {
 	 * @param id the user's id
 	 */
 	@Get(":id/messages")
-	@UseGuards(IsUserGuard)
+	@Groups("own_user")
 	getMessages(@Param("id") id: string): Promise<object> {
 		return this.messageService.findByUser(id);
 	}
