@@ -23,6 +23,15 @@ server {
 		proxy_pass http://${API_HOST}:${API_PORT}/;
 	}
 
+	location /pgadmin/ {
+		proxy_set_header X-Script-Name /pgadmin;
+        proxy_set_header Host $host;
+
+		proxy_pass http://${PGADMIN_HOST}:${PGADMIN_PORT}/;
+
+		proxy_redirect off;
+	}
+
 	ssl_certificate ${SSL_CERTIFICATE};
     ssl_certificate_key ${SSL_CERTIFICATE_KEY};
     include ${SSL_NGINX_OPTIONS};
@@ -52,6 +61,15 @@ server {
 
 	location /api/ {
 		proxy_pass http://${API_HOST}:${API_PORT}/;
+	}
+
+	location /pgadmin/ {
+		proxy_set_header X-Script-Name /pgadmin;
+        proxy_set_header Host $host;
+
+		proxy_pass http://${PGADMIN_HOST}:${PGADMIN_PORT}/;
+
+		proxy_redirect off;
 	}
 
 	ssl_certificate ${SSL_CERTIFICATE};
