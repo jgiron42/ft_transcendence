@@ -1,7 +1,8 @@
 <template>
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
+		<NewChannelPopup v-if="newChannelPopup" />
 		<Chatbox :socket="socket" />
-		<chat-selection :socket="socket" />
+		<chat-selection :socket="socket" :on-new-channel="newChannel" />
 	</div>
 </template>
 
@@ -25,10 +26,17 @@ export default Vue.extend({
 				teardown: false,
 				forceNew: false,
 			}),
+			newChannelPopup: false,
 		};
 	},
 	mounted() {
 		window.socket = this.socket;
+	},
+	methods: {
+		newChannel() {
+			console.log("hello c'est moi");
+			this.newChannelPopup = true;
+		},
 	},
 });
 </script>
