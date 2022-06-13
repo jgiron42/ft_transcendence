@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "@services/auth.service";
 import { Request } from "@src/types/request";
-import config from "@config/api.config";
 
 /**
  * Allows access to the guarded route if the session is validated by TOTP
@@ -11,7 +10,6 @@ export class SessionGuardTOTP implements CanActivate {
 	constructor(private authservice: AuthService) {}
 
 	canActivate(context: ExecutionContext): boolean {
-		if (config.env === "development") return true;
 		// Nest js manipulation to access the underlying express request object
 		const req: Request = context.switchToHttp().getRequest();
 		// Allow access if the session is TOTP validated
