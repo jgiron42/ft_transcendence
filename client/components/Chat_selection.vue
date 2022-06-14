@@ -1,7 +1,7 @@
 <template xmlns="http://www.w3.org/1999/html">
 	<div id="chat-selection" class="w-1/4 h-full flex flex-col">
 		<button class="btn pr-3 pl-3" @click="$modal.show('create_channel')">Open modal</button>
-		<div v-for="(chan, index) of channels" :key="index">
+	<div v-for="(chan, index) of channels" :key="index">
 			<button class="btn pr-3 pl-3" @click="JC(chan.name)">
 				{{ chan.name }}
 			</button>
