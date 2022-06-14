@@ -9,19 +9,19 @@ export class Message {
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	// user who send the message
+	@ManyToOne(() => User, (send_by) => send_by.id)
+	user: User;
+
+	// destination of the message
+	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
+	channel: Channel;
+
 	// content of the messsage
 	@Column()
 	content: string;
 
-	// user who send the message
-	@ManyToOne(() => User, (send_by) => send_by.id)
-	send_by: User;
-
 	// date of the message
 	@Column()
-	date: Date;
-
-	// destination of the message
-	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
-	dest_channel: Channel;
+	created_at: Date;
 }

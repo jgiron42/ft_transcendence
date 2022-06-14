@@ -5,27 +5,15 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class User {
 	@PrimaryGeneratedColumn()
-	id: number;
+	id: string;
 
 	// pseudo of the user
 	@Column()
-	pseudo: string;
+	username: string;
 
 	// path to the avatar of the user
 	@Column()
-	path_avatar: string;
-
-	// password of the user
-	@Column()
-	mdp: string;
-
-	// mail of the user
-	@Column()
-	mail: string;
-
-	// phone of the user
-	@Column()
-	phone: string;
+	image_url: string;
 
 	// number of game played by the user
 	@Column()
@@ -37,17 +25,17 @@ export class User {
 
 	// say if the user use OAuth or not
 	@Column()
-	OAuth: boolean;
-
-	// status of the user
-	@Column()
-	status: number;
+	totp_enabled: boolean;
 
 	// totp key of the user
 	@Column({ length: 20 })
 	totp_key: string;
 
+	// status of the user
+	@Column()
+	status: number;
+
 	// date of registration of the user
 	@Column()
-	date_register: Date;
+	created_at: Date;
 }

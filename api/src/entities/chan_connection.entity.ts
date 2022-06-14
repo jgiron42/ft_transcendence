@@ -9,13 +9,13 @@ export class ChanConnection {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	// Id of the channel
-	@ManyToOne(() => Channel, (chan_id) => chan_id.id)
-	chan_id: Channel;
-
 	// Id of the user
 	@ManyToOne(() => User, (user_id) => user_id.id)
-	user_id: User;
+	user: User;
+
+	// Id of the channel
+	@ManyToOne(() => Channel, (chan_id) => chan_id.id)
+	channel: Channel;
 
 	// role of the user in the channel
 	@Column()
@@ -23,9 +23,13 @@ export class ChanConnection {
 
 	// use to know if the user is mute in the channel
 	@Column()
-	mute: boolean;
+	muted: boolean;
 
 	// date to know the end of the mute
 	@Column()
-	date_end_mute: Date;
+	mute_end: Date;
+
+	// date of the message
+	@Column()
+	created_at: Date;
 }

@@ -14,13 +14,17 @@ export class Channel {
 
 	// type of channel
 	@Column()
-	chat_type: number;
+	type: number;
 
 	// password to access to the channnel
 	@Column()
-	mdp: string;
+	password: string;
 
 	// owner  (and creator) of the channel
 	@ManyToOne(() => User, (owner) => owner.id)
 	owner: User;
+
+	// date of the message
+	@Column()
+	created_at: Date;
 }

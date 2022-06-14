@@ -10,11 +10,11 @@ export class Game {
 
 	// first player id
 	@ManyToOne(() => User, (id_first_player) => id_first_player.id)
-	id_first_player: User;
+	user_one: User;
 
 	// second player id
 	@ManyToOne(() => User, (id_second_player) => id_second_player.id)
-	id_second_player: User;
+	user_two: User;
 
 	// score of the first player
 	@Column()
@@ -24,19 +24,15 @@ export class Game {
 	@Column()
 	score_second_player: number;
 
-	// winner of the game
-	@ManyToOne(() => User, (winner) => winner.id)
-	winner: User;
-
 	// type of game
 	@Column()
 	type: number;
 
 	// status of the game
 	@Column()
-	status: boolean;
+	finished: boolean;
 
 	// date begin of game
 	@Column()
-	date: Date;
+	created_at: Date;
 }
