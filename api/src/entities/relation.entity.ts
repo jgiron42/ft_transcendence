@@ -18,5 +18,9 @@ export class Relation {
 
 	// type of relation
 	@Column()
-	relation_type: number;
+	type: number;
+
+	// date of the message
+	@Column()
+	created_at: Date;
 }
