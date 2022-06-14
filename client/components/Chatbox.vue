@@ -60,7 +60,6 @@ export default Vue.extend({
 		this.socket.on("connect", () => {
 			this.helloConnection();
 		});
-
 		this.socket.on("GAI", (user: User) => {
 			this.onGAI(user);
 		});
@@ -75,12 +74,10 @@ export default Vue.extend({
 		clearMessages() {
 			this.messages = [];
 		},
-
 		initChat() {
 			this.getAccountInformation();
 			this.joinChannel("realm");
 		},
-
 		helloConnection() {
 			this.name = this.$cookies.get("name");
 			if (!this.name) this.name = "riblanc";
@@ -88,8 +85,6 @@ export default Vue.extend({
 				name: this.name,
 			});
 		},
-
-		// Get the account information from the server
 		getAccountInformation() {
 			this.socket.emit("GAI", {
 				uid: this.name,
@@ -98,25 +93,17 @@ export default Vue.extend({
 		onGAI(user: User) {
 			this.user = user;
 		},
-
-		/*
-		 * Join a channel
-		 * @param channelName
-		 */
-		joinChannel(channelName: string) {
+		joinChannel(channel: string) {
 			this.socket.emit("JC", {
-				chanName: channelName,
+				channel,
 			});
 		},
 		onJC(channel: unknown, messages: Message[]) {
-			this.messages = messages;
 			this.channel = channel as Channel;
+			this.messages = messages;
 		},
-
-		// Send a message to server
 		sendMessage() {
 			if (!(this.msgContent.length > 0)) return;
-
 			this.socket.emit("MSG", {
 				content: this.msgContent,
 			});

@@ -1,8 +1,11 @@
 <template>
-	<div id="chat-selection" class="w-1/4 h-full flex flex-col">
-		<button class="btn pr-3 pl-3" @click="$modal.show('create_channel')">Open modal</button>
+	<div id="chat-selection" class="w-1/4 h-full p-4">
+		<button class="chan-text items-center cut-text w-95 btn pr-3 pl-3" @click="$modal.show('create_channel')">
+			Create a channel
+		</button>
+		<Popup component="ChannelCreation"/>
 		<div v-for="(chan, index) of channels" :key="index">
-			<button class="btn pr-3 pl-3" @click="JC(chan.name)">
+			<button class="chan-name cut-text btn pr-3 pl-3" @click="JC(chan.name)">
 				{{ chan.name }}
 			</button>
 		</div>
@@ -50,3 +53,52 @@ export default Vue.extend({
 	},
 });
 </script>
+
+<style>
+#chat-selection {
+	overflow: auto;
+}
+
+.chan-text {
+	overflow: hidden;
+	color: #95b5df;
+	font: 1em "Open Sans", sans-serif;
+	width: 100%;
+	padding: 10px;
+	border-radius: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+	background-color: #364157;
+}
+
+.chan-name {
+	overflow: hidden;
+	color: black;
+	font: 1em "Open Sans", sans-serif;
+	width: 100%;
+	padding: 10px;
+	border-radius: 10px;
+	margin-bottom: 5px;
+	text-align: center;
+	background-color: #cecece;
+}
+
+.close-button {
+	overflow: hidden;
+	color: black;
+	font: 1em "Open Sans", sans-serif;
+	width: 100%;
+	padding: 10px;
+	border-radius: 15px;
+	margin-bottom: 10px;
+	text-align: center;
+	background-color: white;
+}
+
+.cut-text {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	width: 100%;
+	white-space: nowrap;
+}
+</style>

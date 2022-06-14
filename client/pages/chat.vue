@@ -1,5 +1,6 @@
 <template>
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
+		<NewChannelPopup v-if="newChannelPopup" />
 		<Chatbox :socket="socket" />
 		<chat-selection :socket="socket" />
 		<Popup name="create_channel" component="CreateChannel" />
@@ -26,6 +27,7 @@ export default Vue.extend({
 				teardown: false,
 				forceNew: false,
 			}),
+			newChannelPopup: false,
 		};
 	},
 });
@@ -33,7 +35,6 @@ export default Vue.extend({
 
 <style>
 body {
-	background-color: bg-design_gray;
 	@apply bg-design_dgray;
 }
 

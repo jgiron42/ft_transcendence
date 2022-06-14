@@ -8,7 +8,6 @@ import { Socket } from "socket.io";
 @Injectable()
 export class ChannelService {
 	private channelMap: Map<string, string>;
-
 	private logger: Logger = new Logger("ChannelService");
 
 	constructor(

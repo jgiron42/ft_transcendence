@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { Message } from "@src/entities/message.entity";
 import { Channel } from "@src/entities/channel.entity";
 
+
 @Injectable()
 export class MessageService {
 	constructor(
@@ -11,16 +12,16 @@ export class MessageService {
 		private MessageRepository: Repository<Message>,
 	) {}
 
+	findByChannel(channel: Channel): Promise<Message[]> {
+		return this.MessageRepository.find({ where: { dest_channel: channel } });
+	}
+
 	findAll(): Promise<Message[]> {
 		return this.MessageRepository.find();
 	}
 
 	findOne(id: number): Promise<Message> {
 		return this.MessageRepository.findOne({ where: { id } });
-	}
-
-	findByChannel(channel: Channel): Promise<Message[]> {
-		return this.MessageRepository.find({ where: { dest_channel: channel } });
 	}
 
 	async remove(id: string): Promise<void> {

@@ -13,6 +13,7 @@ import { ChannelService } from "@services/channel.service";
 import { SocketService } from "@services/socket.service";
 import { Socket, Server } from "socket.io";
 
+
 @WebSocketGateway({
 	namespace: "chat",
 	cors: {
@@ -92,7 +93,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 			this.socketService.sendError(client, e as Error);
 		}
 	}
-
 	@SubscribeMessage("JC")
 	async onJC(client: Socket, payload: string): Promise<void> {
 		const usr = this.socketService.getClient(client);
