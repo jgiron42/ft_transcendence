@@ -1,10 +1,31 @@
 <template>
-	<modal name="my-modal">
+	<modal :name="name">
 		<div class="v-full h-full flex flex-col">
-			<button class="text-white ml-auto mr-2 mt-1" @click="$modal.hide('my-modal')">X</button>
-			<div class="text-sky-400 v-full h-full">
-				<div class="text-white flex justify-center items-center h-full">This is a popup</div>
-			</div>
+			<button class="text-white ml-auto mr-2 mt-1" @click="$modal.hide(name)">X</button>
+			<Component :is="__component__" />
 		</div>
 	</modal>
 </template>
+
+<script lang="ts">
+import Vue from "vue";
+
+export default Vue.extend({
+	name: "Popup",
+	props: {
+		name: {
+			type: String,
+			required: true,
+		},
+		component: {
+			type: String,
+			required: true,
+		},
+	},
+	computed: {
+		__component__() {
+			return () => import(`@/components/${this.component}.vue`);
+		},
+	},
+});
+</script>

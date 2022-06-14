@@ -16,8 +16,6 @@ export class ChannelService {
 		private messageService: MessageService,
 	) {
 		this.channelMap = new Map<string, string>();
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.createRealm();
 		void this.logger;
 	}
 
@@ -44,7 +42,6 @@ export class ChannelService {
 	async createRealm(): Promise<void> {
 		try {
 			await this.ChannelRepository.save(new Channel("realm", undefined));
-			await this.ChannelRepository.save(new Channel("realm2", undefined));
 		} catch (e) {
 			this.logger.error(e);
 		}

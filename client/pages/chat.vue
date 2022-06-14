@@ -2,6 +2,7 @@
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
 		<Chatbox :socket="socket" />
 		<chat-selection :socket="socket" />
+		<Popup name="create_channel" component="CreateChannel" />
 	</div>
 </template>
 

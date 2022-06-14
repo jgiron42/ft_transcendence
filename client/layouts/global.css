@@ -13,9 +13,8 @@ html {
 	flex-direction: column !important;
 	background-color: #424242 !important;
 	border-radius: 6px !important;
-}
-
-.vm--overlay {
-	backdrop-filter: blur(10px) !important;
-	background-color: #000a !important;
+	left: auto !important;
+	margin-left: auto;
+	margin-right: auto;
+	width: min(500px, 95%) !important;
 }
