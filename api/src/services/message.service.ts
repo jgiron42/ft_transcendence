@@ -4,7 +4,6 @@ import { Repository } from "typeorm";
 import { Message } from "@src/entities/message.entity";
 import { Channel } from "@src/entities/channel.entity";
 
-
 @Injectable()
 export class MessageService {
 	constructor(

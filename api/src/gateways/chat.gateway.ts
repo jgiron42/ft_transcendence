@@ -13,7 +13,6 @@ import { ChannelService } from "@services/channel.service";
 import { SocketService } from "@services/socket.service";
 import { Socket, Server } from "socket.io";
 
-
 @WebSocketGateway({
 	namespace: "chat",
 	cors: {
