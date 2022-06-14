@@ -2,7 +2,7 @@
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
 		<NewChannelPopup v-if="newChannelPopup" />
 		<Chatbox :socket="socket" />
-		<chat-selection :socket="socket" :on-new-channel="newChannel" />
+		<chat-selection :socket="socket" />
 	</div>
 </template>
 
@@ -29,21 +29,11 @@ export default Vue.extend({
 			newChannelPopup: false,
 		};
 	},
-	mounted() {
-		window.socket = this.socket;
-	},
-	methods: {
-		newChannel() {
-			console.log("hello c'est moi");
-			this.newChannelPopup = true;
-		},
-	},
 });
 </script>
 
 <style>
 body {
-	background-color: bg-design_gray;
 	@apply bg-design_dgray;
 }
 
