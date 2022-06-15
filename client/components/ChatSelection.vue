@@ -1,11 +1,16 @@
 <template>
-	<div id="chat-selection" class="w-1/4 h-full p-4">
+	<div id="chat-selection" class="h-full">
 		<button class="chan-text items-center cut-text w-95 btn pr-3 pl-3" @click="$modal.show('create_channel')">
 			Create a channel
 		</button>
 		<div v-for="(chan, index) of channels" :key="index">
-			<button class="chan-name cut-text btn pr-3 pl-3" @click="JC(chan.name)">
-				{{ chan.name }}
+			<button
+				class="chan-name cut-text btn text-left"
+				:class="chan.id == currentChannel.id ? 'selected' : ''"
+				@click="JC(chan.name)"
+			>
+				#
+				<b>{{ chan.name }}</b>
 			</button>
 		</div>
 	</div>
@@ -26,6 +31,7 @@ export default Vue.extend({
 	data() {
 		return {
 			channels: [] as Channel[],
+			currentChannel: Channel,
 		};
 	},
 	mounted() {
@@ -38,16 +44,24 @@ export default Vue.extend({
 		this.socket.on("GC", (chans: Channel[]) => {
 			this.onGC(chans);
 		});
+
+		this.socket.on("JC", (payload = { chan: Channel }) => {
+			this.onJC(payload.chan);
+		});
 	},
 	methods: {
 		JC(chan: string) {
 			this.socket.emit("JC", chan);
+		},
+		onJC(chan: Channel) {
+			this.currentChannel = chan as Channel;
 		},
 		getChannels() {
 			this.socket.emit("GC");
 		},
 		onGC(chans: Channel[]) {
 			this.channels = chans;
+			currentChannel = this.channels[0];
 		},
 	},
 });
@@ -56,6 +70,8 @@ export default Vue.extend({
 <style>
 #chat-selection {
 	overflow: auto;
+	padding: 0.5rem;
+	width: 240px;
 }
 
 .chan-text {
@@ -72,14 +88,12 @@ export default Vue.extend({
 
 .chan-name {
 	overflow: hidden;
-	color: black;
+	color: #bdbdbd;
 	font: 1em "Open Sans", sans-serif;
 	width: 100%;
-	padding: 10px;
-	border-radius: 10px;
+	padding: 3px;
+	border-radius: 5px;
 	margin-bottom: 5px;
-	text-align: center;
-	background-color: #cecece;
 }
 
 .close-button {
@@ -99,5 +113,9 @@ export default Vue.extend({
 	overflow: hidden;
 	width: 100%;
 	white-space: nowrap;
+}
+
+.selected {
+	background-color: #424242;
 }
 </style>

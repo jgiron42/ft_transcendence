@@ -63,8 +63,8 @@ export default Vue.extend({
 		this.socket.on("GAI", (user: User) => {
 			this.onGAI(user);
 		});
-		this.socket.on("JC", (payload = { channel: Channel, messages: [] as Message[] }) => {
-			this.onJC(payload.channel, payload.messages);
+		this.socket.on("JC", (payload = { chan: Channel, messages: [] as Message[] }) => {
+			this.onJC(payload.chan, payload.messages);
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.onMSG(message);

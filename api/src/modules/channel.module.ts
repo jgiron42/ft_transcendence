@@ -28,6 +28,7 @@ export class ChannelModule {
 	async createRealm(): Promise<void> {
 		try {
 			await this.channelRepository.save(new Channel("realm", undefined));
+			await this.channelRepository.save(new Channel("realm2", undefined));
 			this.logger.log("Realm created.");
 		} catch (e) {
 			this.logger.error(e);

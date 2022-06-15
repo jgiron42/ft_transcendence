@@ -1,7 +1,7 @@
 <template>
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-		<chat-selection :socket="socket" />
-    <Chatbox :socket="socket" />
+		<ChatSelection :socket="socket" />
+		<Chatbox :socket="socket" />
 		<Popup name="create_channel" component="ChannelCreation" />
 	</div>
 </template>
