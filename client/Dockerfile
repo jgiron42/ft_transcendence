@@ -19,6 +19,6 @@ RUN NODE_ENV=$DOCKER_NODE_ENV npm run build
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
-EXPOSE 4001
+EXPOSE 4000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl --fail 127.0.0.1:4001 > /dev/null 2>&1 || pkill node
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl --fail 127.0.0.1:4000 > /dev/null 2>&1 || pkill node
