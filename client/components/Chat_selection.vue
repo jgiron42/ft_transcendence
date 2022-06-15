@@ -3,7 +3,6 @@
 		<button class="chan-text items-center cut-text w-95 btn pr-3 pl-3" @click="$modal.show('create_channel')">
 			Create a channel
 		</button>
-		<Popup component="ChannelCreation" />
 		<div v-for="(chan, index) of channels" :key="index">
 			<button class="chan-name cut-text btn pr-3 pl-3" @click="JC(chan.name)">
 				{{ chan.name }}

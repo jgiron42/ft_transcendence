@@ -1,9 +1,8 @@
 <template>
 	<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-		<NewChannelPopup v-if="newChannelPopup" />
-		<Chatbox :socket="socket" />
 		<chat-selection :socket="socket" />
-		<Popup name="create_channel" component="CreateChannel" />
+    <Chatbox :socket="socket" />
+		<Popup name="create_channel" component="ChannelCreation" />
 	</div>
 </template>
 
@@ -27,7 +26,6 @@ export default Vue.extend({
 				teardown: false,
 				forceNew: false,
 			}),
-			newChannelPopup: false,
 		};
 	},
 });

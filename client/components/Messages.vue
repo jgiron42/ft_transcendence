@@ -30,7 +30,7 @@ export default Vue.extend({
 			default: () => [],
 		},
 		user: {
-			type: User,
+			type: Object,
 			default: () => {
 				return new User();
 			},
