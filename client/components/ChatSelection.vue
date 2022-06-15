@@ -31,7 +31,7 @@ export default Vue.extend({
 	data() {
 		return {
 			channels: [] as Channel[],
-			currentChannel: Channel,
+			currentChannel: new Channel(),
 		};
 	},
 	mounted() {
@@ -53,7 +53,7 @@ export default Vue.extend({
 		JC(chan: string) {
 			this.socket.emit("JC", chan);
 		},
-		onJC(chan: Channel) {
+		onJC(chan: Object) {
 			this.currentChannel = chan as Channel;
 		},
 		getChannels() {
@@ -61,7 +61,7 @@ export default Vue.extend({
 		},
 		onGC(chans: Channel[]) {
 			this.channels = chans;
-			currentChannel = this.channels[0];
+			this.currentChannel = this.channels[0];
 		},
 	},
 });
