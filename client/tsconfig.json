@@ -16,7 +16,7 @@
 			"~/*": ["./*"],
 			"@/*": ["./*"]
 		},
-		"types": ["@nuxt/types", "@types/node", "cookie-universal-nuxt", "nuxt-socket-io"]
+		"types": ["@nuxt/types", "@types/node", "cookie-universal-nuxt", "nuxt-socket-io", "@nuxtjs/device"]
 	},
 	"exclude": ["node_modules", ".nuxt", "dist"]
 }

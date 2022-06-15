@@ -27,11 +27,14 @@ export default Vue.extend({
 			type: Object,
 			default: () => {},
 		},
+		currentChannel: {
+			type: Object,
+			default: () => {},
+		},
 	},
 	data() {
 		return {
 			channels: [] as Channel[],
-			currentChannel: new Channel(),
 		};
 	},
 	mounted() {
@@ -44,24 +47,16 @@ export default Vue.extend({
 		this.socket.on("GC", (chans: Channel[]) => {
 			this.onGC(chans);
 		});
-
-		this.socket.on("JC", (payload = { chan: Channel }) => {
-			this.onJC(payload.chan);
-		});
 	},
 	methods: {
 		JC(chan: string) {
 			this.socket.emit("JC", chan);
-		},
-		onJC(chan: Object) {
-			this.currentChannel = chan as Channel;
 		},
 		getChannels() {
 			this.socket.emit("GC");
 		},
 		onGC(chans: Channel[]) {
 			this.channels = chans;
-			this.currentChannel = this.channels[0];
 		},
 	},
 });
@@ -72,6 +67,8 @@ export default Vue.extend({
 	overflow: auto;
 	padding: 0.5rem;
 	width: 240px;
+	min-width: 240px;
+	background-color: #252525;
 }
 
 .chan-text {

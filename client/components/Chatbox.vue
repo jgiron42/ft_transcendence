@@ -1,6 +1,5 @@
 <template>
 	<div id="chat-box" class="w-full h-full flex flex-col">
-		<h1 id="chat-title" class="text-center">Chat</h1>
 		<div id="chat-content" class="flex flex-col-reverse items-center">
 			<Messages :messages="messages" :user="user" />
 		</div>
@@ -117,10 +116,6 @@ export default Vue.extend({
 </script>
 
 <style>
-#chat-title {
-	color: #d5d5d5;
-}
-
 .txt-msg-bg {
 	border: none;
 	border-bottom: 1px solid #333;
@@ -139,6 +134,7 @@ export default Vue.extend({
 
 #chat-box {
 	background-color: #1b1b1b;
+	min-width: 300px;
 }
 
 #chat-content {
