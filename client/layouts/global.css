@@ -17,4 +17,6 @@ html {
 	margin-left: auto;
 	margin-right: auto;
 	width: min(500px, 95%) !important;
+	height: fit-content !important;
+	padding-bottom: 10px;
 }

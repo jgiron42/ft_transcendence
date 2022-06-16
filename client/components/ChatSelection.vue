@@ -93,6 +93,11 @@ export default Vue.extend({
 	margin-bottom: 5px;
 }
 
+.chan-name:hover {
+	background-color: #393939;
+	color: #999;
+}
+
 .close-button {
 	overflow: hidden;
 	color: black;

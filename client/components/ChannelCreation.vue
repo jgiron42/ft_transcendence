@@ -1,8 +1,8 @@
 <template>
 	<div class="v-full h-full">
-		<div class="text-white flex flex-col pl-8 pr-8">
-			<div class="flex flex-row">
-				<p>Channel name</p>
+		<div class="text-white flex flex-col pl-8 pr-8 gap-4">
+			<div class="flex flex-col">
+				<p class="ml-2">Channel name:</p>
 				<div class="area-chan-name p-2">
 					<input
 						id="textarea-chan-name"
@@ -13,21 +13,15 @@
 					/>
 				</div>
 			</div>
-			<div>
-				<br />
-			</div>
 			<select id="type-select" class="text-black p-2" name="pets" @change="selectCategory($event)">
 				<option value="0">--Please choose an option--</option>
 				<option value="1">public</option>
 				<option value="2">private</option>
 				<option value="3">with password</option>
 			</select>
-			<div>
-				<br />
-			</div>
 			<div v-if="chan_type === '3'">
-				<div class="flex flex-row">
-					<p>Enter the password</p>
+				<div class="flex flex-col">
+					<p class="ml-2">Enter the password:</p>
 					<div class="area-chan-name p-2">
 						<input
 							id="textarea-password"
@@ -39,9 +33,6 @@
 						/>
 					</div>
 				</div>
-			</div>
-			<div>
-				<br />
 			</div>
 			<button class="validate">Create the channel {{ chan_name }}</button>
 		</div>
