@@ -1,11 +1,11 @@
 <template>
 	<div class="w-full h-full flex flex-col">
 		<div class="chat-header flex flex-row h-fit">
-			<button id="show-select-btn" class="text-white font-bold rounded" @click="showSelection = !showSelection">
+			<button id="show-select-btn" class="text-white font-bold rounded" @click="onShowSelect">
 				<i class="fas fa-plus">#</i>
 			</button>
 			<h1 id="chat-title" class="w-full text-center mt-auto mb-auto">Chat</h1>
-			<button id="show-select-btn" class="text-white font-bold rounded" @click="showUsers = !showUsers">
+			<button id="show-select-btn" class="text-white font-bold rounded" @click="onShowUsers">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -31,6 +31,7 @@
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
 			<ChatSelection v-if="showSelection" :socket="socket" :current-channel="currentChannel" />
 			<Chatbox :socket="socket" />
+			<UsersInChannel v-if="showUsers" :socket="socket" />
 			<Popup name="create_channel" component="ChannelCreation" />
 		</div>
 	</div>
@@ -70,6 +71,18 @@ export default Vue.extend({
 	methods: {
 		onJC(chan: Channel) {
 			this.currentChannel = chan;
+		},
+		onShowSelect() {
+			if (this.$device.isMobile) {
+				this.showUsers = false;
+			}
+			this.showSelection = !this.showSelection;
+		},
+		onShowUsers() {
+			if (this.$device.isMobile) {
+				this.showSelection = false;
+			}
+			this.showUsers = !this.showUsers;
 		},
 	},
 });

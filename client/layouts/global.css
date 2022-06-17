@@ -7,6 +7,11 @@ html {
 	font-family: BMjapan, sans-serif;
 }
 
+.vm--overlay {
+	backdrop-filter: blur(5px);
+	background-color: #0007 !important;
+}
+
 .vm--modal {
 	display: flex !important;
 	flex: 1 1 auto !important;

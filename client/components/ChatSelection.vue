@@ -31,6 +31,10 @@ export default Vue.extend({
 			type: Object,
 			default: () => {},
 		},
+		align: {
+			type: String,
+			default: "left",
+		},
 	},
 	data() {
 		return {
@@ -38,6 +42,14 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
+		const containerTest = document.getElementById("container-test");
+		if (containerTest != null) {
+			if (this.align === "left") {
+				containerTest.scrollLeft = 0;
+			} else if (this.align === "right") {
+				containerTest.scrollLeft = containerTest.scrollWidth;
+			}
+		}
 		if (this.socket.connected) {
 			this.getChannels();
 		}
