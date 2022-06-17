@@ -32,6 +32,10 @@ export default Vue.extend({
 			type: String,
 			default: "left",
 		},
+		align: {
+			type: String,
+			default: "left",
+		},
 	},
 	data() {
 		return {

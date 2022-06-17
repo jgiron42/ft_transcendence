@@ -99,6 +99,18 @@ export default Vue.extend({
 			}
 			this.showUsers = !this.showUsers;
 		},
+		onShowSelect() {
+			if (this.$device.isMobile) {
+				this.showUsers = false;
+			}
+			this.showSelection = !this.showSelection;
+		},
+		onShowUsers() {
+			if (this.$device.isMobile) {
+				this.showSelection = false;
+			}
+			this.showUsers = !this.showUsers;
+		},
 	},
 });
 </script>
