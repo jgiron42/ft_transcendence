@@ -9,7 +9,6 @@ import { SetMode } from "@utils/set-mode";
 export class User {
 	constructor() {
 		this.id = undefined;
-		this.pseudo = undefined;
 		this.path_avatar = ""; // may be a default avatar path
 		this.nb_game = 0;
 		this.nb_win = 0;
@@ -44,7 +43,7 @@ export class User {
 
 	// say if the user use OAuth or not
 	@Column()
-	@SetMode([["own_user", "cru"], "r"]) // class-transformer
+	@SetMode([["own_user", "r"], "cu"]) // class-transformer
 	OAuth: boolean;
 
 	// status of the user
@@ -54,7 +53,7 @@ export class User {
 
 	// totp key of the user
 	@Column({ length: 20 })
-	@SetMode([["own_user", "cur"]])
+	@SetMode("cu")
 	totp_key: string;
 
 	// date of registration of the user

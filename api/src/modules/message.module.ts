@@ -9,7 +9,11 @@ import { UserModule } from "@modules/user.module";
 import { AuthModule } from "./auth.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Message, User, Channel]), AuthModule, forwardRef(() => UserModule)],
+	imports: [
+		TypeOrmModule.forFeature([Message, User, Channel]),
+		forwardRef(() => AuthModule),
+		forwardRef(() => UserModule),
+	],
 	providers: [MessageService],
 	controllers: [AppController],
 	exports: [MessageService],

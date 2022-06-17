@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Relation } from "@src/entities/relation.entity";
 import { Container } from "typedi";
+import { RelationQuery } from "@src/queries/relationQuery";
 
 @Injectable()
 export class RelationService {
@@ -13,23 +14,38 @@ export class RelationService {
 		Container.set(this.constructor, this);
 	}
 
-	findAll(): Promise<Relation[]> {
-		return this.RelationRepository.find();
+	getReq() {
+		return new RelationQuery(this.RelationRepository);
 	}
 
-	findOne(id: string): Promise<Relation> {
-		return this.RelationRepository.findOne(id);
+	findAll(userId: string, page = 1, itemByPage = 10): Promise<Relation[]> {
+		return this.getReq().in_relation(userId).paginate(page, itemByPage).getMany();
 	}
 
-	async remove(id: string): Promise<void> {
-		await this.RelationRepository.delete(id);
+	findAllAndCount(userId: string, page = 1, itemByPage = 10): Promise<[Relation[], number]> {
+		return this.getReq().in_relation(userId).paginate(page, itemByPage).getManyAndCount();
 	}
 
-	async create(relation: Relation): Promise<Relation> {
-		return this.RelationRepository.save(relation);
+	findOne(id: number): Promise<Relation> {
+		return this.getReq().getOne(id);
 	}
 
-	async findByUser(id: string): Promise<Relation[]> {
-		return this.RelationRepository.find({ where: [{ user_one: id }, { user_two: id }] });
+	async remove(id: number): Promise<void> {
+		await this.getReq().remove(id);
+	}
+
+	create(relation: Relation): Promise<Relation> {
+		return this.save(this.RelationRepository.create(relation));
+	}
+
+	async save(relation: Relation): Promise<Relation> {
+		return await this.RelationRepository.save(relation);
+	}
+
+	update(id: number, relation: Relation) {
+		return this.getReq().update(id, relation);
+	}
+	findByUser(id: string): Promise<Relation[]> {
+		return this.getReq().in_relation(id).getMany();
 	}
 }

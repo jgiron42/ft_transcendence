@@ -3,6 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { Container } from "typedi";
+import { ChanConnectionQuery } from "@src/queries/chanConnectionQuery";
+import { DeepPartial } from "typeorm/common/DeepPartial";
 
 @Injectable()
 export class ChanConnectionService {
@@ -13,31 +15,47 @@ export class ChanConnectionService {
 		Container.set(this.constructor, this);
 	}
 
-	findAll(): Promise<ChanConnection[]> {
-		return this.ChanConnectionRepository.find();
+	getQuery() {
+		return new ChanConnectionQuery(this.ChanConnectionRepository);
 	}
 
-	findOne(id: string): Promise<ChanConnection> {
-		return this.ChanConnectionRepository.findOne(id);
+	findAllAndCount(userid: string, page = 1, itemByPage = 10): Promise<[ChanConnection[], number]> {
+		return this.getQuery().user(userid).paginate(page, itemByPage).getManyAndCount();
 	}
 
-	async remove(id: string): Promise<void> {
-		await this.ChanConnectionRepository.delete(id);
+	findAllAndCountByChannel(channelId: number, page = 1, itemByPage = 10): Promise<[ChanConnection[], number]> {
+		return this.getQuery().channel(channelId).paginate(page, itemByPage).getManyAndCount();
 	}
 
-	async create(chanconnection: ChanConnection): Promise<ChanConnection> {
-		return this.ChanConnectionRepository.save(chanconnection);
+	findOne(id: number): Promise<ChanConnection> {
+		return this.getQuery().getOne(id);
+	}
+
+	async remove(id: number): Promise<void> {
+		await this.getQuery().remove(id);
+	}
+
+	create(chanConnection: DeepPartial<ChanConnection>): Promise<ChanConnection> {
+		return this.save(this.ChanConnectionRepository.create(chanConnection));
+	}
+
+	async save(chanConnection: ChanConnection): Promise<ChanConnection> {
+		return await this.ChanConnectionRepository.save(chanConnection);
+	}
+
+	update(id: number, chanConnection: ChanConnection) {
+		return this.getQuery().update(id, chanConnection);
 	}
 
 	async findByUser(id: string): Promise<ChanConnection[]> {
-		return this.ChanConnectionRepository.find({ where: [{ user_id: id }] });
+		return this.getQuery().user(id).getMany();
 	}
 
 	async findByChannel(id: number): Promise<ChanConnection[]> {
-		return this.ChanConnectionRepository.find({ where: [{ chan_id: id }] });
+		return this.getQuery().channel(id).getMany();
 	}
 
 	async isOnChannel(userId: string, channelId: number): Promise<boolean> {
-		return !!(await this.ChanConnectionRepository.findOne({ where: [{ chan_id: channelId, user_id: userId }] }));
+		return !!(await this.getQuery().channel(channelId).user(userId).query.getOne());
 	}
 }

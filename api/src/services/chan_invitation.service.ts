@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { Container } from "typedi";
+import { InviteQuery } from "@src/queries/inviteQuery";
 
 @Injectable()
 export class ChanInvitationService {
@@ -13,23 +14,37 @@ export class ChanInvitationService {
 		Container.set(this.constructor, this);
 	}
 
-	findAll(): Promise<ChanInvitation[]> {
-		return this.ChanInvitationRepository.find();
+	getQuery() {
+		return new InviteQuery(this.ChanInvitationRepository);
 	}
 
-	findOne(id: string): Promise<ChanInvitation> {
-		return this.ChanInvitationRepository.findOne(id);
+	findAll(userId: string, page = 1, itemByPage = 10): Promise<ChanInvitation[]> {
+		return this.getQuery().in_invitation(userId).paginate(page, itemByPage).getMany();
 	}
 
-	async remove(id: string): Promise<void> {
-		await this.ChanInvitationRepository.delete(id);
+	findOne(id: number): Promise<ChanInvitation> {
+		return this.getQuery().getOne(id);
 	}
 
-	async create(chaninvitation: ChanInvitation): Promise<ChanInvitation> {
-		return this.ChanInvitationRepository.save(chaninvitation);
+	async remove(id: number): Promise<void> {
+		await this.getQuery().remove(id);
 	}
 
+	create(chanInvitation: ChanInvitation): Promise<ChanInvitation> {
+		return this.save(this.ChanInvitationRepository.create(chanInvitation));
+	}
+
+	async save(chanInvitation: ChanInvitation): Promise<ChanInvitation> {
+		return await this.ChanInvitationRepository.save(chanInvitation);
+	}
+
+	update(id: number, chanInvitation: ChanInvitation) {
+		return this.getQuery().update(id, chanInvitation);
+	}
 	async findByChannel(id: number): Promise<ChanInvitation[]> {
-		return this.ChanInvitationRepository.find({ where: [{ invite_where: id }] });
+		return this.getQuery().channel(id).getMany();
+	}
+	async findByChannelAndCount(id: number, page = 1, itemByPage = 10): Promise<[ChanInvitation[], number]> {
+		return this.getQuery().channel(id).paginate(page, itemByPage).getManyAndCount();
 	}
 }

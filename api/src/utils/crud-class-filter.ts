@@ -14,10 +14,14 @@ export const CrudClassFilter = <T>(input: T, type: string, groups?: string[]): T
 	for (const key in obj) {
 		if (Object.prototype.hasOwnProperty.call(obj, key)) {
 			mode = Reflect.getMetadata("crudFilter", obj, key) as crudMode;
-			if (!mode) continue;
+			if (!mode) {
+				delete obj[key];
+				continue;
+			}
 			let isAllowed = false;
 			for (const group of groups) isAllowed ||= mode.has(group) && mode.get(group).includes(type.charAt(0));
-			if (isAllowed) obj[key] = CrudClassFilter(obj[key], type, groups);
+			if (isAllowed)
+				obj[key] = CrudClassFilter(obj[key], type, undefined); // removing groups in nested objects by security
 			else delete obj[key];
 		}
 	}

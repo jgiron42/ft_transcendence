@@ -8,7 +8,7 @@ import { UserModule } from "@modules/user.module";
 import { AuthModule } from "./auth.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Game, User]), AuthModule, forwardRef(() => UserModule)],
+	imports: [TypeOrmModule.forFeature([Game, User]), forwardRef(() => AuthModule), forwardRef(() => UserModule)],
 	providers: [GameService],
 	controllers: [AppController],
 	exports: [GameService],

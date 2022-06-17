@@ -22,7 +22,7 @@ export class Message {
 	content: string;
 
 	// user who send the message
-	@ManyToOne(() => User, (send_by) => send_by.id)
+	@ManyToOne(() => User, (send_by) => send_by.id, { eager: true, onDelete: "CASCADE" })
 	@SetMode("r")
 	@setService(UserService)
 	send_by: User | string;
@@ -33,7 +33,7 @@ export class Message {
 	date: Date;
 
 	// destination of the message
-	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id)
+	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id, { eager: true, onDelete: "CASCADE" })
 	@SetMode("cru")
 	dest_channel: Channel | number;
 }
