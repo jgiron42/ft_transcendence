@@ -8,38 +8,42 @@ import { SetMode } from "@utils/set-mode";
 
 // entity use to describe the channel
 
+export enum ChannelType {
+	PUBLIC,
+	PRIVATE,
+	DM,
+}
+
 @Entity()
 export class Channel {
 	constructor() {
 		this.chat_type = 0;
+		this.mdp = "";
 		this.owner = new User();
 	}
 	@PrimaryGeneratedColumn()
-	@SetMode([["see_channel", "r"]])
+	@SetMode("r")
 	id: number;
 
 	// name of the channel
 	@Column()
-	@SetMode([["channel_owner", "u"], ["see_channel", "r"], "c"])
+	@SetMode("cru")
 	name: string;
 
 	// type of channel
 	@Column()
-	@SetMode([["channel_owner", "u"], ["see_channel", "r"], "c"])
-	chat_type: number;
+	@SetMode("cru")
+	chat_type: ChannelType;
 
 	// password to access to the channnel
 	@Column()
-	@SetMode([["channel_owner", "u"], "c"])
+	@SetMode("cu")
 	mdp: string;
 
 	// owner  (and creator) of the channel
-	@ManyToOne(() => User, (owner) => owner.id, { eager: true })
+	@ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE" })
 	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
-	@SetMode([
-		["channel_owner", "u"],
-		["see_channel", "r"],
-	])
+	@SetMode("cru")
 	owner: User | string;
 }

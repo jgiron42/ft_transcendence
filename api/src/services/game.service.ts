@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Game } from "@src/entities/game.entity";
 import { Container } from "typedi";
+import { GameQuery } from "@src/queries/gameQuery";
 
 @Injectable()
 export class GameService {
@@ -13,23 +14,38 @@ export class GameService {
 		Container.set(this.constructor, this);
 	}
 
-	findAll(): Promise<Game[]> {
-		return this.GameRepository.find();
+	getQuery() {
+		return new GameQuery(this.GameRepository);
 	}
 
-	findOne(id: string): Promise<Game> {
-		return this.GameRepository.findOne(id);
+	findAll(page = 1, itemByPage = 10): Promise<Game[]> {
+		return this.getQuery().paginate(page, itemByPage).getMany();
+	}
+	findAllAndCount(page = 1, itemByPage = 10): Promise<[Game[], number]> {
+		return this.getQuery().paginate(page, itemByPage).getManyAndCount();
 	}
 
-	async remove(id: string): Promise<void> {
-		await this.GameRepository.delete(id);
+	findOne(id: number): Promise<Game> {
+		return this.getQuery().getOne(id);
+	}
+
+	async remove(id: number) {
+		return this.getQuery().remove(id);
 	}
 
 	async findByUser(id: string): Promise<Game[]> {
-		return this.GameRepository.find({ where: [{ first_player: id }, { second_player: id }] });
+		return this.getQuery().in_game(id).getMany();
 	}
 
-	async create(game: Game): Promise<Game> {
-		return this.GameRepository.save(game);
+	create(channel: Game): Promise<Game> {
+		return this.save(this.GameRepository.create(channel));
+	}
+
+	async save(channel: Game): Promise<Game> {
+		return await this.GameRepository.save(channel);
+	}
+
+	update(id: number, game: Game) {
+		return this.getQuery().update(id, game);
 	}
 }

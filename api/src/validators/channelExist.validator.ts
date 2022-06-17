@@ -1,29 +1,29 @@
 import { Injectable } from "@nestjs/common";
 import { ValidatorConstraintInterface, ValidatorConstraint } from "class-validator";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "@entities/user.entity";
 import { Repository } from "typeorm";
+import { Channel } from "@src/entities/channel.entity";
 
 /**
  * validator for user object, return true if the user exist else throw a bad request exception
  */
-@ValidatorConstraint({ name: "UserExists", async: true })
+@ValidatorConstraint({ name: "ChannelExist", async: true })
 @Injectable()
-export class UserExistsRule implements ValidatorConstraintInterface {
+export class ChannelExistRule implements ValidatorConstraintInterface {
 	constructor(
-		@InjectRepository(User)
-		private usersRepository: Repository<User>,
+		@InjectRepository(Channel)
+		private channelRepository: Repository<Channel>,
 	) {}
 
-	async validate(value: string) {
+	async validate(value: number) {
 		try {
-			await this.usersRepository.findOneByOrFail({ id: value });
+			await this.channelRepository.findOneByOrFail({ id: value });
 		} catch (e) {
 			return false;
 		}
 		return true;
 	}
 	defaultMessage() {
-		return `User doesn't exist`;
+		return `Channel doesn't exist`;
 	}
 }

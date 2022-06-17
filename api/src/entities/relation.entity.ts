@@ -13,19 +13,19 @@ export class Relation {
 	id: number;
 
 	// user one is the user who owned the relation
-	@ManyToOne(() => User, (user_one) => user_one.id)
+	@ManyToOne(() => User, (user_one) => user_one.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
-	@SetMode("cru")
-	user_one: User;
+	@SetMode("cr")
+	user_one: User | string;
 
 	// user two is the user which the user one have a relation
-	@ManyToOne(() => User, (user_two) => user_two.id)
+	@ManyToOne(() => User, (user_two) => user_two.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
-	@SetMode("cru")
-	user_two: User;
+	@SetMode("cr")
+	user_two: User | string;
 
 	// type of relation
 	@Column()
-	@SetMode("cru")
+	@SetMode("cr")
 	relation_type: number;
 }

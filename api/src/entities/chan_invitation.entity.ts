@@ -4,13 +4,14 @@ import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
 import { ChannelService } from "@services/channel.service";
 import { SetMode } from "@utils/set-mode";
-import { Expose } from "class-transformer";
+import { Validate } from "class-validator";
+import { UserExistsRule } from "@src/validators/userExist.validator";
+import { ChannelExistRule } from "@src/validators/channelExist.validator";
 import { User } from "./user.entity";
 
 // entity use to manage the channel invitation
 
 @Entity()
-@Expose() // class-transformer
 export class ChanInvitation {
 	constructor() {
 		this.date = new Date();
@@ -25,19 +26,22 @@ export class ChanInvitation {
 	date: Date;
 
 	// who invite a user to join a channel
-	@ManyToOne(() => User, (invite_by) => invite_by.id)
+	@ManyToOne(() => User, (invite_by) => invite_by.id, { eager: true, onDelete: "CASCADE" })
+	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
 	@SetMode("r")
-	invite_by: User;
+	invite_by: User | string;
 
 	// who is invited to join the channel
-	@ManyToOne(() => User, (invited) => invited.id)
+	@ManyToOne(() => User, (invited) => invited.id, { eager: true, onDelete: "CASCADE" })
+	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
 	@SetMode("rcu")
-	invited: User;
+	invited: User | string;
 
 	/// channel where the user is invite
-	@ManyToOne(() => Channel, (invite_where) => invite_where.id)
+	@ManyToOne(() => Channel, (invite_where) => invite_where.id, { eager: true, onDelete: "CASCADE" })
+	@Validate(ChannelExistRule) // class-validator
 	@setService(ChannelService)
 	@SetMode("rcu")
 	invite_where: Channel;

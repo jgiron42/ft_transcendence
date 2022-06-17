@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, UseGuards, Post, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Put, UseGuards, Post, UseInterceptors, Res, UseFilters, Req } from "@nestjs/common";
 import { UserService } from "@services/user.service";
 import { DevelopmentGuard } from "@src/guards/development.guard";
 import { GameService } from "@services/game.service";
@@ -11,10 +11,13 @@ import { getPutPipeline } from "@utils/getPutPipeline";
 import { getPostPipeline } from "@utils/getPostPipeline";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { SessionGuard } from "@guards/session.guard";
-import { Request as MyRequest } from "@src/types/request";
-import { MapGroupInterceptor } from "@interceptors/map-group.interceptor";
+import { Request, Request as MyRequest } from "@src/types/request";
 import { SetGroupMappers } from "@utils/setGroupMappers";
-import { Groups } from "@utils/groupsDecorator";
+import { Response } from "express";
+import { PerPage } from "@utils/PerPage";
+import { Page } from "@utils/Page";
+import { QueryFailedFilter } from "@filters/query-failed.filter";
+import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
 
 @Controller("users")
 @UseGuards(...SessionGuard)
@@ -22,6 +25,7 @@ import { Groups } from "@utils/groupsDecorator";
 @SetGroupMappers({
 	own_user: (req: MyRequest<User>) => req.params?.id && req.user?.id === req.params?.id,
 })
+@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
 export class UsersController {
 	constructor(
 		private userService: UserService,
@@ -35,8 +39,15 @@ export class UsersController {
 	 * get all visible users
 	 */
 	@Get()
-	getAll(): Promise<object> {
-		return this.userService.findAll();
+	async getAll(
+		@Page() page: number,
+		@PerPage() per_page: number,
+		@Res({ passthrough: true }) res: Response,
+	): Promise<object> {
+		const [ret, total] = await this.userService.findAllAndCount(page, per_page);
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
@@ -44,19 +55,20 @@ export class UsersController {
 	 * @param id
 	 */
 	@Get(":id")
-	@UseInterceptors(new MapGroupInterceptor("own_user", (req: MyRequest<User>) => req.user.id === req.params.id))
 	async getOne(@Param("id") id: string): Promise<object> {
 		return await this.userService.findOne(id);
 	}
 
 	/**
 	 * edit the user designated by id
-	 * @param user
 	 */
 	@Put(":id")
-	@Groups("own_user")
-	update(@MyRequestPipe(...getPutPipeline(User, UserService)) user: User): Promise<object> {
-		return this.userService.create(user);
+	update(
+		@Param("id") id: string,
+		@MyRequestPipe(...getPutPipeline(User)) user: User,
+		@Req() req: Request,
+	): Promise<object> {
+		return this.userService.getQuery().is(req.user.id).update(id, user);
 	}
 
 	/**
@@ -66,46 +78,89 @@ export class UsersController {
 	 */
 	@Post()
 	@UseGuards(DevelopmentGuard)
-	create(@MyRequestPipe(...getPostPipeline(User)) user: User): Promise<object> {
+	create(@MyRequestPipe(...getPostPipeline(User)) user: User) {
 		return this.userService.create(user);
 	}
 
 	/**
 	 * get all games of an user
-	 * @param id the user's id
 	 */
 	@Get(":id/games")
-	getGames(@Param("id") id: string): Promise<object> {
-		return this.gameService.findByUser(id);
+	async getGames(
+		@Param("id") id: string,
+		@Res({ passthrough: true }) res: Response,
+		@Page() page: number,
+		@PerPage() per_page: number,
+	): Promise<object> {
+		const [ret, total] = await this.gameService.getQuery().in_game(id).paginate(page, per_page).getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
 	 * get all relations of a user
-	 * @param id the user's id
 	 */
 	@Get(":id/relations")
-	@Groups("own_user")
-	getRelations(@Param("id") id: string): Promise<object> {
-		return this.relationService.findByUser(id);
+	async getRelations(
+		@Param("id") id: string,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+		@Page() page: number,
+		@PerPage() per_page: number,
+	): Promise<object> {
+		const [ret, total] = await this.relationService
+			.getReq()
+			.in_relation(req.user.id)
+			.in_relation(id)
+			.paginate(page, per_page)
+			.getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
 	 * get all chanConnections of a user
-	 * @param id the user's id
 	 */
 	@Get(":id/chan_connections")
-	@Groups("own_user")
-	getChanConnections(@Param("id") id: string): Promise<object> {
-		return this.chanConnectionService.findByUser(id);
+	async getChanConnections(
+		@Param("id") id: string,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+		@Page() page: number,
+		@PerPage() per_page: number,
+	): Promise<object> {
+		const [ret, total] = await this.chanConnectionService
+			.getQuery()
+			.see_connection(req.user.id)
+			.user(id)
+			.paginate(page, per_page)
+			.getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
 	 * get all messages sent by a user
-	 * @param id the user's id
 	 */
 	@Get(":id/messages")
-	@Groups("own_user")
-	getMessages(@Param("id") id: string): Promise<object> {
-		return this.messageService.findByUser(id);
+	async getMessages(
+		@Param("id") id: string,
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+		@Page() page: number,
+		@PerPage() per_page: number,
+	): Promise<object> {
+		const [ret, total] = await this.messageService
+			.getQuery()
+			.see_message(req.user.id)
+			.user(id)
+			.paginate(page, per_page)
+			.getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 }

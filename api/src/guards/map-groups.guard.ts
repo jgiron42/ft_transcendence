@@ -1,11 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { Observable } from "rxjs";
 import { requestBinaryPredicate } from "@src/types/binaryPredicate";
 import { Request } from "@src/types/request";
 
 @Injectable()
 export class MapGroupsGuard implements CanActivate {
-	canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+	async canActivate(context: ExecutionContext): Promise<boolean> {
 		if (context.getType() !== "http") return true;
 		if (Reflect.hasMetadata("groupMapper", context.getClass())) {
 			const mappings = Reflect.getMetadata("groupMapper", context.getClass()) as Record<
@@ -16,7 +15,7 @@ export class MapGroupsGuard implements CanActivate {
 			for (const group in mappings)
 				if (Object.prototype.hasOwnProperty.call(mappings, group)) {
 					req.groups ??= [];
-					if (mappings[group](req)) req.groups.push(group);
+					if (await mappings[group](req)) req.groups.push(group);
 				}
 		}
 		return true;

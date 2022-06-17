@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "@entities/user.entity";
-import { Allow, Validate } from "class-validator";
+import { Validate } from "class-validator";
 import { UserExistsRule } from "@src/validators/userExist.validator";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -26,17 +26,19 @@ export class Game {
 
 	// first player id
 	@Validate(UserExistsRule) // class-validator
-	@ManyToOne(() => User, (user) => user.id, { eager: true })
+	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
-	@SetMode("cru")
+	@SetMode("cr")
 	first_player: User | string;
 
 	// second player id
 	@Validate(UserExistsRule)
-	@ManyToOne(() => User, (user) => user.id, { eager: true })
+	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
-	@SetMode("cru")
+	@SetMode("cr")
 	second_player: User | string;
+
+	second_playerId: string;
 
 	// score of the first player
 	@Column()
@@ -49,14 +51,13 @@ export class Game {
 	score_second_player: number;
 
 	// winner of the game
-	@ManyToOne(() => User, (winner) => winner.id, { nullable: true })
+	@ManyToOne(() => User, (winner) => winner.id, { eager: true, onDelete: "CASCADE" })
 	@SetMode("r")
 	winner: User | string;
 
 	// type of game
 	@Column()
-	@Allow() // class-validator
-	@SetMode("cru")
+	@SetMode("cr")
 	type: number;
 
 	// status of the game

@@ -6,6 +6,9 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
+	Req,
+	Res,
+	UseFilters,
 	UseGuards,
 	UseInterceptors,
 	UsePipes,
@@ -22,34 +25,21 @@ import { getPostPipeline } from "@utils/getPostPipeline";
 import { Message } from "@src/entities/message.entity";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { getPutPipeline } from "@utils/getPutPipeline";
-import { Container } from "typedi";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Request } from "@src/types/request";
-import { SetGroupMappers } from "@utils/setGroupMappers";
-import {Groups} from "@utils/groupsDecorator";
-// import { SessionGuard } from "@guards/session.guard";
+import { Groups } from "@utils/groupsDecorator";
+import { SessionGuard } from "@guards/session.guard";
+import { Response } from "express";
+import { DevelopmentGuard } from "@src/guards/development.guard";
+import { Page } from "@utils/Page";
+import { PerPage } from "@utils/PerPage";
+import { QueryFailedFilter } from "@filters/query-failed.filter";
+import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
 
 @Controller("channels")
-// @UseGuards(...SessionGuard)
+@UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@SetGroupMappers({
-	on_channel: async (req: Request<Channel>) => {
-		const service = Container.get(ChanConnectionService);
-		const id = Number(req.params.id);
-		if (!Number.isSafeInteger(id)) return false;
-		return await service.isOnChannel(req.user.id, id);
-	},
-	see_channel: (req: Request<Channel>) => {
-		void req;
-		return true; // TODO: channel type
-	},
-	channel_owner: async (req: Request<Channel>) => {
-		const service = Container.get(ChannelService);
-		const id = Number(req.params.id);
-		if (!Number.isSafeInteger(id)) return false;
-		return req.user.id && (await service.findOne(id))?.owner === req.user.id;
-	},
-})
+@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
 export class ChannelsController {
 	constructor(
 		private channelService: ChannelService,
@@ -61,66 +51,88 @@ export class ChannelsController {
 	 * return all channels visible by the user
 	 */
 	@Get()
-	getAll(): Promise<object> {
-		return this.channelService.findAll();
+	async getAll(
+		@Page() page: number,
+		@PerPage() per_page: number,
+		@Res({ passthrough: true }) res: Response,
+		@Req() req: Request,
+	): Promise<object> {
+		const [ret, total] = await this.channelService
+			.getQuery()
+			.see_channel(req.user.id)
+			.paginate(page, per_page)
+			.getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
 	 * return a channel if the user can see it
-	 * @param id
 	 */
 	@Get(":id")
-	@Groups("see_channel")
-	getOne(@Param("id", ParseIntPipe) id: number): Promise<object> {
-		return this.channelService.findOne(id);
+	getOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
+		return this.channelService.getQuery().see_channel(req.user.id).getOne(id);
 	}
 
 	/**
 	 * create a channel
-	 * @param channel
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
-	create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel): Promise<object> {
+	create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @Req() req: Request) {
+		channel.owner = req.user;
 		return this.channelService.create(channel);
 	}
 
 	/**
 	 * update a channel if the user is the owner
-	 * @param channel
-	 * @param id the channel id
 	 */
-	@UseGuards(ChannelExistGuard)
-	@Groups("channel_owner")
 	@Put(":id")
 	update(
 		@Param("id", ParseIntPipe) id: number,
-		@MyRequestPipe(...getPutPipeline(Channel, ChannelService)) channel: Channel,
+		@MyRequestPipe(...getPutPipeline(Channel)) channel: Channel,
+		@Req() req: Request,
 	): Promise<object> {
-		void id;
-		return this.channelService.create(channel);
+		return this.channelService.getQuery().own_channel(req.user.id).update(id, channel);
 	}
 
 	/**
 	 * delete a channel if the user is the owner
-	 * @param id
 	 */
 	@Delete(":id")
-	@UseGuards(ChannelExistGuard)
-	@Groups("channel_owner")
-	remove(@Param("id", ParseIntPipe) id: number): Promise<void> {
-		return this.channelService.remove(id);
+	remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
+		return this.channelService.getQuery().own_channel(req.user.id).remove(id);
 	}
 
 	/**
 	 * return all chan_connection from a channel if the user is on this channel
-	 * @param id
 	 */
 	@Get(":id/chan_connections")
-	@UseGuards(ChannelExistGuard)
-	@Groups("on_channel")
-	getConnections(@Param("id", ParseIntPipe) id: number): Promise<object> {
-		return this.chanConnectionService.findByChannel(id);
+	async getConnections(
+		@Param("id", ParseIntPipe) id: number,
+		@Page() page: number,
+		@PerPage() per_page: number,
+		@Res({ passthrough: true }) res: Response,
+		@Req() req: Request,
+	): Promise<object> {
+		const [ret, total] = await this.chanConnectionService
+			.getQuery()
+			.see_connection(req.user.id)
+			.channel(id)
+			.paginate(page, per_page)
+			.getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
+	}
+
+	@Post(":id/join")
+	@UseGuards(DevelopmentGuard)
+	async joinChannel(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
+		await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
+		// TODO: password protect
+		return this.chanConnectionService.create({ user_id: req.user, chan_id: await this.channelService.findOne(id) });
 	}
 
 	/**
@@ -153,13 +165,19 @@ export class ChannelsController {
 
 	/**
 	 * return all invitations for a channel if the user is on this channel
-	 * @param id
 	 */
 	@Get(":id/invitations")
-	@UseGuards(ChannelExistGuard)
 	@Groups("on_channel")
-	getInvitation(@Param("id", ParseIntPipe) id: number): Promise<object> {
-		return this.chanInvitationService.findByChannel(id);
+	async getInvitation(
+		@Param("id", ParseIntPipe) id: number,
+		@Page() page: number,
+		@PerPage() per_page: number,
+		@Res({ passthrough: true }) res: Response,
+	): Promise<object> {
+		const [ret, total] = await this.chanInvitationService.findByChannelAndCount(id, page, per_page);
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
