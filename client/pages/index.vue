@@ -10,10 +10,16 @@
 </template>
 
 <script lang="ts">
-export default {
+// import lol from "@/plugins/my-plugin2.js"
+import Vue from "vue";
+
+export default Vue.extend({
 	name: "Index",
+	mounted() {
+		this.$myInjectedFunction();
+	},
 	methods: {},
-};
+});
 </script>
 
 <style>
