@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { Component } from "vue";
+import Vue from "vue";
 
 interface Window {
 	x: number;
@@ -18,11 +18,16 @@ interface Ball {
 	radius: number;
 }
 
-interface Paddle {
+interface Bar {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
+}
+
+interface KeyNode {
+	pressed: Boolean;
+	handler: Function | null;
 }
 
 export default Vue.extend({
@@ -35,33 +40,35 @@ export default Vue.extend({
 			width: 400,
 			height: 250,
 		} as Window,
-		paddleLeft: {
+		barLeft: {
 			width: 10,
 			height: 200,
 			x: 0,
 			y: 0,
-		} as Paddle,
-		paddleRight: {
+		} as Bar,
+		barRight: {
 			width: 10,
 			height: 200,
 			x: 0,
 			y: 0,
-		},
+		} as Bar,
 		ball: {
 			x: 10,
 			y: 10,
 			radius: 2,
 		} as Ball,
+		interval: 1,
+		keyMap: {} as Record<string, KeyNode>,
 	}),
 	created() {
-		this.paddleLeft = {
+		this.barLeft = {
 			x: this.window.x + 10,
 			y: this.window.y + (3 * this.window.height) / 8,
 			width: 10,
 			height: this.window.height / 4,
 		};
 
-		this.paddleRight = {
+		this.barRight = {
 			x: this.window.x + this.window.width - 20,
 			y: this.window.y + (3 * this.window.height) / 8,
 			width: 10,
@@ -73,6 +80,20 @@ export default Vue.extend({
 			y: this.window.y + this.window.height / 2,
 			radius: 10,
 		};
+		this.keyMap = {
+			KeyW: {
+				handler: () => {
+					this.barLeft.y -= 1;
+				},
+				pressed: false,
+			},
+			KeyS: {
+				handler: () => {
+					this.barLeft.y += 1;
+				},
+				pressed: false,
+			},
+		};
 	},
 	mounted() {
 		this.canvas = document.getElementById("tuto") as HTMLCanvasElement;
@@ -81,14 +102,49 @@ export default Vue.extend({
 		this.ctx.fillStyle = "rgb(0, 0, 0)";
 		this.ctx.fillRect(this.window.x, this.window.y, this.window.width, this.window.height);
 		this.ctx.fillStyle = "rgb(255,255,255)";
-		this.ctx.fillRect(this.paddleLeft.x, this.paddleLeft.y, this.paddleLeft.width, this.paddleLeft.height);
 
-		this.ctx.fillRect(this.paddleRight.x, this.paddleRight.y, this.paddleRight.width, this.paddleRight.height);
-
-		this.ctx.beginPath();
-		this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, 2 * Math.PI);
-		this.ctx.fill();
-		this.ctx.stroke();
+		document.addEventListener("keypress", this.handleKeyPress);
+		this.redraw();
+		setInterval(this.updateGame, this.interval);
+	},
+	methods: {
+		drawBall() {
+			if (this.ctx) {
+				this.ctx.beginPath();
+				this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, 2 * Math.PI);
+				this.ctx.fill();
+				this.ctx.stroke();
+			}
+		},
+		drawLeftBar() {
+			if (this.ctx) this.ctx.fillRect(this.barLeft.x, this.barLeft.y, this.barLeft.width, this.barLeft.height);
+		},
+		drawRightBar() {
+			if (this.ctx)
+				this.ctx.fillRect(this.barRight.x, this.barRight.y, this.barRight.width, this.barRight.height);
+		},
+		clear() {
+			if (this.ctx) {
+				this.ctx.fillStyle = "rgb(0, 0, 0)";
+				this.ctx.fillRect(this.window.x, this.window.y, this.window.width, this.window.height);
+				this.ctx.fillStyle = "rgb(255,255,255)";
+			}
+		},
+		redraw() {
+			this.clear();
+			this.drawBall();
+			this.drawLeftBar();
+			this.drawRightBar();
+		},
+		handleKeyPress(event: KeyboardEvent) {
+			if (event) {
+				const keyNode = this.keyMap[event.code];
+				if (keyNode) keyNode.pressed = true;
+			}
+		},
+		updateGame() {
+			this.redraw();
+		},
 	},
 });
 </script>
