@@ -31,7 +31,9 @@ export class AppController {
 	@Get("/newUserExample")
 	async testDB(): Promise<User[]> {
 		const newUser = {
+			id: "foo",
 			username: "test",
+			pseudo: "test",
 			image_url: "test",
 			nb_game: 0,
 			nb_win: 0,

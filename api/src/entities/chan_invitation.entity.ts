@@ -20,6 +20,14 @@ export class ChanInvitation {
 	@SetMode("r")
 	id: number;
 
+	// date of invitation
+	@Column()
+	date: Date;
+
+	// who invite a user to join a channel
+	@ManyToOne(() => User, (invite_by) => invite_by.id)
+	invite_by: User;
+
 	// who is invited to join the channel
 	@ManyToOne(() => User, (invited) => invited.id, { eager: true, onDelete: "CASCADE" })
 	@Validate(UserExistsRule) // class-validator
