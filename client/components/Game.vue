@@ -15,7 +15,7 @@ interface Window {
 interface Ball {
 	x: number;
 	y: number;
-	radius: number;
+	width: number;
 }
 
 interface Bar {
@@ -55,9 +55,9 @@ export default Vue.extend({
 		ball: {
 			x: 10,
 			y: 10,
-			radius: 2,
+			width: 2,
 		} as Ball,
-		interval: 1,
+		interval: 5,
 		keyMap: {} as Record<string, KeyNode>,
 	}),
 	created() {
@@ -78,7 +78,7 @@ export default Vue.extend({
 		this.ball = {
 			x: this.window.x + this.window.width / 2,
 			y: this.window.y + this.window.height / 2,
-			radius: 10,
+			width: 10,
 		};
 		this.keyMap = {
 			KeyW: {
@@ -89,6 +89,7 @@ export default Vue.extend({
 			},
 			KeyS: {
 				handler: () => {
+					// console.log("here");
 					this.barLeft.y += 1;
 				},
 				pressed: false,
@@ -104,16 +105,18 @@ export default Vue.extend({
 		this.ctx.fillStyle = "rgb(255,255,255)";
 
 		document.addEventListener("keypress", this.handleKeyPress);
+		document.addEventListener("keyup", this.handleKeyPress);
 		this.redraw();
 		setInterval(this.updateGame, this.interval);
 	},
 	methods: {
 		drawBall() {
 			if (this.ctx) {
-				this.ctx.beginPath();
-				this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, 2 * Math.PI);
-				this.ctx.fill();
-				this.ctx.stroke();
+				// this.ctx.beginPath();
+				// this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, 2 * Math.PI);
+				// this.ctx.fill();
+				// this.ctx.stroke();
+				this.ctx.fillRect(this.ball.x, this.ball.y, this.ball.width, this.ball.width);
 			}
 		},
 		drawLeftBar() {
@@ -138,11 +141,25 @@ export default Vue.extend({
 		},
 		handleKeyPress(event: KeyboardEvent) {
 			if (event) {
+				// console.log(event);
 				const keyNode = this.keyMap[event.code];
-				if (keyNode) keyNode.pressed = true;
+				// console.log(keyNode.t);
+				if (keyNode) keyNode.pressed = event.type === "keypress";
 			}
 		},
+		replaceElemsInBound() {
+			if (this.barLeft.y + this.barLeft.height > this.window.y + this.window.height)
+				this.barLeft.y = this.window.y + this.window.height - this.barLeft.height;
+			if (this.barLeft.y < this.window.y) this.barLeft.y = this.window.y;
+		},
 		updateGame() {
+			for (const keyName in this.keyMap) {
+				const key = this.keyMap[keyName] as KeyNode;
+				if (key.pressed && key.handler) {
+					key.handler();
+				}
+			}
+			this.replaceElemsInBound();
 			this.redraw();
 		},
 	},
