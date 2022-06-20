@@ -1,11 +1,11 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
 // import {TypeORMError} from "typeorm/browser/error/TypeORMError";
-import { EntityNotFoundError } from "typeorm";
+import { TypeORMError } from "typeorm";
 import { Response } from "express";
 
-@Catch(EntityNotFoundError)
-export class EntityNotFoundFilter implements ExceptionFilter {
-	catch(exception: EntityNotFoundError, host: ArgumentsHost) {
+@Catch(TypeORMError)
+export class TypeormErrorFilter implements ExceptionFilter {
+	catch(exception: TypeORMError, host: ArgumentsHost) {
 		switch (host.getType()) {
 			case "http":
 				host.switchToHttp()
