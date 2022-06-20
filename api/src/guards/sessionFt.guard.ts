@@ -21,7 +21,7 @@ export class SessionGuardFt implements CanActivate {
 			if (!req.user) {
 				const user = new User();
 				user.id = req.session.user.id;
-				user.pseudo = req.session.user.firstName ?? req.session.user.id;
+				user.username = req.session.user.firstName ?? req.session.user.id;
 				req.user = await this.userService.create(user);
 			}
 			// Allow access

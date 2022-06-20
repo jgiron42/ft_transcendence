@@ -132,7 +132,7 @@ export class ChannelsController {
 	async joinChannel(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
 		await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
 		// TODO: password protect
-		return this.chanConnectionService.create({ user_id: req.user, chan_id: await this.channelService.findOne(id) });
+		return this.chanConnectionService.create({ user: req.user, channel: await this.channelService.findOne(id) });
 	}
 
 	/**
@@ -159,7 +159,7 @@ export class ChannelsController {
 		@MyRequestPipe(...getPostPipeline(Message)) message: Message,
 		@Param("id", ParseIntPipe) id: number,
 	): Promise<object> {
-		message.dest_channel = await this.channelService.findOne(id);
+		message.channel = await this.channelService.findOne(id);
 		return this.messageService.create(message);
 	}
 
@@ -193,7 +193,7 @@ export class ChannelsController {
 		@MyRequestPipe(...getPostPipeline(ChanInvitation)) chanInvitation: ChanInvitation,
 		@Param("id", ParseIntPipe) id: number,
 	): Promise<object> {
-		chanInvitation.invite_where = await this.channelService.findOne(id);
+		chanInvitation.channel = await this.channelService.findOne(id);
 		return this.chanInvitationService.create(chanInvitation);
 	}
 }

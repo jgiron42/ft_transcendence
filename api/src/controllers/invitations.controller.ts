@@ -67,7 +67,7 @@ export class InvitationsController {
 	async accept(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
 		const invite = await this.chanInvitationService.getQuery().invited(req.user.id).getOneOrFail(id);
 		await this.chanInvitationService.getQuery().remove(id);
-		return this.chanConnection.create({ user_id: invite.invited as User, chan_id: invite.invite_where });
+		return this.chanConnection.create({ user: invite.user as User, channel: invite.channel });
 	}
 
 	/**

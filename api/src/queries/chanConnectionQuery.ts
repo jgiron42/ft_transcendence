@@ -9,30 +9,30 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 			entityRepository,
 			entityRepository
 				.createQueryBuilder("chan_connection")
-				.leftJoinAndSelect("chan_connection.user_id", "user")
-				.leftJoinAndSelect("chan_connection.chan_id", "channel"),
+				.leftJoinAndSelect("chan_connection.user", "user")
+				.leftJoinAndSelect("chan_connection.channel", "channel"),
 		);
 	}
 
 	user(userId: string) {
-		this.query = this.query.andWhere({ user_id: userId });
+		this.query = this.query.andWhere({ user: userId });
 		return this;
 	}
 
 	channel(channelId: number) {
-		this.query = this.query.andWhere({ chan_id: channelId });
+		this.query = this.query.andWhere({ channel: channelId });
 		return this;
 	}
 
 	see_connection(userId: string) {
 		this.query = this.query
-			.leftJoin(ChanConnection, "other_chan_connection", "other_chan_connection.chanIdId = channel.id")
+			.leftJoin(ChanConnection, "other_chan_connection", "other_chan_connection.channelId = channel.id")
 			.andWhere(
 				new Brackets((qb) => {
 					qb.where("channel.owner = :userid", { userid: userId })
-						.orWhere("other_chan_connection.userIdId = :userid", { userid: userId })
-						.orWhere("chan_connection.userIdId = :userid", { userid: userId })
-						.orWhere("channel.chat_type = :visibleType", { visibleType: ChannelType.PUBLIC });
+						.orWhere("other_chan_connection.userId = :userid", { userid: userId })
+						.orWhere("chan_connection.userId = :userid", { userid: userId })
+						.orWhere("channel.type = :visibleType", { visibleType: ChannelType.PUBLIC });
 				}),
 			);
 		return this;
@@ -41,7 +41,7 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 	connection_owner(userId: string) {
 		this.query = this.query.andWhere(
 			new Brackets((qb) => {
-				qb.where("chan_connection.userIdId = :userid", { userid: userId }).orWhere("channel.owner = :userid", {
+				qb.where("chan_connection.userId = :userid", { userid: userId }).orWhere("channel.owner = :userid", {
 					userid: userId,
 				});
 			}),

@@ -7,11 +7,12 @@ import { SetMode } from "@utils/set-mode";
 
 @Entity()
 @Expose() // class-transformer
-@Unique("unique_connection", ["chan_id", "user_id"])
+@Unique("unique_connection", ["channel", "user"])
 export class ChanConnection {
 	constructor() {
 		this.role = 0;
-		this.mute = false;
+		this.muted = false;
+		this.created_at = new Date();
 	}
 
 	@PrimaryGeneratedColumn()
@@ -19,14 +20,14 @@ export class ChanConnection {
 	id: number;
 
 	// Id of the channel
-	@ManyToOne(() => Channel, (chan_id) => chan_id.id, { eager: true, onDelete: "CASCADE" })
+	@ManyToOne(() => Channel, (channel) => channel.id, { eager: true, onDelete: "CASCADE" })
 	@SetMode("cru")
-	chan_id: Channel;
+	channel: Channel;
 
 	// Id of the user
-	@ManyToOne(() => User, (user_id) => user_id.id, { eager: true, onDelete: "CASCADE" })
+	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@SetMode("cru")
-	user_id: User;
+	user: User;
 
 	// role of the user in the channel
 	@Column()
@@ -36,10 +37,14 @@ export class ChanConnection {
 	// use to know if the user is mute in the channel
 	@Column()
 	@SetMode("cru")
-	mute: boolean;
+	muted: boolean;
 
 	// date to know the end of the mute
 	@Column({ nullable: true })
 	@SetMode("cru")
-	date_end_mute: Date;
+	mute_end: Date;
+
+	// date of the message
+	@Column()
+	created_at: Date;
 }

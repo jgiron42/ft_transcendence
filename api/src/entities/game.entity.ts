@@ -13,11 +13,11 @@ export class Game {
 	constructor() {
 		this.score_second_player = 0;
 		this.score_first_player = 0;
-		this.first_player = new User();
-		this.second_player = new User();
-		this.status = false;
+		this.user_one = new User();
+		this.user_two = new User();
+		this.finished = false;
 		this.type = 0;
-		this.date = new Date();
+		this.created_at = new Date();
 	}
 
 	@PrimaryGeneratedColumn()
@@ -29,16 +29,14 @@ export class Game {
 	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
 	@SetMode("cr")
-	first_player: User | string;
+	user_one: User | string;
 
 	// second player id
 	@Validate(UserExistsRule)
 	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
 	@SetMode("cr")
-	second_player: User | string;
-
-	second_playerId: string;
+	user_two: User | string;
 
 	// score of the first player
 	@Column()
@@ -50,11 +48,6 @@ export class Game {
 	@SetMode("r")
 	score_second_player: number;
 
-	// winner of the game
-	@ManyToOne(() => User, (winner) => winner.id, { eager: true, onDelete: "CASCADE" })
-	@SetMode("r")
-	winner: User | string;
-
 	// type of game
 	@Column()
 	@SetMode("cr")
@@ -63,10 +56,10 @@ export class Game {
 	// status of the game
 	@Column()
 	@SetMode("r")
-	status: boolean;
+	finished: boolean;
 
 	// date begin of game
 	@Column()
 	@SetMode("r")
-	date: Date;
+	created_at: Date;
 }

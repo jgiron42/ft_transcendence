@@ -8,16 +8,16 @@ export class InviteQuery extends QueryCooker<ChanInvitation> {
 			entityRepository,
 			entityRepository
 				.createQueryBuilder("invitation")
-				.leftJoinAndSelect("invitation.invite_by", "invite_by")
-				.leftJoinAndSelect("invitation.invited", "invited")
-				.leftJoinAndSelect("invitation.invited_where", "channel"),
+				.leftJoinAndSelect("invitation.invited_by", "invited_by")
+				.leftJoinAndSelect("invitation.user", "invited")
+				.leftJoinAndSelect("invitation.channel", "channel"),
 		);
 	}
 
 	in_invitation(userId: string) {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
-				qb.where("invite_by.id = :userId", { userId }).orWhere("invited.id = :userId", { userId }),
+				qb.where("invited_by.id = :userId", { userId }).orWhere("invited.id = :userId", { userId }),
 			),
 		);
 		return this;
@@ -28,8 +28,8 @@ export class InviteQuery extends QueryCooker<ChanInvitation> {
 		return this;
 	}
 
-	channel(chanId: number) {
-		this.query = this.query.andWhere("channel.id = chanId", { chanId });
+	channel(channelId: number) {
+		this.query = this.query.andWhere("channel.id = channelId", { channelId });
 		return this;
 	}
 }
