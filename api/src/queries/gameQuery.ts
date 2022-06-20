@@ -8,8 +8,8 @@ export class GameQuery extends QueryCooker<Game> {
 			entityRepository,
 			entityRepository
 				.createQueryBuilder("game")
-				.leftJoinAndSelect("game.first_player", "user_one")
-				.leftJoinAndSelect("game.second_player", "user_two"),
+				.leftJoinAndSelect("game.user_one", "user_one")
+				.leftJoinAndSelect("game.user_two", "user_two"),
 		);
 	}
 

@@ -31,14 +31,14 @@ export class AppController {
 	@Get("/newUserExample")
 	async testDB(): Promise<User[]> {
 		const newUser = {
-			pseudo: "test",
-			path_avatar: "test",
+			username: "test",
+			image_url: "test",
 			nb_game: 0,
 			nb_win: 0,
-			OAuth: false,
+			totp_enabled: false,
 			status: 0,
 			totp_key: "test",
-			date_register: new Date(),
+			created_at: new Date(),
 		} as User;
 		await this.userService.create(newUser);
 		return this.userService.findAll();

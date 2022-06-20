@@ -14,35 +14,34 @@ import { User } from "./user.entity";
 @Entity()
 export class ChanInvitation {
 	constructor() {
-		this.date = new Date();
+		this.created_at = new Date();
 	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
-
-	// date of invitation
-	@Column()
-	@SetMode("r")
-	date: Date;
-
-	// who invite a user to join a channel
-	@ManyToOne(() => User, (invite_by) => invite_by.id, { eager: true, onDelete: "CASCADE" })
-	@Validate(UserExistsRule) // class-validator
-	@setService(UserService)
-	@SetMode("r")
-	invite_by: User | string;
 
 	// who is invited to join the channel
 	@ManyToOne(() => User, (invited) => invited.id, { eager: true, onDelete: "CASCADE" })
 	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
 	@SetMode("rcu")
-	invited: User | string;
+	user: User | string;
 
+	// who invite a user to join a channel
+	@ManyToOne(() => User, (invite_by) => invite_by.id, { eager: true, onDelete: "CASCADE" })
+	@Validate(UserExistsRule) // class-validator
+	@setService(UserService)
+	@SetMode("r")
+	invited_by: User | string;
 	/// channel where the user is invite
-	@ManyToOne(() => Channel, (invite_where) => invite_where.id, { eager: true, onDelete: "CASCADE" })
+	@ManyToOne(() => Channel, (channel) => channel.id, { eager: true, onDelete: "CASCADE" })
 	@Validate(ChannelExistRule) // class-validator
 	@setService(ChannelService)
 	@SetMode("rcu")
-	invite_where: Channel;
+	channel: Channel;
+
+	// date of invitation
+	@Column()
+	@SetMode("r")
+	created_at: Date;
 }

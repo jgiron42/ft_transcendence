@@ -30,8 +30,8 @@ export class ChannelService {
 			.createQueryBuilder()
 			.select("channel")
 			.from(Channel, "channel")
-			.leftJoin(ChanConnection, "chan_connection", "chan_connection.chanIdId = channel.id")
-			.where("chan_connection.chanIdId = :id", { id })
+			.leftJoin(ChanConnection, "chan_connection", "chan_connection.channelIdId = channel.id")
+			.where("chan_connection.channelIdId = :id", { id })
 			.getOne();
 	}
 

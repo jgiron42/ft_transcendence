@@ -8,8 +8,8 @@ export class MessageQuery extends QueryCooker<Message> {
 			entityRepository,
 			entityRepository
 				.createQueryBuilder("message")
-				.leftJoinAndSelect("message.send_by", "user")
-				.leftJoinAndSelect("message.dest_channel", "channel"),
+				.leftJoinAndSelect("message.user", "user")
+				.leftJoinAndSelect("message.channel", "channel"),
 		);
 	}
 
@@ -18,15 +18,15 @@ export class MessageQuery extends QueryCooker<Message> {
 		return this;
 	}
 
-	channel(chanId: number) {
-		this.query = this.query.andWhere("channel.id = :chanId", { chanId });
+	channel(channelId: number) {
+		this.query = this.query.andWhere("channel.id = :channelId", { channelId });
 		return this;
 	}
 
 	see_message(userId: string) {
 		this.query = this.query
-			.leftJoin("chan_connection", "chan_connection", "chan_connection.chanIdId = channel.id")
-			.andWhere("chan_connection.userIdId = :userid1", { userid1: userId });
+			.leftJoin("chan_connection", "chan_connection", "chan_connection.channelId = channel.id")
+			.andWhere("chan_connection.userId = :userid1", { userid1: userId });
 		return this;
 	}
 }

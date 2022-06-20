@@ -17,9 +17,9 @@ export enum ChannelType {
 @Entity()
 export class Channel {
 	constructor() {
-		this.chat_type = 0;
-		this.mdp = "";
-		this.owner = new User();
+		this.type = ChannelType.PUBLIC;
+		this.password = "";
+		this.created_at = new Date();
 	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
@@ -31,14 +31,17 @@ export class Channel {
 	name: string;
 
 	// type of channel
-	@Column()
+	@Column({
+		type: "enum",
+		enum: ChannelType,
+	})
 	@SetMode("cru")
-	chat_type: ChannelType;
+	type: ChannelType;
 
 	// password to access to the channnel
 	@Column()
 	@SetMode("cu")
-	mdp: string;
+	password: string;
 
 	// owner  (and creator) of the channel
 	@ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE" })
@@ -46,4 +49,8 @@ export class Channel {
 	@setService(UserService)
 	@SetMode("cru")
 	owner: User | string;
+
+	// date of the message
+	@Column()
+	created_at: Date;
 }

@@ -26,7 +26,7 @@ export class AuthService {
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	hasTOTP(user: User): boolean {
-		return user.OAuth;
+		return user.totp_enabled;
 	}
 
 	/**

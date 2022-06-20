@@ -9,13 +9,13 @@ import { SetMode } from "@utils/set-mode";
 export class User {
 	constructor() {
 		this.id = undefined;
-		this.path_avatar = ""; // may be a default avatar path
+		this.image_url = ""; // may be a default avatar path
 		this.nb_game = 0;
 		this.nb_win = 0;
-		this.OAuth = false;
+		this.totp_enabled = false;
 		this.totp_key = "";
 		this.status = 0;
-		this.date_register = new Date();
+		this.created_at = new Date();
 	}
 	@PrimaryColumn()
 	@SetMode("cr")
@@ -24,12 +24,12 @@ export class User {
 	// pseudo of the user
 	@Column({ unique: true })
 	@SetMode("cru")
-	pseudo: string;
+	username: string;
 
 	// path to the avatar of the user
 	@Column()
 	@SetMode("cru")
-	path_avatar: string;
+	image_url: string;
 
 	// number of game played by the user
 	@Column()
@@ -44,7 +44,7 @@ export class User {
 	// say if the user use OAuth or not
 	@Column()
 	@SetMode([["own_user", "r"], "cu"]) // class-transformer
-	OAuth: boolean;
+	totp_enabled: boolean;
 
 	// status of the user
 	@Column()
@@ -59,5 +59,5 @@ export class User {
 	// date of registration of the user
 	@Column()
 	@SetMode("r")
-	date_register: Date;
+	created_at: Date;
 }

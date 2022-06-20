@@ -8,6 +8,9 @@ import { SetMode } from "@utils/set-mode";
 
 @Entity()
 export class Relation {
+	constructor() {
+		this.created_at = new Date();
+	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -27,5 +30,9 @@ export class Relation {
 	// type of relation
 	@Column()
 	@SetMode("cr")
-	relation_type: number;
+	type: number;
+
+	// date of creation
+	@Column()
+	created_at: Date;
 }
