@@ -16,12 +16,12 @@ import Vue from "vue";
 import Game from "~/components/Game.vue";
 
 export default Vue.extend({
-    name: "Index",
-    mounted() {
-        this.$myInjectedFunction();
-    },
-    methods: {},
-    components: { Game }
+	name: "Index",
+	components: { Game },
+	mounted() {
+		this.$myInjectedFunction();
+	},
+	methods: {},
 });
 </script>
 
