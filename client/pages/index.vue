@@ -6,19 +6,22 @@
 				<Settings />
 			</div>
 		</div>
+		<Game />
 	</div>
 </template>
 
 <script lang="ts">
 // import lol from "@/plugins/my-plugin2.js"
 import Vue from "vue";
+import Game from "~/components/Game.vue";
 
 export default Vue.extend({
-	name: "Index",
-	mounted() {
-		this.$myInjectedFunction();
-	},
-	methods: {},
+    name: "Index",
+    mounted() {
+        this.$myInjectedFunction();
+    },
+    methods: {},
+    components: { Game }
 });
 </script>
 
