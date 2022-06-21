@@ -1,10 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
 import { Channel } from "@src/entities/channel.entity";
 import { Container } from "typedi";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChannelQuery } from "@src/queries/channelQuery";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class ChannelService {
@@ -15,6 +16,15 @@ export class ChannelService {
 		private entityManager: EntityManager,
 	) {
 		Container.set(this.constructor, this);
+	}
+
+	static async checkPassword(password: string, passwordHash: string): Promise<void> {
+		if (!password || !(await bcrypt.compare(password, passwordHash)))
+			throw new BadRequestException("Invalid password");
+	}
+
+	static async hashPassword(password: string): Promise<string> {
+		return bcrypt.hash(password, await bcrypt.genSalt());
 	}
 
 	getQuery() {

@@ -6,6 +6,7 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
+	Query,
 	Req,
 	Res,
 	UseFilters,
@@ -13,7 +14,6 @@ import {
 	UseInterceptors,
 	UsePipes,
 } from "@nestjs/common";
-import { ChannelExistGuard } from "@guards/channel-exist.guard";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { MessageService } from "@services/message.service";
@@ -33,13 +33,12 @@ import { Response } from "express";
 import { DevelopmentGuard } from "@src/guards/development.guard";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 
 @Controller("channels")
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class ChannelsController {
 	constructor(
 		private channelService: ChannelService,
@@ -80,8 +79,9 @@ export class ChannelsController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
-	create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @Req() req: Request) {
+	async create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @Req() req: Request) {
 		channel.owner = req.user;
+		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
 		return this.channelService.create(channel);
 	}
 
@@ -129,37 +129,50 @@ export class ChannelsController {
 
 	@Post(":id/join")
 	@UseGuards(DevelopmentGuard)
-	async joinChannel(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
-		await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
-		// TODO: password protect
-		return this.chanConnectionService.create({ user: req.user, channel: await this.channelService.findOne(id) });
+	async joinChannel(
+		@Param("id", ParseIntPipe) id: number,
+		@Req() req: Request,
+		@Query("password") password: string,
+	): Promise<object> {
+		const channel = await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
+		if (channel.password !== "") await ChannelService.checkPassword(password, channel.password);
+		return this.chanConnectionService.create({ user: req.user, channel });
 	}
 
 	/**
 	 * return all messages from a channel if the user is on this channel
-	 * @param id
 	 */
 	@Get(":id/messages")
-	@UseGuards(ChannelExistGuard)
 	@Groups("on_channel")
-	getMessage(@Param("id", ParseIntPipe) id: number): Promise<object> {
-		return this.messageService.findByChannel(id);
+	async getMessage(
+		@Param("id", ParseIntPipe) id: number,
+		@Page() page: number,
+		@Res({ passthrough: true }) res: Response,
+		@PerPage() per_page: number,
+		@Req() req: Request,
+	): Promise<object> {
+		const [ret, total] = await this.messageService
+			.getQuery()
+			.see_message(req.user.id)
+			.channel(id)
+			.paginate(page, per_page)
+			.getManyAndCount();
+		res.setHeader("total_entities", total);
+		res.setHeader("total_pages", Math.ceil(total / per_page));
+		return ret;
 	}
 
 	/**
 	 * resend a message to a channel if the user is on this channel
-	 * @param id
-	 * @param message
 	 */
 	@Post(":id/messages")
-	@UseGuards(ChannelExistGuard)
-	@Groups("on_channel")
 	@UsePipes(getValidationPipe(Message))
 	async sendMessage(
 		@MyRequestPipe(...getPostPipeline(Message)) message: Message,
 		@Param("id", ParseIntPipe) id: number,
+		@Req() req: Request,
 	): Promise<object> {
-		message.channel = await this.channelService.findOne(id);
+		message.channel = await this.channelService.getQuery().on_channel(req.user.id).getOneOrFail(id);
 		return this.messageService.create(message);
 	}
 
@@ -167,14 +180,19 @@ export class ChannelsController {
 	 * return all invitations for a channel if the user is on this channel
 	 */
 	@Get(":id/invitations")
-	@Groups("on_channel")
 	async getInvitation(
 		@Param("id", ParseIntPipe) id: number,
 		@Page() page: number,
 		@PerPage() per_page: number,
 		@Res({ passthrough: true }) res: Response,
+		@Req() req: Request,
 	): Promise<object> {
-		const [ret, total] = await this.chanInvitationService.findByChannelAndCount(id, page, per_page);
+		await this.channelService.getQuery().on_channel(req.user.id).getOneOrFail(id);
+		const [ret, total] = await this.chanInvitationService
+			.getQuery()
+			.channel(id)
+			.paginate(page, per_page)
+			.getManyAndCount();
 		res.setHeader("total_entities", total);
 		res.setHeader("total_pages", Math.ceil(total / per_page));
 		return ret;
@@ -182,18 +200,16 @@ export class ChannelsController {
 
 	/**
 	 * create an invitation for a channel if the user is on this channel
-	 * @param id
-	 * @param chanInvitation
 	 */
 	@Post(":id/invitations")
-	@UseGuards(ChannelExistGuard)
-	@Groups("on_channel")
 	@UsePipes(getValidationPipe(ChanInvitation))
 	async sendInvitations(
 		@MyRequestPipe(...getPostPipeline(ChanInvitation)) chanInvitation: ChanInvitation,
 		@Param("id", ParseIntPipe) id: number,
+		@Req() req: Request,
 	): Promise<object> {
-		chanInvitation.channel = await this.channelService.findOne(id);
+		chanInvitation.invited_by = req.user;
+		chanInvitation.channel = await this.channelService.getQuery().on_channel(req.user.id).getOneOrFail(id);
 		return this.chanInvitationService.create(chanInvitation);
 	}
 }

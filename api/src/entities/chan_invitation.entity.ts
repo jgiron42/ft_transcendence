@@ -6,7 +6,6 @@ import { ChannelService } from "@services/channel.service";
 import { SetMode } from "@utils/set-mode";
 import { Validate } from "class-validator";
 import { UserExistsRule } from "@src/validators/userExist.validator";
-import { ChannelExistRule } from "@src/validators/channelExist.validator";
 import { User } from "./user.entity";
 
 // entity use to manage the channel invitation
@@ -29,13 +28,12 @@ export class ChanInvitation {
 
 	// who invite a user to join a channel
 	@ManyToOne(() => User, (invite_by) => invite_by.id, { eager: true, onDelete: "CASCADE" })
-	@Validate(UserExistsRule) // class-validator
-	@setService(UserService)
 	@SetMode("r")
-	invited_by: User | string;
-	/// channel where the user is invite
+	invited_by: User;
+
+	// channel where the user is invited
 	@ManyToOne(() => Channel, (channel) => channel.id, { eager: true, onDelete: "CASCADE" })
-	@Validate(ChannelExistRule) // class-validator
+	// @Validate(ChannelExistRule) // class-validator
 	@setService(ChannelService)
 	@SetMode("rcu")
 	channel: Channel;

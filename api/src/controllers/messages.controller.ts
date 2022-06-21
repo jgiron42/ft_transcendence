@@ -6,19 +6,18 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { Request } from "@src/types/request";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
 
 @Controller("messages")
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class MessagesController {
 	constructor(private messageService: MessageService) {}
 
 	/**
-	 * get all messages TODO: visible by a specific user
+	 * get all messages
 	 */
 	@Get()
 	async getAll(

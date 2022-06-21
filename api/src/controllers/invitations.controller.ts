@@ -16,17 +16,16 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { Request } from "@src/types/request";
 import { ChanInvitationService } from "@services/chan_invitation.service";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { User } from "@src/entities/user.entity";
 
-@Controller("users")
+@Controller("invitations")
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class InvitationsController {
 	constructor(private chanInvitationService: ChanInvitationService, private chanConnection: ChanConnectionService) {}
 

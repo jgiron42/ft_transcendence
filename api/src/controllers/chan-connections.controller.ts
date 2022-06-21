@@ -17,13 +17,12 @@ import { Request } from "@src/types/request";
 import { MyRequestPipe } from "@utils/myRequestPipe";
 import { getPutPipeline } from "@utils/getPutPipeline";
 import { ChanConnection } from "@entities/chan_connection.entity";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 
 @Controller("connections")
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class ChanConnectionsController {
 	constructor(private chanConnectionService: ChanConnectionService) {}
 

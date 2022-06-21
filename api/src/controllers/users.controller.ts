@@ -16,8 +16,7 @@ import { SetGroupMappers } from "@utils/setGroupMappers";
 import { Response } from "express";
 import { PerPage } from "@utils/PerPage";
 import { Page } from "@utils/Page";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 
 @Controller("users")
 @UseGuards(...SessionGuard)
@@ -25,7 +24,7 @@ import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
 @SetGroupMappers({
 	own_user: (req: MyRequest<User>) => req.params?.id && req.user?.id === req.params?.id,
 })
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class UsersController {
 	constructor(
 		private userService: UserService,

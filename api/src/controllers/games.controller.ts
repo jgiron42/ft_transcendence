@@ -4,6 +4,7 @@ import {
 	Param,
 	ParseIntPipe,
 	Post,
+	Req,
 	Res,
 	UseFilters,
 	UseGuards,
@@ -20,13 +21,15 @@ import { SessionGuard } from "@guards/session.guard";
 import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
+import { Request } from "@src/types/request";
+import { User } from "@src/entities/user.entity";
+import { ValidationError } from "@src/exceptions/validationError.exception";
 
 @Controller("games")
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class GamesController {
 	constructor(private gameService: GameService) {}
 
@@ -56,12 +59,12 @@ export class GamesController {
 
 	/**
 	 * create a new Game
-	 * @param game the json object game
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Game))
-	create(@MyRequestPipe(...getPostPipeline(Game)) game: Game) {
-		// TODO: protect
+	create(@MyRequestPipe(...getPostPipeline(Game)) game: Game, @Req() req: Request) {
+		if ((game.user_one as User)?.id !== req.user.id && (game.user_two as User)?.id !== req.user.id)
+			throw new ValidationError("user must be in game creation");
 		return this.gameService.create(game);
 	}
 }

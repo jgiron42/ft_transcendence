@@ -22,15 +22,15 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
-import { QueryFailedFilter } from "@filters/query-failed.filter";
+import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { Request } from "@src/types/request";
-import { Groups } from "@utils/groupsDecorator";
-import { EntityNotFoundFilter } from "@filters/entity-not-found.filter";
+import { User } from "@entities/user.entity";
+import { ValidationError } from "@src/exceptions/validationError.exception";
 
 @Controller("relations")
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor)
-@UseFilters(QueryFailedFilter, EntityNotFoundFilter)
+@UseFilters(TypeormErrorFilter)
 export class RelationsController {
 	constructor(private relationService: RelationService) {}
 
@@ -64,13 +64,13 @@ export class RelationsController {
 
 	/**
 	 * create the relation designated by id
-	 * @param relation
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Relation))
-	@Groups("in_relation_creation")
-	create(@MyRequestPipe(...getPostPipeline(Relation)) relation: Relation) {
-		return this.relationService.create(relation); // TODO: protect
+	create(@MyRequestPipe(...getPostPipeline(Relation)) relation: Relation, @Req() req: Request) {
+		if ((relation.user_one as User)?.id !== req.user.id && (relation.user_two as User)?.id !== req.user.id)
+			throw new ValidationError("user must be in relation creation");
+		return this.relationService.create(relation);
 	}
 
 	/**
