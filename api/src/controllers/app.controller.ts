@@ -49,11 +49,11 @@ export class AppController {
 		return this.userService.findAll();
 	}
 
-	@Post("/newUserExample")
-	async testDBPost(@Query() data: { pseudo: string }): Promise<User[]> {
+	@Get("/newUserExample")
+	async testDB(@Query() data: { pseudo: string }, @Session() ses: SessionT): Promise<User[]> {
 		const usr = {
 			pseudo: data.pseudo,
-			path_avatar: "test",
+			path_avatar: data.pseudo,
 			mdp: "test",
 			mail: "test",
 			phone: "test",
@@ -65,6 +65,9 @@ export class AppController {
 			date_register: new Date(),
 		} as User;
 		await this.userService.create(usr);
+		ses.ftIdentified = 9999999999999;
+		ses.totpIdentified = true;
+		ses.user = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
 		return this.userService.findAll();
 	}
 }

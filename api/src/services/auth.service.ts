@@ -110,4 +110,29 @@ export class AuthService {
 			else socket.session = {} as SessionT;
 		}
 	}
+
+	getSession(token: string): Promise<SessionT> {
+		const SID = cookieParser.signedCookie(token, config.sessionSecret);
+		if (SID === false) return undefined;
+		return promisify<string, SessionData>((sid: string, callback: (err: any, result: SessionData | null) => void) =>
+			this.sessionStore.get(sid, callback),
+		)(SID) as Promise<SessionT>;
+	}
+
+	setSession(token: string, ses: SessionT): Promise<void> {
+		const SID = cookieParser.signedCookie(token, config.sessionSecret);
+		if (SID === false) return undefined;
+		return promisify<string, SessionData>((sid: string, session: SessionData, callback: (err: any) => void) =>
+			this.sessionStore.set(sid, session, callback),
+		)(SID, ses);
+	}
+
+	async wsLoadSession(context: ExecutionContext): Promise<void> {
+		if (context.getType() === "ws") {
+			const socket: Socket = context.switchToWs().getClient<Socket>();
+			socket.token = context.switchToWs().getData<{ token: string }>()?.token ?? socket.token;
+			if (socket?.token) socket.session = await this.getSession(socket.token);
+			else socket.session = {} as SessionT;
+		}
+	}
 }
