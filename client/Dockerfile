@@ -9,11 +9,13 @@ ARG buildtarget
 
 WORKDIR /app
 
-COPY . .
+COPY package.json .
 
 ENV DOCKER_NODE_ENV=${buildtarget}
 
 RUN npm install
+
+COPY . .
 
 RUN NODE_ENV=$DOCKER_NODE_ENV npm run build
 

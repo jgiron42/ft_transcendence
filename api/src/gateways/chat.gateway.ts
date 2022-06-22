@@ -1,17 +1,21 @@
-import { Logger } from "@nestjs/common";
+import { Logger, UseGuards, UseInterceptors } from "@nestjs/common";
 import {
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer,
 	OnGatewayInit,
 	OnGatewayDisconnect,
+	ConnectedSocket,
 } from "@nestjs/websockets";
 import { Message } from "@entities/message.entity";
 import { UserService } from "@services/user.service";
 import { MessageService } from "@services/message.service";
 import { ChannelService } from "@services/channel.service";
 import { SocketService } from "@services/socket.service";
-import { Socket, Server } from "socket.io";
+import { Server } from "socket.io";
+import { Socket } from "@src/types/socket";
+import { SessionGuard } from "@guards/session.guard";
+import { WebsocketSaveSession } from "@interceptors/websocket-save-session";
 
 @WebSocketGateway({
 	namespace: "chat",
@@ -19,6 +23,8 @@ import { Socket, Server } from "socket.io";
 		origin: "*",
 	},
 })
+@UseInterceptors(WebsocketSaveSession)
+@UseGuards(...SessionGuard)
 export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 	constructor(
 		private readonly userService: UserService,
@@ -36,19 +42,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("HC")
-	async onHelloConnection(client: Socket, payload: { name: string }) {
-		const usr = await this.userService.findByUid(payload.name);
+	async onHelloConnection(@ConnectedSocket() socket: Socket) {
+		const usr = await this.userService.findByUid(socket.session.user.id);
 		try {
 			if (usr) {
-				this.socketService.addClient(client, usr);
-				this.onGAI(client);
-				await this.channelService.joinChannel(client, "realm");
+				this.socketService.addClient(socket, usr);
+				this.onGAI(socket);
+				await this.channelService.joinChannel(socket, "realm");
 			} else {
 				throw new Error("User not found");
 			}
 		} catch (e) {
 			this.logger.error(e);
-			this.socketService.sendError(client, e as Error);
+			this.socketService.sendError(socket, e as Error);
 		}
 	}
 

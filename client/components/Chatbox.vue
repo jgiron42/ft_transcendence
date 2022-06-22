@@ -82,6 +82,7 @@ export default Vue.extend({
 			if (!this.name) this.name = "riblanc";
 			this.socket.emit("HC", {
 				name: this.name,
+				token: this.$cookies.get("connect.sid"),
 			});
 		},
 		getAccountInformation() {
