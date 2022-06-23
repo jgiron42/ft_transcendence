@@ -1,7 +1,7 @@
 <template>
 	<div id="user-selection" class="h-full">
 		<div v-for="(user, index) of users" :key="index">
-			<button class="user-name cut-text btn text-left">
+			<button class="user-name cut-text btn text-left" @click="$modal.show('user_profile')">
 				<b>{{ user.pseudo }}</b>
 			</button>
 		</div>
