@@ -2,7 +2,7 @@
 # Script to easily launch the project in dev mode
 
 cd proxy
-mv templates/default.conf.template ../
+mv templates/default.conf.template .
 cp dev.default.conf.template templates/
 
 cd ..
