@@ -3,7 +3,7 @@
 
 cd proxy
 mv templates/default.conf.template .
-cp dev.default.conf.template templates/
+cp dev.default.conf.template templates/default.conf.template
 
 cd ..
 sudo chown -R 5050:5050 pgadmin/
