@@ -3,98 +3,98 @@
 version: "3.5"
 
 services:
-    client:
-        container_name: ft_client
-        build: ./client
-        networks:
-            - ft_transcendance
-        ports:
-            - 127.0.0.1:4000:4000
-        environment:
-            TZ: Europe/Paris
-        volumes:
-            # Mount code to avoid rebuild container to refresh code
-            - ./client/components:/app/client/components
-            - ./client/config:/app/client/config
-            - ./client/entrypoint.sh:/app/client/entrypoint.sh
-            - ./client/jsconfig.json:/app/client/jsconfig.json
-            - ./client/logs:/app/client/logs
-            - ./client/nuxt.config.js:/app/client/nuxt.config.js
-            - ./client/package.json:/app/client/package.json
-            - ./client/pages:/app/client/pages
-            - ./client/static:/app/client/static
-            - ./client/store:/app/client/store
-            - ./client/stylelint.config.js:/app/client/stylelint.config.js
-            - ./client/tailwind.config.js:/app/client/tailwind.config.js
-            - ./client/tsconfig.json:/app/client/tsconfig.json
+  client:
+    container_name: ft_client
+    build: ./client
+    networks:
+      - ft_transcendance
+    ports:
+      - 127.0.0.1:4000:4000
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      # Mount code to avoid rebuild container to refresh code
+      - ./client/components:/app/client/components
+      - ./client/config:/app/client/config
+      - ./client/entrypoint.sh:/app/client/entrypoint.sh
+      - ./client/jsconfig.json:/app/client/jsconfig.json
+      - ./client/logs:/app/client/logs
+      - ./client/nuxt.config.js:/app/client/nuxt.config.js
+      - ./client/package.json:/app/client/package.json
+      - ./client/pages:/app/client/pages
+      - ./client/static:/app/client/static
+      - ./client/store:/app/client/store
+      - ./client/stylelint.config.js:/app/client/stylelint.config.js
+      - ./client/tailwind.config.js:/app/client/tailwind.config.js
+      - ./client/tsconfig.json:/app/client/tsconfig.json
 
-        healthcheck:
-            disable: false
-        restart: always
-    
-    api:
-      container_name: ft_api
-      build: ./api
-      networks:
+    healthcheck:
+      disable: false
+    restart: always
+
+  api:
+    container_name: ft_api
+    build: ./api
+    networks:
       - default
       - ft_transcendance
-      ports:
+    ports:
       - 0.0.0.0:3000:3000
-      environment:
-    # Values from parent shell, overriden by values from .env
-        - INTRA42_UID=${INTRA42_UID}
-        - INTRA42_SECRET=${INTRA42_SECRET}
-    # Config file containing credentials values
-        - CONFIG_FILE=/opt/.env
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=postgres
-        - POSTGRES_DB=ft_db
-      volumes:
-  # Add env config file
+    environment:
+      # Values from parent shell, overriden by values from .env
+      - INTRA42_UID=${INTRA42_UID}
+      - INTRA42_SECRET=${INTRA42_SECRET}
+      # Config file containing credentials values
+      - CONFIG_FILE=/opt/.env
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ft_db
+    volumes:
+      # Add env config file
       - ./api/.env:/opt/.env
-  # Mount code to avoid rebuild container to refresh code
+      # Mount code to avoid rebuild container to refresh code
       - ./api/src:/app/src
       - ./api/config.json:/app/api/config.json
-      healthcheck:
-        disable: false
-      restart: always
-  
-    db:
-        image: postgres:14.1-alpine
-        restart: always
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=ft_db
-        ports:
-            - '5432:5432'
+    healthcheck:
+      disable: false
+    restart: always
 
-    ft_proxy:
-        image: nginx
-        volumes:
-            - ./proxy/templates:/etc/nginx/templates
-            - ./proxy/ssl:/etc/letsencrypt
-        ports:
-            - "80:80"
-            - "443:443"
-        networks:
-            - default
-            - ft_transcendance
-        environment:
-            - NGINX_PROD_HOST=transcendance.nollium.com
-            - NGINX_DEV_HOST=localhost
-            - NGINX_HTTP_PORT=80
-            - NGINX_HTTPS_PORT=443
-            - API_HOST=api
-            - API_PORT=3000
-            - CLIENT_HOST=client
-            - CLIENT_PORT=4000
-            - SSL_CERTIFICATE=/etc/letsencrypt/live/transcendance.nollium.com/fullchain.pem
-            - SSL_CERTIFICATE_KEY=/etc/letsencrypt/live/transcendance.nollium.com/privkey.pem
-            - SSL_NGINX_OPTIONS=/etc/letsencrypt/options-ssl-nginx.conf
-            - SSL_NGINX_DHPARAM=/etc/letsencrypt/ssl-dhparams.pem
-        restart: always
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ft_db
+    ports:
+      - "5432:5432"
+
+  ft_proxy:
+    image: nginx
+    volumes:
+      - ./proxy/templates:/etc/nginx/templates
+      - ./proxy/ssl:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - default
+      - ft_transcendance
+    environment:
+      - NGINX_PROD_HOST=transcendance.nollium.com
+      - NGINX_DEV_HOST=localhost
+      - NGINX_HTTP_PORT=80
+      - NGINX_HTTPS_PORT=443
+      - API_HOST=api
+      - API_PORT=3000
+      - CLIENT_HOST=client
+      - CLIENT_PORT=4000
+      - SSL_CERTIFICATE=/etc/letsencrypt/live/transcendance.nollium.com/fullchain.pem
+      - SSL_CERTIFICATE_KEY=/etc/letsencrypt/live/transcendance.nollium.com/privkey.pem
+      - SSL_NGINX_OPTIONS=/etc/letsencrypt/options-ssl-nginx.conf
+      - SSL_NGINX_DHPARAM=/etc/letsencrypt/ssl-dhparams.pem
+    restart: always
 
 networks:
-    ft_transcendance:
-        external: false
+  ft_transcendance:
+    external: false
