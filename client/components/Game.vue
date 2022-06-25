@@ -1,39 +1,19 @@
 <template>
-	<canvas id="tuto" width="500" height="500"> </canvas>
+	<div>
+		<canvas id="game"> </canvas>
+	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 
-interface Vector2D {
+class Vector2D {
 	x: number;
 	y: number;
-}
-
-interface Point2D {
-	x: number;
-	y: number;
-}
-
-interface Window {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-}
-
-interface Ball {
-	x: number;
-	y: number;
-	width: number;
-	speed: Vector2D;
-}
-
-interface Bar {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+	constructor(x: number, y:number) {
+		this.x = x
+		this.y = y
+	}
 }
 
 interface KeyNode {
@@ -41,240 +21,150 @@ interface KeyNode {
 	handler: Function | null;
 }
 
-interface IntersectResult {
-	result: boolean;
-	x: number;
-	y: number;
+class Player {
+	pos: Vector2D
+	speed: number
+	size: Vector2D
+	constructor(screenWidth: number, screenHeight: number, x: number) {
+		this.pos = new Vector2D(x, (screenHeight / 2) - 100 / 2)
+		this.size = new Vector2D(20, 100)
+		this.speed = 10;
+	}
+	update(vk_up: Boolean, vk_down: Boolean, res: Vector2D) {
+		if (vk_up && this.pos.y - this.speed > 15) {
+			this.pos.y -= this.speed;
+		}
+		else if (vk_down && this.pos.y + this.speed < res.y - 15 - this.size.y) {
+			this.pos.y += this.speed;
+		}
+	}
+	draw(ctx: CanvasRenderingContext2D, res: Vector2D) {
+		ctx.beginPath()
+		ctx.rect(this.pos.x + 2, this.pos.y +2, this.size.x, this.size.y)
+		ctx.fillStyle = "#0000FF"
+		ctx.fill()
+		ctx.closePath();
+		ctx.beginPath()
+		ctx.rect(this.pos.x, this.pos.y, this.size.x, this.size.y)
+		ctx.fillStyle = "#FFFFFF"
+		ctx.fill()
+		ctx.closePath();
+	}
+}
+
+class Ball {
+	speed: number;
+	pos: Vector2D;
+	dir: Vector2D;
+	ballradius: number;
+	constructor(res: Vector2D) {
+		this.speed = 5;
+		this.pos = new Vector2D(res.x / 2, res.y / 2)
+		this.dir = new Vector2D(this.speed, this.speed)
+		this.ballradius = 10;
+	}
+	update(res: Vector2D) {
+		if (this.pos.y + this.dir.y < this.ballradius / 2 || this.pos.y + this.dir.y > res.y - this.ballradius / 2)
+			this.dir.y = -this.dir.y;
+		if (this.pos.x + this.dir.x > res.x - this.ballradius / 2 || this.pos.x + this.dir.x < this.ballradius / 2)
+			this.dir.x = -this.dir.x;
+		this.pos.x += this.dir.x
+		this.pos.y += this.dir.y
+	}
+	draw(ctx: CanvasRenderingContext2D) {
+		ctx.beginPath()
+		ctx.arc(this.pos.x + 2, this.pos.y + 2, this.ballradius, 0, 2 * Math.PI, false);
+		ctx.fillStyle = "#ff0000";
+		ctx.fill()
+		ctx.closePath()
+		ctx.beginPath()
+		ctx.arc(this.pos.x, this.pos.y, this.ballradius, 0, 2 * Math.PI, false);
+		ctx.fillStyle = "#ffffff";
+		ctx.fill();
+		ctx.closePath();
+	}
 }
 
 export default Vue.extend({
 	data: () => ({
 		canvas: null as HTMLCanvasElement | null,
 		ctx: null as CanvasRenderingContext2D | null,
-		window: {
-			x: 50,
-			y: 50,
-			width: 400,
-			height: 250,
-		} as Window,
-		barLeft: {
-			width: 10,
-			height: 200,
-			x: 0,
-			y: 0,
-		} as Bar,
-		barRight: {
-			width: 10,
-			height: 200,
-			x: 0,
-			y: 0,
-		} as Bar,
-		ball: {
-			x: 10,
-			y: 10,
-			width: 2,
-			speed: {
-				x: -1,
-				y: 0,
-			},
-		} as Ball,
 		interval: 5,
-		keyMap: {} as Record<string, KeyNode>,
-		barSpeed: 2,
+		vk_up: false,
+		vk_down: false,
+		score_p1: 0,
+		score_p2: 0,
+		res: new Vector2D(900, 600),
+		ball: new Ball(new Vector2D(450, 300)),
+		p1: new Player(900, 600, 40),
+		p2: new Player(900, 600, 840),
 	}),
-	created() {
-		this.barLeft = {
-			x: this.window.x + 10,
-			y: this.window.y + (3 * this.window.height) / 8,
-			width: 10,
-			height: this.window.height / 4,
-		};
-
-		this.barRight = {
-			x: this.window.x + this.window.width - 20,
-			y: this.window.y + (3 * this.window.height) / 8,
-			width: 10,
-			height: this.window.height / 4,
-		};
-
-		this.ball = {
-			x: this.window.x + this.window.width / 2,
-			y: this.window.y + this.window.height / 2,
-			width: 10,
-			speed: { x: -1, y: 0 },
-		};
-		this.keyMap = {
-			KeyW: {
-				handler: () => {
-					this.barLeft.y -= this.barSpeed;
-				},
-				pressed: false,
-			},
-			KeyS: {
-				handler: () => {
-					// console.log("here");
-					this.barLeft.y += this.barSpeed;
-				},
-				pressed: false,
-			},
-		};
-	},
 	mounted() {
-		this.canvas = document.getElementById("tuto") as HTMLCanvasElement;
+		// Init Canvas and apply ratio
+		this.canvas = document.getElementById("game") as HTMLCanvasElement;
+		this.canvas.width = this.res.x;
+		this.canvas.height = this.res.y;
+		this.res.x = this.res.x
+		this.res.y = this.res.y
+
 		this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
-		this.ctx.fillStyle = "rgb(0, 0, 0)";
-		this.ctx.fillRect(this.window.x, this.window.y, this.window.width, this.window.height);
-		this.ctx.fillStyle = "rgb(255,255,255)";
+		// Adding event hooks
+		document.addEventListener("keydown", this.handleKeyPress, false);
+		document.addEventListener("keyup", this.handleKeyRelease, false);
 
-		document.addEventListener("keypress", this.handleKeyPress);
-		document.addEventListener("keyup", this.handleKeyPress);
-		this.redraw();
-		setInterval(this.updateGame, this.interval);
+		// Create Entities
+		setInterval(this.draw, 10);
 	},
 	methods: {
-		drawBall() {
-			if (this.ctx) {
-				// this.ctx.beginPath();
-				// this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, 2 * Math.PI);
-				// this.ctx.fill();
-				// this.ctx.stroke();
-				this.ctx.fillRect(this.ball.x, this.ball.y, this.ball.width, this.ball.width);
+
+		// Rendering loop
+		draw() {
+			if (this.ctx && this.p1 && this.ball && this.res) {
+				// update
+				this.p1.update(this.vk_up, this.vk_down, this.res);
+				this.p2.update(false, false, this.res);
+				this.ball.update(this.res);
+
+				// render
+				this.clear();
+				this.ball.draw(this.ctx)
+				this.p1.draw(this.ctx, this.res)
+				this.p2.draw(this.ctx, this.res)
 			}
 		},
-		drawLeftBar() {
-			if (this.ctx) this.ctx.fillRect(this.barLeft.x, this.barLeft.y, this.barLeft.width, this.barLeft.height);
-		},
-		drawRightBar() {
-			if (this.ctx)
-				this.ctx.fillRect(this.barRight.x, this.barRight.y, this.barRight.width, this.barRight.height);
-		},
+
+		// Refresh what is drawn to the screen
 		clear() {
 			if (this.ctx) {
-				this.ctx.fillStyle = "rgb(0, 0, 0)";
-				this.ctx.fillRect(this.window.x, this.window.y, this.window.width, this.window.height);
-				this.ctx.fillStyle = "rgb(255,255,255)";
+				this.ctx.beginPath()
+				this.ctx.fillStyle = "#ffffff";
+				this.ctx.fillRect(0, 0, this.res.x, this.res.y);
+				this.ctx.fillStyle = "#000000"
+				this.ctx.fillRect(10, 10, this.res.x - 20, this.res.y - 20)
+				this.ctx.fillStyle = "#ffffff";
+				this.ctx.font = "100px roboto"
+				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - 200 - 25, 200)
+				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + 200 - 25, 200)
+				for (let i = 0; i < this.res.y / 2 * 24; i++) {
+					if (i%2) {
+						this.ctx.fillRect(this.res.x / 2 - 7, i * 20 + 10, 10, 20)
+					}
+				}
 			}
-		},
-		redraw() {
-			this.clear();
-			this.drawBall();
-			this.drawLeftBar();
-			this.drawRightBar();
 		},
 		handleKeyPress(event: KeyboardEvent) {
-			if (event) {
-				// console.log(event);
-				const keyNode = this.keyMap[event.code];
-				// console.log(keyNode.t);
-				if (keyNode) keyNode.pressed = event.type === "keypress";
-			}
+			if (event.key == "Up" || event.key == "ArrowUp")
+				this.vk_up = true;
+			else if (event.key == "Down" || event.key == "ArrowDown")
+				this.vk_down = true;
 		},
-		replaceElemsInBound() {
-			if (this.barLeft.y + this.barLeft.height > this.window.y + this.window.height)
-				this.barLeft.y = this.window.y + this.window.height - this.barLeft.height;
-			if (this.barLeft.y < this.window.y) this.barLeft.y = this.window.y;
-		},
-		intersect(
-			x1: number,
-			y1: number,
-			x2: number,
-			y2: number,
-			x3: number,
-			y3: number,
-			x4: number,
-			y4: number,
-		): IntersectResult {
-			// Check if none of the lines are of length 0
-			if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
-				return { result: false } as IntersectResult;
-			}
-
-			const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-
-			// Lines are parallel
-			if (denominator === 0) {
-				return { result: false } as IntersectResult;
-			}
-
-			const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-			const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
-
-			// is the intersection along the segments
-			if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-				return { result: false } as IntersectResult;
-			}
-
-			// Return a object with the x and y coordinates of the intersection
-			const x = x1 + ua * (x2 - x1);
-			const y = y1 + ua * (y2 - y1);
-
-			return { result: true, x, y };
-		},
-		handleBarIntersect(bar: Bar): void {
-			const currentBallPos: Point2D = { x: this.ball.x, y: this.ball.y };
-			const newBallPos: Point2D = {
-				x: currentBallPos.x + this.ball.speed.x,
-				y: currentBallPos.y + this.ball.speed.y,
-			};
-			const widthOffset = bar.width * (bar === this.barLeft ? 1 : -1);
-			const barStart: Point2D = { x: bar.x + widthOffset, y: bar.y };
-			const barEnd: Point2D = {
-				x: barStart.x + widthOffset,
-				y: bar.y + bar.height,
-			};
-			const intersect: IntersectResult = this.intersect(
-				currentBallPos.x,
-				currentBallPos.y,
-				newBallPos.x,
-				newBallPos.y,
-				barStart.x,
-				barStart.y,
-				barEnd.x,
-				barEnd.y,
-			);
-			if (intersect.result === true) {
-				this.ball.x = intersect.x;
-				this.ball.y = intersect.y;
-				this.ball.speed.x *= -1;
-				const isUp: boolean = intersect.y > bar.y + bar.height / 2;
-				this.ball.speed.y = isUp ? 0.5 : -0.5;
-				newBallPos.x = currentBallPos.x + this.ball.speed.x;
-				newBallPos.y = currentBallPos.y + this.ball.speed.y;
-			}
-			this.ball.x = newBallPos.x;
-			this.ball.y = newBallPos.y;
-		},
-		handleTopAndBottom() {
-			const currentBallPos: Point2D = { x: this.ball.x, y: this.ball.y };
-			const newBallPos: Point2D = {
-				x: currentBallPos.x + this.ball.speed.x,
-				y: currentBallPos.y + this.ball.speed.y,
-			};
-			if (
-				newBallPos.y - this.ball.width / 2 < this.window.y ||
-				newBallPos.y + this.ball.width / 2 > this.window.y + this.window.height
-			)
-				this.ball.speed.y *= -1;
-		},
-		updateGame() {
-			for (const keyName in this.keyMap) {
-				const key = this.keyMap[keyName] as KeyNode;
-				if (key.pressed && key.handler) key.handler();
-			}
-			this.handleBarIntersect(this.barLeft);
-			this.handleBarIntersect(this.barRight);
-			this.handleTopAndBottom();
-
-			if (this.ball.x > this.window.x + this.window.width || this.ball.x < this.window.x) {
-				this.ball.x = this.window.x + this.window.width / 2;
-				this.ball.y = this.window.y + this.window.height / 2;
-				this.ball.speed.y = 0;
-				this.ball.speed.x = 1;
-			}
-			this.replaceElemsInBound();
-			this.redraw();
-		},
+		handleKeyRelease(event: KeyboardEvent) {
+			if (event.key == "Up" || event.key == "ArrowUp")
+				this.vk_up = false;
+			else if (event.key == "Down" || event.key == "ArrowDown")
+				this.vk_down = false;
+		}
 	},
 });
 </script>
