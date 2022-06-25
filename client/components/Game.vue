@@ -16,11 +16,6 @@ class Vector2D {
 	}
 }
 
-interface KeyNode {
-	pressed: Boolean;
-	handler: Function | null;
-}
-
 class Player {
 	pos: Vector2D
 	speed: number
