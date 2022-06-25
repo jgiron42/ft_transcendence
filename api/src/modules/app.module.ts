@@ -20,6 +20,7 @@ import { RelationsController } from "@controllers/relations.controller";
 import { MessagesController } from "@controllers/messages.controller";
 import { ChannelsController } from "@controllers/channels.controller";
 import { GamesController } from "@controllers/games.controller";
+import { ChatModule } from "@modules/chat.module";
 
 @Module({
 	imports: [
@@ -42,6 +43,7 @@ import { GamesController } from "@controllers/games.controller";
 		ChanConnectionModule,
 		ChanInvitationModule,
 		AuthModule,
+		ChatModule,
 	],
 	controllers: [AppController, RelationsController, MessagesController, ChannelsController, GamesController],
 })

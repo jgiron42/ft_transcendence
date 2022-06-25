@@ -8,6 +8,7 @@
 		"allowJs": true,
 		"sourceMap": true,
 		"strict": true,
+		"strictPropertyInitialization": false,
 		"noEmit": true,
 		"experimentalDecorators": true,
 		"baseUrl": ".",
@@ -15,7 +16,7 @@
 			"~/*": ["./*"],
 			"@/*": ["./*"]
 		},
-		"types": ["@nuxt/types", "@types/node"]
+		"types": ["@nuxt/types", "@types/node", "cookie-universal-nuxt", "nuxt-socket-io", "@nuxtjs/device"]
 	},
 	"exclude": ["node_modules", ".nuxt", "dist"]
 }
