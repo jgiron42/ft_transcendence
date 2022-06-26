@@ -26,7 +26,7 @@ export class Channel {
 	id: number;
 
 	// name of the channel
-	@Column()
+	@Column({unique: true})
 	@SetMode("cru")
 	name: string;
 

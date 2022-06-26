@@ -80,7 +80,6 @@ export class ChannelsController {
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
 	async create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @Req() req: Request) {
-		console.log("channel: " + JSON.stringify(channel));
 		channel.owner = req.user;
 		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
 		return this.channelService.create(channel);

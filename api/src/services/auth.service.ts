@@ -65,7 +65,6 @@ export class AuthService {
 	 */
 	isFtLogged(ses: SessionT): boolean {
 		// Return true if the time since last authentication is inferior to the timeout
-		console.log(JSON.stringify(ses));
 		return ses.ftIdentified && ses.ftIdentified + this.getTimeout() > Date.now();
 	}
 
