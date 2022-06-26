@@ -24,5 +24,6 @@ module.exports = {
 		"no-descending-specificity": null,
 		"block-no-empty": null,
 		"selector-class-pattern": null, // Turned off CSS class nomenclature
+		"selector-id-pattern": null, // Turned off CSS class nomenclature
 	},
 };
