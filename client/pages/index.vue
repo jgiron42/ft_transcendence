@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import GameDispatcher from "~/components/GameDispatcher.vue";
+import GameDispatcher from "@/components/GameDispatcher.vue";
 export default {
 	name: "Index",
 	components: { GameDispatcher },

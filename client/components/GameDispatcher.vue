@@ -4,10 +4,11 @@
 </template>
 
 <script lang="ts">
+import Vue from "vue";
 import Matchmaking from "./Matchmaking.vue";
 import Game from "./Game.vue";
 
-export default {
+export default Vue.extend({
 	components: { Matchmaking, Game },
 	data: () => ({
 		gameID: 42,
@@ -22,5 +23,5 @@ export default {
 			this.inGame = true;
 		});
 	},
-};
+});
 </script>

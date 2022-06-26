@@ -2,7 +2,8 @@
 	<div @click="handleClick"><BoxButton type="button" :content="buttonContent" /></div>
 </template>
 <script lang="ts">
-export default {
+import Vue from "vue";
+export default Vue.extend({
 	// Data should be updated by websocket events
 	data: () => ({
 		waiting: false,
@@ -58,5 +59,5 @@ export default {
 			this.updateMatchmakingStatus();
 		},
 	},
-};
+});
 </script>
