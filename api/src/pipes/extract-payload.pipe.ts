@@ -7,6 +7,7 @@ import { Request } from "@src/types/request";
 @Injectable()
 export class ExtractPayloadPipe<T> implements PipeTransform {
 	transform(req: Request<T>): T {
+		console.log("req.value = " + JSON.stringify(req.value));
 		return req.value;
 	}
 }

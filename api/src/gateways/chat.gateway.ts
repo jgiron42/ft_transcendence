@@ -4,6 +4,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 	OnGatewayInit,
+	OnGatewayConnection,
 	OnGatewayDisconnect,
 	ConnectedSocket,
 } from "@nestjs/websockets";
@@ -21,7 +22,7 @@ import { WebsocketSaveSession } from "@interceptors/websocket-save-session";
 })
 @UseInterceptors(WebsocketSaveSession)
 @UseGuards(...SessionGuard)
-export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(private readonly userService: UserService) {}
 
 	@WebSocketServer() server: Server;
@@ -44,6 +45,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 		} catch (e) {
 			this.logger.error(e);
 		}
+	}
+
+	handleConnection(client: Socket) {
+		client.emit("Hello world");
 	}
 
 	handleDisconnect(client: Socket) {

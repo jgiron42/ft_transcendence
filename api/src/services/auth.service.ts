@@ -36,7 +36,9 @@ export class AuthService {
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	hasTOTP(user: User): boolean {
-		return user.totp_enabled;
+		void user;
+		return true;
+		// return user.totp_enabled;
 	}
 
 	/**
@@ -63,6 +65,7 @@ export class AuthService {
 	 */
 	isFtLogged(ses: SessionT): boolean {
 		// Return true if the time since last authentication is inferior to the timeout
+		console.log(JSON.stringify(ses));
 		return ses.ftIdentified && ses.ftIdentified + this.getTimeout() > Date.now();
 	}
 
