@@ -6,3 +6,22 @@
 html {
 	font-family: BMjapan, sans-serif;
 }
+
+.vm--overlay {
+	backdrop-filter: blur(5px);
+	background-color: #0007 !important;
+}
+
+.vm--modal {
+	display: flex !important;
+	flex: 1 1 auto !important;
+	flex-direction: column !important;
+	background-color: #424242 !important;
+	border-radius: 6px !important;
+	left: auto !important;
+	margin-left: auto;
+	margin-right: auto;
+	width: min(500px, 95%) !important;
+	height: fit-content !important;
+	padding-bottom: 10px;
+}

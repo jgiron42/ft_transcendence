@@ -1,11 +1,11 @@
 <template>
 	<div class="w-full h-full flex flex-col">
 		<div class="chat-header flex flex-row h-fit">
-			<button id="show-select-btn" class="text-white font-bold rounded" @click="onShowSelect">
+			<button id="show-list-btn" class="text-white font-bold rounded" @click="onShowChannels">
 				<i class="fas fa-plus">#</i>
 			</button>
 			<h1 id="chat-title" class="w-full text-center mt-auto mb-auto">Chat</h1>
-			<button id="show-select-btn" class="text-white font-bold rounded" @click="onShowUsers">
+			<button id="show-list-btn" class="text-white font-bold rounded" @click="onShowUsers">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -29,7 +29,7 @@
 			</button>
 		</div>
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-			<ChatSelection v-if="showSelection" :socket="socket" :current-channel="currentChannel" />
+			<ChatSelection v-if="showChannels" :socket="socket" :current-channel="chat.currentChannel" />
 			<Chatbox :socket="socket" />
 			<UsersInChannel v-if="showUsers" :socket="socket" />
 			<Popup name="create_channel" component="ChannelCreation" />
@@ -45,6 +45,7 @@ export default Vue.extend({
 	name: "Chat",
 	data() {
 		return {
+			currentChannel: new Channel(),
 			socket: this.$nuxtSocket({
 				name: "chat",
 				channel: "/chat",
@@ -58,29 +59,32 @@ export default Vue.extend({
 				teardown: false,
 				forceNew: false,
 			}),
-			showSelection: !this.$device.isMobile,
+			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
-			currentChannel: new Channel(),
 		};
 	},
 	mounted() {
-		this.socket.on("JC", (payload = { chan: Channel }) => {
-			this.onJC(payload.chan);
+		this.updateChannel();
+		this.socket.on("connect", () => {
+			this.$nuxt.$emit("initSocket");
 		});
 	},
 	methods: {
 		onJC(chan: Channel) {
-			this.currentChannel = chan;
+			this.chat.currentChannel = chan;
 		},
-		onShowSelect() {
+		updateChannel() {
+			this.currentChannel = this.chat.currentChannel;
+		},
+		onShowChannels() {
 			if (this.$device.isMobile) {
 				this.showUsers = false;
 			}
-			this.showSelection = !this.showSelection;
+			this.showChannels = !this.showChannels;
 		},
 		onShowUsers() {
 			if (this.$device.isMobile) {
-				this.showSelection = false;
+				this.showChannels = false;
 			}
 			this.showUsers = !this.showUsers;
 		},
@@ -113,7 +117,7 @@ body {
 	margin-right: auto;
 }
 
-#show-select-btn {
+#show-list-btn {
 	font: 1.5rem/1.5rem Roboto, sans-serif;
 	width: 35px;
 	height: 35px;
