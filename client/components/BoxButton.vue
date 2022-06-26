@@ -1,0 +1,34 @@
+<template>
+	<button
+		:class="`m-1 p-4 py-6 ${color} break-words border-design_white border-4 rounded rounded-br-none text-3xl text-center text-design_white text-center hover:text-gray-400`"
+	>
+		<p v-for="(line, index) in content" :key="index">
+			{{ line }}
+		</p>
+	</button>
+</template>
+<script lang="ts">
+export default {
+	name: "BoxButton",
+	props: {
+		content: {
+			type: Array,
+			required: true,
+			default: () => ["DEFAULT TITLE"],
+		},
+		color: {
+			type: String,
+			default: "bg-design_blue",
+		},
+	},
+};
+</script>
+<style>
+.wrap-this {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	-ms-word-break: break-all;
+	word-break: break-word;
+	hyphens: auto;
+}
+</style>
