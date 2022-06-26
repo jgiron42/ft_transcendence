@@ -14,19 +14,19 @@ services:
             TZ: Europe/Paris
         volumes:
             # Mount code to avoid rebuild container to refresh code
-            - ./client/components:/app/client/components
-            - ./client/config:/app/client/config
-            - ./client/entrypoint.sh:/app/client/entrypoint.sh
-            - ./client/jsconfig.json:/app/client/jsconfig.json
-            - ./client/logs:/app/client/logs
-            - ./client/nuxt.config.js:/app/client/nuxt.config.js
-            - ./client/package.json:/app/client/package.json
-            - ./client/pages:/app/client/pages
-            - ./client/static:/app/client/static
-            - ./client/store:/app/client/store
-            - ./client/stylelint.config.js:/app/client/stylelint.config.js
-            - ./client/tailwind.config.js:/app/client/tailwind.config.js
-            - ./client/tsconfig.json:/app/client/tsconfig.json
+            - ./client/components:/app/components
+            - ./client/config:/app/config
+            - ./client/entrypoint.sh:/app/entrypoint.sh
+            - ./client/jsconfig.json:/app/jsconfig.json
+            - ./client/logs:/app/logs
+            - ./client/nuxt.config.js:/app/nuxt.config.js
+            - ./client/package.json:/app/package.json
+            - ./client/pages:/app/pages
+            - ./client/static:/app/static
+            - ./client/store:/app/store
+            - ./client/stylelint.config.js:/app/stylelint.config.js
+            - ./client/tailwind.config.js:/app/tailwind.config.js
+            - ./client/tsconfig.json:/app/tsconfig.json
 
         healthcheck:
             disable: false
