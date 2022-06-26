@@ -1,6 +1,8 @@
 <template>
-	<div>
-		<canvas id="game"> </canvas>
+	<div class="flex w-full h-full">
+		<div class="top-1/3">
+			<canvas id="game" width="500" height="400"> </canvas>
+		</div>
 	</div>
 </template>
 
@@ -20,9 +22,9 @@ class Player {
 	pos: Vector2D
 	speed: number
 	size: Vector2D
-	constructor(screenWidth: number, screenHeight: number, x: number) {
-		this.pos = new Vector2D(x, (screenHeight / 2) - 100 / 2)
+	constructor(res: Vector2D, x: number) {
 		this.size = new Vector2D(20, 100)
+		this.pos = new Vector2D(x, (res.y / 2) - 100 / 2)
 		this.speed = 10;
 	}
 	update(vk_up: Boolean, vk_down: Boolean, res: Vector2D) {
@@ -61,8 +63,7 @@ class Ball {
 	update(res: Vector2D) {
 		if (this.pos.y + this.dir.y < this.ballradius / 2 || this.pos.y + this.dir.y > res.y - this.ballradius / 2)
 			this.dir.y = -this.dir.y;
-		if (this.pos.x + this.dir.x > res.x - this.ballradius / 2 || this.pos.x + this.dir.x < this.ballradius / 2)
-			this.dir.x = -this.dir.x;
+			
 		this.pos.x += this.dir.x
 		this.pos.y += this.dir.y
 	}
@@ -78,6 +79,23 @@ class Ball {
 		ctx.fill();
 		ctx.closePath();
 	}
+	bounce(x: number, y:number) {
+		this.dir.x *= x;
+		this.dir.y *= y;
+	}
+	collide(pad: Player) {
+		if(this.pos.y + this.dir.y >= pad.pos.y + pad.pos.y || this.pos.y + this.dir.y + this.ballradius / 2 <= pad.pos.y
+			|| this.pos.x + this.dir.x >= pad.pos.x + pad.size.x || this.pos.x + this.dir.x + this.ballradius / 2 <= pad.pos.x)
+		    return ;
+		if(this.pos.y + this.dir.y <= pad.pos.y + pad.size.y )
+		    this.bounce(-1,1);
+		else if(this.pos.y + this.dir.y + this.ballradius >= pad.pos.y)
+		    this.bounce(-1,1);
+		else if(this.pos.x + this.dir.x + this.ballradius >= pad.pos.x )
+	 	    this.bounce(1,-1);
+		else if(this.pos.x + this.dir.x <= pad.pos.x + pad.size.x)
+    		this.bounce(1,-1);
+	}
 }
 
 export default Vue.extend({
@@ -89,18 +107,18 @@ export default Vue.extend({
 		vk_down: false,
 		score_p1: 0,
 		score_p2: 0,
-		res: new Vector2D(900, 600),
+		res: null as Vector2D | null,
 		ball: new Ball(new Vector2D(450, 300)),
-		p1: new Player(900, 600, 40),
-		p2: new Player(900, 600, 840),
+		p1: null as Player | null,
+		p2: null as Player | null,
 	}),
 	mounted() {
 		// Init Canvas and apply ratio
 		this.canvas = document.getElementById("game") as HTMLCanvasElement;
-		this.canvas.width = this.res.x;
-		this.canvas.height = this.res.y;
-		this.res.x = this.res.x
-		this.res.y = this.res.y
+		this.res = new Vector2D(this.canvas.width, this.canvas.height);
+		this.p2 = new Player(this.res, this.res.x - this.res.x / 10)
+		if (this.p2)
+			this.p1 = new Player(this.res, this.res.x / 10 - this.p2.size.x)
 
 		this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
@@ -115,12 +133,27 @@ export default Vue.extend({
 
 		// Rendering loop
 		draw() {
-			if (this.ctx && this.p1 && this.ball && this.res) {
+			if (this.ctx && this.p1 && this.ball && this.res && this.p2) {
 				// update
+				if (this.ball.pos.x + this.ball.dir.x <= 0) {
+					this.score_p2 += 1
+					this.ball.pos.x = this.res.x / 2;
+					this.ball.pos.y = this.res.y / 2;
+					this.ball.dir.y = 0
+				} else if (this.ball.pos.x + this.ball.dir.x >= this.res.x) {
+					this.score_p1 += 1
+					this.ball.pos.x = this.res.x / 2;
+					this.ball.pos.y = this.res.y / 2;
+					this.ball.dir.y = 0
+				}
 				this.p1.update(this.vk_up, this.vk_down, this.res);
-				this.p2.update(false, false, this.res);
+				if (this.ball.pos.y + this.ball.dir.y < this.p2.pos.y)
+					this.p2.update(true, false, this.res);
+				else if (this.ball.pos.y + this.ball.dir.y > this.p2.pos.y)
+					this.p2.update(false, true, this.res);
 				this.ball.update(this.res);
-
+				this.ball.collide(this.p1);
+				this.ball.collide(this.p2);
 				// render
 				this.clear();
 				this.ball.draw(this.ctx)
@@ -131,7 +164,7 @@ export default Vue.extend({
 
 		// Refresh what is drawn to the screen
 		clear() {
-			if (this.ctx) {
+			if (this.ctx && this.res) {
 				this.ctx.beginPath()
 				this.ctx.fillStyle = "#ffffff";
 				this.ctx.fillRect(0, 0, this.res.x, this.res.y);
@@ -139,8 +172,8 @@ export default Vue.extend({
 				this.ctx.fillRect(10, 10, this.res.x - 20, this.res.y - 20)
 				this.ctx.fillStyle = "#ffffff";
 				this.ctx.font = "100px roboto"
-				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - 200 - 25, 200)
-				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + 200 - 25, 200)
+				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - this.res.x / 4 - 25, 200)
+				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + this.res.x / 4 - 25, 200)
 				for (let i = 0; i < this.res.y / 2 * 24; i++) {
 					if (i%2) {
 						this.ctx.fillRect(this.res.x / 2 - 7, i * 20 + 10, 10, 20)
@@ -163,3 +196,12 @@ export default Vue.extend({
 	},
 });
 </script>
+
+<style scoped>
+canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    width: 800px;
+}
+</style>
