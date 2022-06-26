@@ -1,9 +1,9 @@
 <template>
 	<div
-		class="w-full h-full flex flex-col items-center border-4 border-design_white bg-design_black overflow-hidden rounded-md"
+		class="w-full h-full flex flex-col items-center border-4 border-design_white bg-design_black overflow-hidden rounded-md min-h-full"
 	>
 		<div
-			id="tittle"
+			id="title"
 			class="text-design_white h-8 justify-center top-1/2 flex w-full border-b-2 border-design_white text-center bg-design_blue"
 		>
 			<div class="inline-block align-center">SETTINGS</div>
@@ -12,9 +12,10 @@
 			<button
 				class="w-1/2 text-center"
 				:class="
-					selected
+					'p-4 ' +
+					(selected
 						? 'bg-design_black text-design_white hover:bg-design_dgray'
-						: 'text-design_black bg-design_white hover:bg-design_gray'
+						: 'text-design_black bg-design_white hover:bg-design_gray')
 				"
 				@click="selected = false"
 			>
@@ -23,9 +24,10 @@
 			<button
 				class="w-1/2 text-center"
 				:class="
-					!selected
+					'p-4 ' +
+					(!selected
 						? 'bg-design_black text-design_white hover:bg-design_dgray'
-						: 'text-design_black bg-design_white hover:bg-design_gray'
+						: 'text-design_black bg-design_white hover:bg-design_gray')
 				"
 				@click="selected = true"
 			>
