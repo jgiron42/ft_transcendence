@@ -8,7 +8,7 @@
 			</div>
 		</div>
 		<div id="spacer" class="h-1/3"></div>
-		<div class="flex h-full justify-around">
+		<div class="flex h-full justify-center p-6">
 			<input id="set-profile-btn" type="file" class="h-full" @change="onFileChange" />
 		</div>
 	</div>
