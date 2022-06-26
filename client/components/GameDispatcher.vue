@@ -32,6 +32,10 @@ export default Vue.extend({
 			forceNew: false,
 		});
 
+		this.matchmakingSocket.on("connect_error", (err) => {
+			console.log("[MATCHMAKING]: ERROR:", err);
+			this.$nuxt.$emit("addAlert", { title: "MATCHMAKING ERROR", message: JSON.stringify(err) });
+		});
 		// Log all event
 		this.matchmakingSocket.onAny((event, ...args) => {
 			console.log("[MATCHMAKING]:", event, args);

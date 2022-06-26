@@ -1,6 +1,7 @@
 <template>
 	<div id="app" class="w-screen overflow-hidden flex flex-col h-full">
 		<Header />
+		<AlertManager />
 		<div id="page" class="flex flex-row items-center content-center justify-evenly overflow-x-auto h-full">
 			<div class="w-fit h-full w-2/5">
 				<Settings />
