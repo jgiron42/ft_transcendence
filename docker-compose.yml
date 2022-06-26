@@ -14,19 +14,7 @@ services:
             TZ: Europe/Paris
         volumes:
             # Mount code to avoid rebuild container to refresh code
-            - ./client/components:/app/components
-            - ./client/config:/app/config
-            - ./client/entrypoint.sh:/app/entrypoint.sh
-            - ./client/jsconfig.json:/app/jsconfig.json
-            - ./client/logs:/app/logs
-            - ./client/nuxt.config.js:/app/nuxt.config.js
-            - ./client/package.json:/app/package.json
-            - ./client/pages:/app/pages
-            - ./client/static:/app/static
-            - ./client/store:/app/store
-            - ./client/stylelint.config.js:/app/stylelint.config.js
-            - ./client/tailwind.config.js:/app/tailwind.config.js
-            - ./client/tsconfig.json:/app/tsconfig.json
+            - ./client:/app
 
         healthcheck:
             disable: false
