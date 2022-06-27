@@ -4,6 +4,7 @@
 		<BoxButton
 			color="bg-red-900"
 			:content="['(!) WIP (!)', '---', `GAME #${gameID}`, '---', 'SELF', 'VS', opponentName]"
+			:enable-hover="false"
 		/>
 	</div>
 </template>

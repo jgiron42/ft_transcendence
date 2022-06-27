@@ -1,6 +1,8 @@
 <template>
 	<button
-		:class="`m-1 p-4 py-6 ${color} break-words border-design_white border-4 rounded rounded-br-none text-3xl text-center text-design_white text-center hover:text-gray-400`"
+		:class="`m-1 p-4 py-6 ${color} break-words border-design_white border-4 rounded rounded-br-none text-3xl text-design_white text-center ${
+			enableHover ? 'hover:text-gray-400' : 'cursor-default'
+		}`"
 	>
 		<p v-for="(line, index) in content" :key="index">
 			{{ line }}
@@ -19,6 +21,10 @@ export default {
 		color: {
 			type: String,
 			default: "bg-design_blue",
+		},
+		enableHover: {
+			type: Boolean,
+			default: true,
 		},
 	},
 };
