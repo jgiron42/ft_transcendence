@@ -17,7 +17,7 @@ export default {
 		},
 	},
 	data: () => ({
-		opponentName: "CHARLIE",
+		opponentName: "CH4R-L13",
 	}),
 };
 </script>
