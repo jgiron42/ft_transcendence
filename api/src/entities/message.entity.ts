@@ -9,7 +9,7 @@ import { User } from "./user.entity";
 
 @Entity()
 export class Message {
-	cosntructor() {
+	constructor() {
 		this.created_at = new Date();
 	}
 	@PrimaryGeneratedColumn()
