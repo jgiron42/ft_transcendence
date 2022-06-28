@@ -31,6 +31,10 @@ export class ChanConnectionService {
 		return this.getQuery().getOne(id);
 	}
 
+	async findOneByConnection(userId: string, channelId: number): Promise<ChanConnection> {
+		return await this.getQuery().channel(channelId).user(userId).query.getOne();
+	}
+
 	async remove(id: number): Promise<void> {
 		await this.getQuery().remove(id);
 	}
