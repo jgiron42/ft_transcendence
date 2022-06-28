@@ -11,7 +11,7 @@ export class User {
 		this.created_at = new Date();
 	}
 
-	id: number | null;
+	id: number | string | null;
 	username: string;
 	image_url: string;
 	nb_game: number;
