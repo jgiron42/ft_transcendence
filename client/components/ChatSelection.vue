@@ -65,6 +65,7 @@ export default Vue.extend({
 			const tmp = await this.chat.joinChannel(chan);
 			if (tmp) {
 				this.$nuxt.$emit("updateCurrentChannel", tmp);
+				this.socket.emit("JC", tmp.id);
 			}
 		},
 	},

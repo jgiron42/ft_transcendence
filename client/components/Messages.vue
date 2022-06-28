@@ -18,8 +18,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { Message } from "@/models/Message";
-import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store";
+import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "Messages",
@@ -32,10 +32,15 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.$nuxt.$on("updateCurrentChannel", (chan: Channel) => {
-			this.api.get("/channels/" + chan.id + "/messages", null, (d: { data: Message[] }) => {
-				this.messages = d.data;
-			});
+		this.$nuxt.$on("JC", (messages: Message[]) => {
+			this.messages = messages;
+		});
+		this.$nuxt.$on("MSG", (message: Message) => {
+			const u = new User();
+			u.id = message.user;
+			u.username = message.user;
+			message.user = u;
+			this.messages.push(message);
 		});
 	},
 });

@@ -77,6 +77,12 @@ export default Vue.extend({
 		this.socket.on("updateMessages", () => {
 			this.$nuxt.$emit("updateChannels");
 		});
+		this.socket.on("JC", (messages: Message[]) => {
+			this.$nuxt.$emit("JC", messages);
+		});
+		this.socket.on("MSG", (message: Message) => {
+			this.$nuxt.$emit("MSG", message);
+		});
 	},
 	methods: {
 		onShowChannels() {

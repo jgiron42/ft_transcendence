@@ -162,7 +162,7 @@ export class ChannelsController {
 			.getManyAndCount();
 		res.setHeader("total_entities", total);
 		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret.sort((a: Message, b: Message): number => a.created_at.getTime() - b.created_at.getTime());
+		return ret;
 	}
 
 	/**
