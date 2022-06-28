@@ -39,6 +39,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Message } from "@/models/Message";
 
 export default Vue.extend({
 	name: "Chat",
