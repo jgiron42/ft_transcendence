@@ -1,7 +1,7 @@
 <template>
 	<div id="chat-box" class="w-full h-full flex flex-col">
 		<div id="chat-content" class="flex flex-col-reverse items-center">
-			<Messages :messages="messages" />
+			<Messages />
 		</div>
 		<div id="msgBar" class="flex p-2">
 			<div class="txt-msg-bg w-full h-full min-w-0 p-2">
@@ -30,6 +30,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Message } from "@/models/Message";
+import { Channel } from "@/models/Channel";
 
 export default Vue.extend({
 	name: "Chatbox",
@@ -43,16 +44,15 @@ export default Vue.extend({
 		return {
 			title: "ChatBox",
 			msgContent: "",
-			messages: [] as Message[],
+			currentChannel: new Channel(),
 		};
 	},
 	mounted() {
-		this.clearMessages();
+		this.$nuxt.$on("updateCurrentChannel", (chan: Channel) => {
+			this.currentChannel = chan;
+		});
 	},
 	methods: {
-		clearMessages() {
-			this.messages = [];
-		},
 		helloConnection() {
 			this.socket.emit("HC", {
 				token: this.$cookies.get("connect.sid"),
@@ -60,9 +60,13 @@ export default Vue.extend({
 		},
 		sendMessage() {
 			if (!(this.msgContent.length > 0)) return;
-			this.socket.emit("MSG", {
-				content: this.msgContent,
-			});
+			// this.socket.emit("MSG", {
+			// 	content: this.msgContent,
+			// });
+			const msg = new Message();
+			msg.content = this.msgContent;
+			msg.created_at = new Date();
+			this.api.post("/channels/" + this.currentChannel.id + "/messages", msg);
 			this.msgContent = "";
 		},
 	},

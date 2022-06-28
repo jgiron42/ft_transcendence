@@ -2,8 +2,14 @@ import Vue from "vue";
 import axios from "axios";
 
 interface apiInterface {
-	get(route: string, data: Object, onSuccess: Function, onError: Function): Promise<void>;
-	post(route: string, data: Object, onSuccess: Function, onError: Function): Promise<void>;
+	get(route: string, params?: Object | null, onSuccess?: Function | null, onError?: Function | null): Promise<void>;
+	post(
+		route: string,
+		data?: Object | null,
+		params?: Object | null,
+		onSuccess?: Function | null,
+		onError?: Function | null,
+	): Promise<void>;
 }
 
 declare module "vue/types/vue" {
@@ -13,25 +19,25 @@ declare module "vue/types/vue" {
 }
 
 Vue.prototype.api = <apiInterface>{
-	async post(route: string, data: Object, onSuccess: (a: any) => {}, onError: (a: any) => {}) {
+	async post(route: string, data = null, params = null, onSuccess = null, onError = null) {
 		await axios
-			.post(process.env.apiBaseUrl + route, data, { withCredentials: true })
+			.post(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
 			.then((response) => {
-				onSuccess(response);
+				if (onSuccess !== null) onSuccess(response);
 			})
-			.catch((error) => {
+			.catch((err) => {
 				// error.response.data.message
-				onError(error);
+				if (onError !== null) onError(err);
 			});
 	},
-	async get(route: string, onSuccess: (a: any) => {}, onError: (a: any) => {}) {
+	async get(route: string, params = null, onSuccess = null, onError = null) {
 		await axios
-			.get(process.env.apiBaseUrl + route, { withCredentials: true })
+			.get(process.env.apiBaseUrl + route, { withCredentials: true, params })
 			.then((response) => {
-				onSuccess(response);
+				if (onSuccess !== null) onSuccess(response);
 			})
-			.catch((error) => {
-				onError(error);
+			.catch((err) => {
+				if (onError !== null) onError(err);
 			});
 	},
 };

@@ -1,7 +1,8 @@
 <template>
 	<div id="user-selection" class="h-full">
 		<div v-for="(user, index) of users" :key="index">
-			<button class="user-name cut-text btn text-left" @click="$modal.show('user_profile')">
+			<!--button class="user-name cut-text btn text-left" @click="$modal.show('user_profile')"-->
+			<button class="user-name cut-text btn text-left" @click="getUsers">
 				<b>{{ user.username }}</b>
 			</button>
 		</div>
@@ -11,6 +12,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { User } from "@/models/User";
+import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "ChatSelection",
@@ -27,6 +29,9 @@ export default Vue.extend({
 	data() {
 		return {
 			users: [] as User[],
+			get me() {
+				return chatStore.me;
+			},
 		};
 	},
 	mounted() {
@@ -55,8 +60,13 @@ export default Vue.extend({
 		});
 	},
 	methods: {
-		getUsers() {
+		async getUsers() {
 			this.socket.emit("GU");
+			const u = new User();
+			u.username = "riblanc";
+			u.id = u.username;
+			console.log(JSON.stringify(u));
+			await chatStore.updateMe(u);
 		},
 		onGU(users: User[]) {
 			this.users = users;

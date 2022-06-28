@@ -7,7 +7,7 @@
 			<button
 				class="chan-name cut-text btn text-left"
 				:class="chan.id == currentChannel.id ? 'selected' : ''"
-				@click="JC(chan.name)"
+				@click="joinChannel(chan)"
 			>
 				#
 				<b>{{ chan.name }}</b>
@@ -19,15 +19,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { Channel } from "@/models/Channel";
+import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "ChatSelection",
 	props: {
 		socket: {
-			type: Object,
-			default: () => {},
-		},
-		currentChannel: {
 			type: Object,
 			default: () => {},
 		},
@@ -38,7 +35,10 @@ export default Vue.extend({
 	},
 	data() {
 		return {
-			channels: [] as Channel[],
+			get channels() {
+				return chatStore.channels;
+			},
+			currentChannel: new Channel(),
 		};
 	},
 	mounted() {
@@ -50,16 +50,22 @@ export default Vue.extend({
 				containerTest.scrollLeft = containerTest.scrollWidth;
 			}
 		}
-		this.$nuxt.$on("GC", (chans: Channel[]) => {
-			this.onGC(chans);
+		this.$nuxt.$on("updateChannels", () => {
+			this.onUpdateChannels();
+		});
+		this.$nuxt.$on("updateCurrentChannel", (chan: Channel) => {
+			this.currentChannel = chan;
 		});
 	},
 	methods: {
-		JC(chan: string) {
-			this.socket.emit("JC", chan);
+		onUpdateChannels() {
+			this.chat.getChannels();
 		},
-		onGC(chans: Channel[]) {
-			this.channels = chans;
+		async joinChannel(chan: Channel) {
+			const tmp = await this.chat.joinChannel(chan);
+			if (tmp) {
+				this.$nuxt.$emit("updateCurrentChannel", tmp);
+			}
 		},
 	},
 });

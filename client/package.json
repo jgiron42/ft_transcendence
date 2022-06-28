@@ -23,6 +23,7 @@
 		"nuxt-socket-io": "^2.0.3",
 		"vue": "^2.6.14",
 		"vue-js-modal": "^2.0.1",
+		"vue-property-decorator": "^9.1.2",
 		"vue-server-renderer": "^2.6.14",
 		"vue-template-compiler": "^2.6.14",
 		"webpack": "^4.46.0"
@@ -48,6 +49,7 @@
 		"stylelint": "^14.1.0",
 		"stylelint-config-prettier": "^9.0.3",
 		"stylelint-config-recommended-vue": "^1.1.0",
-		"stylelint-config-standard": "^24.0.0"
+		"stylelint-config-standard": "^24.0.0",
+		"vuex-module-decorators": "^0.17.0"
 	}
 }

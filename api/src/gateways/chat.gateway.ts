@@ -35,10 +35,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage("HC")
 	async onHelloConnection(@ConnectedSocket() socket: Socket) {
+		if (socket.session === undefined) return;
 		const usr = await this.userService.findOne(socket.session.user.id);
 		try {
 			if (usr) {
 				// await this.channelService.joinChannel(socket, "realm");
+				socket.emit("updateChannels");
 			} else {
 				throw new Error("User not found");
 			}
@@ -47,8 +49,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
-	handleConnection(client: Socket) {
-		client.emit("Hello world");
+	handleConnection(socket: Socket) {
+		socket.emit("HC");
 	}
 
 	handleDisconnect(client: Socket) {

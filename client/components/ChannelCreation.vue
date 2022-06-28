@@ -58,12 +58,7 @@ export default Vue.extend({
 			this.channel.type = (ChannelType as any)[(event.target as HTMLInputElement).value];
 		},
 		createChannel() {
-			this.api.post(
-				"/channels",
-				this.channel,
-				() => this.$modal.hide("create_channel"),
-				() => {},
-			);
+			this.api.post("/channels", this.channel, null, () => this.$modal.hide("create_channel"));
 		},
 	},
 });
