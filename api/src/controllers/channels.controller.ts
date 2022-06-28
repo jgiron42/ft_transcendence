@@ -136,6 +136,9 @@ export class ChannelsController {
 	): Promise<object> {
 		const channel = await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
 		if (channel.password !== "") await ChannelService.checkPassword(password, channel.password);
+		if (await this.chanConnectionService.isOnChannel(req.user.id, id)) {
+			return await this.chanConnectionService.findOneByConnection(req.user.id, id);
+		}
 		return this.chanConnectionService.create({ user: req.user, channel });
 	}
 
@@ -159,7 +162,7 @@ export class ChannelsController {
 			.getManyAndCount();
 		res.setHeader("total_entities", total);
 		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
+		return ret.sort((a: Message, b: Message): number => a.created_at.getTime() - b.created_at.getTime());
 	}
 
 	/**
@@ -173,6 +176,7 @@ export class ChannelsController {
 		@Req() req: Request,
 	): Promise<object> {
 		message.channel = await this.channelService.getQuery().on_channel(req.user.id).getOneOrFail(id);
+		message.user = req.user.id;
 		return this.messageService.create(message);
 	}
 
