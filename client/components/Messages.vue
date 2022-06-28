@@ -2,14 +2,11 @@
 	<div id="messages">
 		<div v-for="(message, index) of messages" :key="message.id" class="message-content">
 			<div v-if="index === 0 || messages[index - 1].user.id != message.user.id" class="message-header">
-				<span
-					v-if="(message.user.id === whoAmI.id) != true && message.user.id.length > 0"
-					class="message-author"
-				>
+				<span v-if="(message.user.id === me.id) != true && message.user.id.length > 0" class="message-author">
 					{{ message.user.username }}:
 				</span>
 			</div>
-			<div class="message-text break-all" :class="message.user.id == whoAmI.id ? 'mine' : ''">
+			<div class="message-text break-all" :class="message.user.id == me.id ? 'mine' : ''">
 				<div class="items-center w-95">
 					{{ message.content }}
 				</div>
@@ -23,26 +20,20 @@ import Vue from "vue";
 import { Message } from "@/models/Message";
 import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store";
-import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "Messages",
 	data() {
 		return {
 			messages: [] as Message[],
-			user: new User(),
+			get me() {
+				return chatStore.me;
+			},
 		};
-	},
-	computed: {
-		whoAmI() {
-			return chatStore.me;
-		}
 	},
 	mounted() {
 		this.$nuxt.$on("updateCurrentChannel", (chan: Channel) => {
-			console.log("Messages: " + JSON.stringify(chan));
 			this.api.get("/channels/" + chan.id + "/messages", null, (d: { data: Message[] }) => {
-				console.log("messages: " + JSON.stringify(d.data));
 				this.messages = d.data;
 			});
 		});

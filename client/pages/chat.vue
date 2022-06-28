@@ -66,12 +66,12 @@ export default Vue.extend({
 			this.socket.emit("HC", {
 				token: this.$cookies.get("connect.sid"),
 			});
+			this.chat.whoAmI();
 		});
 		this.socket.on("connect", () => {
 			this.$nuxt.$emit("initSocket");
 		});
 		this.socket.on("updateChannels", () => {
-			console.log("wouw update channels");
 			this.$nuxt.$emit("updateChannels");
 		});
 		this.socket.on("updateMessages", () => {

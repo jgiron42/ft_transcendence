@@ -1,4 +1,4 @@
-import { Store } from "vuex"
+import { Store } from "vuex";
 import { getModule } from "vuex-module-decorators";
 import Chat from "@/store/chat";
 

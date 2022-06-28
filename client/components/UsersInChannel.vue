@@ -2,7 +2,7 @@
 	<div id="user-selection" class="h-full">
 		<div v-for="(user, index) of users" :key="index">
 			<!--button class="user-name cut-text btn text-left" @click="$modal.show('user_profile')"-->
-			<button class="user-name cut-text btn text-left" @click="getUsers">
+			<button class="user-name cut-text btn text-left">
 				<b>{{ user.username }}</b>
 			</button>
 		</div>
@@ -49,26 +49,12 @@ export default Vue.extend({
 				containerTest.scrollLeft = containerTest.scrollWidth;
 			}
 		}
-		if (this.socket.connected) {
-			this.getUsers();
-		}
-		this.socket.on("GAI", () => {
-			this.getUsers();
-		});
-		this.socket.on("GU", (users: User[]) => {
-			this.onGU(users);
+		this.socket.on("updateUsers", (users: User[]) => {
+			this.onUpdateUsers(users);
 		});
 	},
 	methods: {
-		async getUsers() {
-			this.socket.emit("GU");
-			const u = new User();
-			u.username = "riblanc";
-			u.id = u.username;
-			console.log(JSON.stringify(u));
-			await chatStore.updateMe(u);
-		},
-		onGU(users: User[]) {
+		onUpdateUsers(users: User[]) {
 			this.users = users;
 		},
 	},

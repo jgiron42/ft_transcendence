@@ -10,7 +10,7 @@ export class GroupGuard implements CanActivate {
 		void this.groups;
 		const ret = true;
 		/* idk, but return true until fix...
-		** for (const g of this.groups) ret &&= context.switchToHttp().getRequest<Request>().groups.includes(g);
+		 * for (const g of this.groups) ret &&= context.switchToHttp().getRequest<Request>().groups.includes(g);
 		 */ return ret;
 	}
 }
