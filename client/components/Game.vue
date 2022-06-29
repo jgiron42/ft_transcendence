@@ -1,13 +1,48 @@
 <template>
 	<div class="flex w-full h-full">
 		<div class="top-1/3">
-			<canvas id="game" width="500" height="400"> </canvas>
+			<canvas id="game" width="896" height="504"> </canvas>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+
+
+// cap value to -1 1
+function normalize(x: number) {
+	if (x < -1) {
+		while (x < -1)
+			x += 1;
+		return x;
+	}
+	else if (x > 1) {
+		while (x > 1) {
+			x -= 1;
+		}
+		return x;
+	}
+	return x;
+}
+
+function intersection(p1: Vector2D, p2: Vector2D, p3: Vector2D, p4: Vector2D) {
+	let ua, ub, denom = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
+	if (denom == 0) {
+		return null
+	}
+	ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.y - p3.y)) / denom
+	ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.y - p3.y)) / denom
+	return new Vector2D(p1.x + ua * (p2.x - p1.x), p1.y + ua * (p2.y - p1.y));
+}
+
+// Translate x from one range to another
+function translate(x:number, s1: number, e1:number, s2: number, e2: number) {
+	let leftSpan = e1 - s1	
+	let rightSpan = e2 - s2
+	let scaled = (x - s1) / leftSpan
+	return normalize(s2 - (scaled*rightSpan))
+}
 
 class Vector2D {
 	x: number;
@@ -28,10 +63,10 @@ class Player {
 		this.speed = 10;
 	}
 	update(vk_up: Boolean, vk_down: Boolean, res: Vector2D) {
-		if (vk_up && this.pos.y - this.speed > 15) {
+		if (vk_up && this.pos.y - this.speed > 0) {
 			this.pos.y -= this.speed;
 		}
-		else if (vk_down && this.pos.y + this.speed < res.y - 15 - this.size.y) {
+		else if (vk_down && this.pos.y + this.speed < res.y - this.size.y) {
 			this.pos.y += this.speed;
 		}
 	}
@@ -47,6 +82,12 @@ class Player {
 		ctx.fill()
 		ctx.closePath();
 	}
+	get_width() {
+		return this.size.x
+	}
+	get_height() {
+		return this.size.y
+	}
 }
 
 class Ball {
@@ -57,10 +98,10 @@ class Ball {
 	constructor(res: Vector2D) {
 		this.speed = 5;
 		this.pos = new Vector2D(res.x / 2, res.y / 2)
-		this.dir = new Vector2D(this.speed, this.speed)
+		this.dir = new Vector2D(this.speed, 0)
 		this.ballradius = 10;
 	}
-	update(res: Vector2D) {
+	update(res: Vector2D, ctx: CanvasRenderingContext2D) {
 		if (this.pos.y + this.dir.y < this.ballradius / 2 || this.pos.y + this.dir.y > res.y - this.ballradius / 2)
 			this.dir.y = -this.dir.y;
 			
@@ -83,18 +124,41 @@ class Ball {
 		this.dir.x *= x;
 		this.dir.y *= y;
 	}
-	collide(pad: Player) {
-		if(this.pos.y + this.dir.y >= pad.pos.y + pad.pos.y || this.pos.y + this.dir.y + this.ballradius / 2 <= pad.pos.y
-			|| this.pos.x + this.dir.x >= pad.pos.x + pad.size.x || this.pos.x + this.dir.x + this.ballradius / 2 <= pad.pos.x)
-		    return ;
-		if(this.pos.y + this.dir.y <= pad.pos.y + pad.size.y )
-		    this.bounce(-1,1);
-		else if(this.pos.y + this.dir.y + this.ballradius >= pad.pos.y)
-		    this.bounce(-1,1);
-		else if(this.pos.x + this.dir.x + this.ballradius >= pad.pos.x )
-	 	    this.bounce(1,-1);
-		else if(this.pos.x + this.dir.x <= pad.pos.x + pad.size.x)
-    		this.bounce(1,-1);
+	collide(pad: Player, res: Vector2D) {
+		// Colision pad right
+		if (this.pos.y + this.dir.y >= pad.pos.y && this.pos.y + this.dir.y <= pad.pos.y + pad.size.y) {
+			if (this.pos.x > res.x / 2) {
+				if (this.pos.x < pad.pos.x && this.pos.x + this.dir.x > pad.pos.x) {
+					this.dir.x = -this.dir.x
+					let part = 0
+					if (this.pos.y + this.dir.y > pad.pos.y + pad.size.y/3 && this.pos.y + this.dir.y < pad.pos.y + 2*pad.size.y/3)
+						part = 1
+					else if (this.pos.y + this.dir.y >= pad.pos.y + 2 * pad.size.y/3)
+						part = 2
+					if (part == 0)
+						this.dir.y = -1
+					else if (part == 1)
+						this.dir.y = 0
+					else
+						this.dir.y = 1
+				}
+			} else if (this.pos.x < res.x / 2) {
+				if (this.pos.x > pad.pos.x + pad.size.x && this.pos.x + this.dir.x < pad.pos.x + pad.size.x) {
+					this.dir.x = -this.dir.x
+					let part = 0
+					if (this.pos.y + this.dir.y > pad.pos.y + pad.size.y/3 && this.pos.y + this.dir.y < pad.pos.y + 2*pad.size.y/3)
+						part = 1
+					else if (this.pos.y + this.dir.y >= pad.pos.y + 2 * pad.size.y/3)
+						part = 2
+					if (part == 0)
+						this.dir.y = -1
+					else if (part == 1)
+						this.dir.y = 0
+					else
+						this.dir.y = 1
+				}
+			}
+		}
 	}
 }
 
@@ -139,21 +203,23 @@ export default Vue.extend({
 					this.score_p2 += 1
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
-					this.ball.dir.y = 0
+					this.ball.dir.y = 1
+					this.ball.speed = 5
 				} else if (this.ball.pos.x + this.ball.dir.x >= this.res.x) {
 					this.score_p1 += 1
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
-					this.ball.dir.y = 0
+					this.ball.dir.y = -1
+					this.ball.speed = 5
 				}
 				this.p1.update(this.vk_up, this.vk_down, this.res);
-				if (this.ball.pos.y + this.ball.dir.y < this.p2.pos.y)
+				if (this.ball.pos.y + this.ball.dir.y < this.p2.pos.y + this.p2.size.y / 2)
 					this.p2.update(true, false, this.res);
-				else if (this.ball.pos.y + this.ball.dir.y > this.p2.pos.y)
+				else if (this.ball.pos.y + this.ball.dir.y > this.p2.pos.y + this.p2.size.y / 2)
 					this.p2.update(false, true, this.res);
-				this.ball.update(this.res);
-				this.ball.collide(this.p1);
-				this.ball.collide(this.p2);
+				this.ball.update(this.res, this.ctx);
+				this.ball.collide(this.p1, this.res);
+				this.ball.collide(this.p2, this.res);
 				// render
 				this.clear();
 				this.ball.draw(this.ctx)
