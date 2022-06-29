@@ -50,7 +50,6 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.channel.owner = "riblanc";
 		this.channel.type = ChannelType.PUBLIC;
 	},
 	methods: {

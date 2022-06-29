@@ -47,7 +47,8 @@ export class Channel {
 	@ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE" })
 	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
-	@SetMode("cru")
+	// @SetMode("cru")
+	@SetMode("ru") // removed temporarily 'c' to avoid "owner undefined doesn't exist when creating a channel"
 	owner: User | string;
 
 	// date of the message
