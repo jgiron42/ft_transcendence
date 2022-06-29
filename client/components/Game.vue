@@ -63,10 +63,10 @@ class Player {
 		this.speed = 10;
 	}
 	update(vk_up: Boolean, vk_down: Boolean, res: Vector2D) {
-		if (vk_up && this.pos.y - this.speed > 0) {
+		if (vk_up && this.pos.y - this.speed > 10) {
 			this.pos.y -= this.speed;
 		}
-		else if (vk_down && this.pos.y + this.speed < res.y - this.size.y) {
+		else if (vk_down && this.pos.y + this.speed < res.y - this.size.y - 10) {
 			this.pos.y += this.speed;
 		}
 	}
@@ -102,7 +102,7 @@ class Ball {
 		this.ballradius = 10;
 	}
 	update(res: Vector2D, ctx: CanvasRenderingContext2D) {
-		if (this.pos.y + this.dir.y < this.ballradius / 2 || this.pos.y + this.dir.y > res.y - this.ballradius / 2)
+		if (this.pos.y + this.dir.y < this.ballradius / 2 + 10 || this.pos.y + this.dir.y > res.y - this.ballradius / 2)
 			this.dir.y = -this.dir.y;
 			
 		this.pos.x += this.dir.x
