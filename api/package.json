@@ -9,7 +9,7 @@
 		"build": "nest build",
 		"start": "NODE_ENV=development nest start",
 		"start:dev": "npm run build && NODE_ENV=development nest start --watch",
-		"start:prod": "NODE_ENV=production node dist/src/main",
+		"start:prod": "NODE_ENV=production node dist/main",
 		"lint": "eslint -c .eslintrc.js ./",
 		"lint:fix": "eslint '*/**/*.ts' --quiet --fix",
 		"test": "jest --coverage"
