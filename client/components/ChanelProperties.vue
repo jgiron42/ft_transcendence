@@ -2,21 +2,21 @@
 	<div id="user-pannel" class="h-full">
 		<div class="flex flex-col">
 			<div class="flex btn_group">
-				<button class="btn-selec">User</button>
-				<button class="btn-selec">Friends</button>
-				<button class="btn-selec">Admin</button>
+				<button class="btn-selec" @click.prevent="selection = 0">User</button>
+				<button class="btn-selec" @click.prevent="selection = 1">Friends</button>
+				<button v-if="checkOwner()" class="btn-selec" @click.prevent="selection = 2">Admin</button>
 			</div>
-			<div v-if="selection === 0">
-				<UsersInChannel :socket="socket" />
-			</div>
+			<UsersInChannel v-if="selection === 0" :socket="socket" />
 			<div v-if="selection === 1">prout</div>
-			<div v-if="selection === 2">prout</div>
+			<AdminPanel v-if="selection === 2" />
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { User } from "@/models/User";
+import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "SelectionUserPannel",
@@ -33,7 +33,19 @@ export default Vue.extend({
 	data() {
 		return {
 			selection: 0,
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
+			get me() {
+				return chatStore.me;
+			},
 		};
+	},
+	methods: {
+		checkOwner(): boolean {
+			if (this.currentChannel.owner === undefined) return false;
+			return this.me.id === (this.currentChannel.owner as User).id;
+		}
 	},
 });
 </script>
