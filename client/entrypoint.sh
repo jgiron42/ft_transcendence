@@ -19,7 +19,7 @@ if [ ! $RUN_SCRIPT ]
 then
 	if [ "$NODE_ENV" = 'production' ]
 	then
-		export "RUN_SCRIPT=start:prod"
+		export "RUN_SCRIPT=start"
 	else
 		export "RUN_SCRIPT=dev"
 	fi
