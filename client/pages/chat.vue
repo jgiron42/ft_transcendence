@@ -31,7 +31,7 @@
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
 			<ChatSelection v-if="showChannels" :socket="socket" />
 			<Chatbox :socket="socket" />
-			<UsersInChannel v-if="showUsers" :socket="socket" />
+			<ChanelProperties v-if="showUsers" :socket="socket" />
 			<Popup name="create_channel" component="ChannelCreation" />
 		</div>
 	</div>
