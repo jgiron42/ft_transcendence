@@ -145,7 +145,7 @@ test_e2e_client:
   variables:
     stage: client
   script:
-  - docker load < "docker_images/api.docker"
+  - docker load < "docker_images/client.docker"
   - cd ..
   - apk add docker-compose
   - docker-compose up -d client # db
