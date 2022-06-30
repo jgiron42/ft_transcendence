@@ -11,22 +11,13 @@ services:
         ports:
             - 127.0.0.1:4000:4000
         environment:
-            TZ: Europe/Paris
+            - TZ=Europe/Paris
+            - API_PORT=${API_PORT-3000}
+            - API_BASE_URL=${API_BASE_URL-http://localhost:3000}
+            - WSS_BASE_URL=${WSS_BASE_URL-wss://localhost:3000}
         volumes:
             # Mount code to avoid rebuild container to refresh code
-            - ./client/components:/app/client/components
-            - ./client/config:/app/client/config
-            - ./client/entrypoint.sh:/app/client/entrypoint.sh
-            - ./client/jsconfig.json:/app/client/jsconfig.json
-            - ./client/logs:/app/client/logs
-            - ./client/nuxt.config.js:/app/client/nuxt.config.js
-            - ./client/package.json:/app/client/package.json
-            - ./client/pages:/app/client/pages
-            - ./client/static:/app/client/static
-            - ./client/store:/app/client/store
-            - ./client/stylelint.config.js:/app/client/stylelint.config.js
-            - ./client/tailwind.config.js:/app/client/tailwind.config.js
-            - ./client/tsconfig.json:/app/client/tsconfig.json
+            - ./client:/app
 
         healthcheck:
             disable: false
@@ -44,6 +35,9 @@ services:
     # Values from parent shell, overriden by values from .env
         - INTRA42_UID=${INTRA42_UID-0}
         - INTRA42_SECRET=${INTRA42_SECRET-0}
+        - API_PORT=${API_PORT-3000}
+        - API_BASE_URL=${API_BASE_URL-http://localhost:3000}
+        - WSS_BASE_URL=${WSS_BASE_URL-wss://localhost:3000}
     # Config file containing credentials values
         - CONFIG_FILE=/opt/.env
         - POSTGRES_USER=postgres
