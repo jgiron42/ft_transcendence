@@ -8,7 +8,7 @@ services:
     - default
     - ft_transcendance
     ports:
-    - 0.0.0.0:3001:3000
+    - 0.0.0.0:3000:3000
     environment:
     # Values from parent shell, overriden by values from .env
       - INTRA42_UID=${INTRA42_UID}
@@ -26,7 +26,6 @@ services:
     - ./src:/app/src
     - ./tsconfig.json:/app/tsconfig.json
     - ./tsconfig.build.json:/app/tsconfig.build.json
-    - ./config.json:/app/config.json
     healthcheck:
       disable: false
     restart: unless-stopped

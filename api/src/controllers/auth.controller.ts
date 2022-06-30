@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Redirect, Req, Session, UseFilters, UseGuards } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Get,
+	Post,
+	Redirect,
+	Req,
+	Session,
+	UseFilters,
+	UseGuards,
+	Request as RequestDecorator,
+} from "@nestjs/common";
 import { AuthService } from "@services/auth.service";
 import { SessionGuard } from "@guards/session.guard";
 import { AuthGuard } from "@nestjs/passport";
@@ -7,6 +18,7 @@ import { SessionT } from "@src/types/session";
 import { LoggedGuard } from "@guards/logged.guard";
 import { antiAuthFilter } from "@filters/antiAuth.filter";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
+import { DevelopmentGuard } from "@guards/development.guard";
 
 @Controller("auth")
 @UseGuards(LoggedGuard)
@@ -70,5 +82,16 @@ export class AuthController {
 	@UseGuards(SessionGuardFt, AuthGuard("totp"))
 	totpAuth(@Session() ses: Record<string, any>) {
 		ses.totpIdentified = true;
+	}
+
+	/**
+	 * Route used in development only to set the current session without using the oauth nor totp
+	 * @param newSes the new value of session (must be of type SessionT)
+	 */
+	@Post("session")
+	@UseGuards(new DevelopmentGuard())
+	setSession(@Body() newSes: SessionT, @RequestDecorator() req: Request) {
+		req.session = Object.assign(req.session, newSes);
+		return req.session;
 	}
 }
