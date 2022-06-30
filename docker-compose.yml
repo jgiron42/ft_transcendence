@@ -5,6 +5,7 @@ version: "3.5"
 services:
     client:
         container_name: ft_client
+        image: ft_transcendance_client:latest
         build: ./client
         networks:
             - ft_transcendance
@@ -27,6 +28,7 @@ services:
     
     api:
       container_name: ft_api
+      image: ft_transcendance_api:latest
       build: ./api
       networks:
       - default
