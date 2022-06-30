@@ -120,6 +120,7 @@ test_e2e_api:
   variables:
     stage: api
   script:
+  - docker load < "docker_images/api.docker"
   - cd ..
   - apk add docker-compose
   - docker-compose up -d api db  # db
@@ -148,6 +149,7 @@ test_e2e_client:
   variables:
     stage: client
   script:
+  - docker load < "docker_images/api.docker"
   - cd ..
   - apk add docker-compose
   - docker-compose up -d client # db
