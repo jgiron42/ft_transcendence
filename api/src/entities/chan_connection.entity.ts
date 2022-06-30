@@ -5,6 +5,12 @@ import { Expose } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
 //    This entity is use in order to know who have access to which channel
 
+export enum ChannelRole {
+	USER,
+	ADMIN,
+	OWNER,
+}
+
 @Entity()
 @Expose() // class-transformer
 @Unique("unique_connection", ["channel", "user"])
@@ -13,6 +19,7 @@ export class ChanConnection {
 		this.role = 0;
 		this.muted = false;
 		this.created_at = new Date();
+		void ChannelRole;
 	}
 
 	@PrimaryGeneratedColumn()
@@ -29,10 +36,14 @@ export class ChanConnection {
 	@SetMode("cru")
 	user: User;
 
-	// role of the user in the channel
+	//  role of the user in the channel
+	@Column({
+		type: "enum",
+		enum: ChannelRole,
+	})
 	@Column()
 	@SetMode("cru")
-	role: number;
+	role: ChannelRole;
 
 	// use to know if the user is mute in the channel
 	@Column()

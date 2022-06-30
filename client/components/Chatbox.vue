@@ -30,7 +30,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Message } from "@/models/Message";
-import { Channel } from "@/models/Channel";
+import { chatStore } from "@/store/";
 
 export default Vue.extend({
 	name: "Chatbox",
@@ -44,13 +44,10 @@ export default Vue.extend({
 		return {
 			title: "ChatBox",
 			msgContent: "",
-			currentChannel: new Channel(),
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 		};
-	},
-	mounted() {
-		this.$nuxt.$on("updateCurrentChannel", (chan: Channel) => {
-			this.currentChannel = chan;
-		});
 	},
 	methods: {
 		helloConnection() {
@@ -60,9 +57,6 @@ export default Vue.extend({
 		},
 		sendMessage() {
 			if (!(this.msgContent.length > 0)) return;
-			// this.socket.emit("MSG", {
-			// 	content: this.msgContent,
-			// });
 			const msg = new Message();
 			msg.content = this.msgContent;
 			msg.created_at = new Date();

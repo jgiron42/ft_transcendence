@@ -1,9 +1,9 @@
 <template>
 	<div id="user-selection" class="h-full">
-		<div v-for="(user, index) of users" :key="index">
+		<div v-for="(connection, index) of chanConnections" :key="index">
 			<!--button class="user-name cut-text btn text-left" @click="$modal.show('user_profile')"-->
 			<button class="user-name cut-text btn text-left">
-				<b>{{ user.username }}</b>
+				<b>{{ connection.user.username }} {{ connection.role }}</b>
 			</button>
 		</div>
 	</div>
@@ -11,62 +11,26 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { User } from "@/models/User";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "ChatSelection",
-	props: {
-		socket: {
-			type: Object,
-			default: () => {},
-		},
-		align: {
-			type: String,
-			default: "right",
-		},
-	},
 	data() {
 		return {
-			users: [] as User[],
+			get chanConnections() {
+				return chatStore.chanConnections;
+			},
 			get me() {
 				return chatStore.me;
 			},
 		};
-	},
-	mounted() {
-		// this is a test
-		const u = new User();
-		u.username = "test";
-		this.users.push(u);
-		this.users.push(u);
-		// ///////////////////
-		const containerTest = document.getElementById("container-test");
-		if (containerTest != null) {
-			if (this.align === "left") {
-				containerTest.scrollLeft = 0;
-			} else if (this.align === "right") {
-				containerTest.scrollLeft = containerTest.scrollWidth;
-			}
-		}
-		this.socket.on("updateUsers", (users: User[]) => {
-			this.onUpdateUsers(users);
-		});
-	},
-	methods: {
-		onUpdateUsers(users: User[]) {
-			this.users = users;
-		},
 	},
 });
 </script>
 
 <style>
 #user-selection {
-	overflow: auto;
-	padding: 0.5rem;
-	width: 240px;
-	min-width: 240px;
+	width: 100%;
 	background-color: #252525;
 }
 

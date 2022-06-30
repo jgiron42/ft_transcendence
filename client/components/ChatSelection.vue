@@ -38,7 +38,9 @@ export default Vue.extend({
 			get channels() {
 				return chatStore.channels;
 			},
-			currentChannel: new Channel(),
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 		};
 	},
 	mounted() {
@@ -53,9 +55,6 @@ export default Vue.extend({
 		this.$nuxt.$on("updateChannels", () => {
 			this.onUpdateChannels();
 		});
-		this.$nuxt.$on("updateCurrentChannel", (chan: Channel) => {
-			this.currentChannel = chan;
-		});
 	},
 	methods: {
 		onUpdateChannels() {
@@ -64,7 +63,6 @@ export default Vue.extend({
 		async joinChannel(chan: Channel) {
 			const tmp = await this.chat.joinChannel(chan);
 			if (tmp) {
-				this.$nuxt.$emit("updateCurrentChannel", tmp);
 				this.socket.emit("JC", tmp.id);
 			}
 		},

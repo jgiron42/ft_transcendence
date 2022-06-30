@@ -16,6 +16,7 @@ import {
 } from "@nestjs/common";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
+import { ChannelRole } from "@entities/chan_connection.entity";
 import { MessageService } from "@services/message.service";
 import { ChanInvitationService } from "@services/chan_invitation.service";
 import { Channel } from "@entities/channel.entity";
@@ -82,7 +83,9 @@ export class ChannelsController {
 	async create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @Req() req: Request) {
 		channel.owner = req.user;
 		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
-		return this.channelService.create(channel);
+		const ret = await this.channelService.create(channel);
+		return this.chanConnectionService.create({ user: req.user, channel: ret, role: ChannelRole.OWNER });
+		return ret;
 	}
 
 	/**

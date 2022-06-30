@@ -51,7 +51,7 @@ export class ChannelService {
 		await this.getQuery().remove(id);
 	}
 
-	create(channel: Channel): Promise<Channel> {
+	async create(channel: Channel): Promise<Channel> {
 		const chan = this.ChannelRepository.create(channel);
 		this.socketService.sendMessage("updateChannels", null, "realm");
 		return this.save(chan);

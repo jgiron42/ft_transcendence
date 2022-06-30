@@ -2,6 +2,7 @@ import Vue from "vue";
 import { User } from "@/models/User";
 import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store/";
+import { ChanConnection } from "@/models/ChanConnection";
 
 // import { User } from "@/models/User";
 // import { Message } from "@/models/Message";
@@ -10,7 +11,8 @@ interface chatInterface {
 	whoAmI(): Promise<User | undefined>;
 	createChannel(chan: Channel): void;
 	joinChannel(chan: Channel): Promise<Channel | undefined>;
-	getChannels(): Promise<Channel | undefined>;
+	getChannels(): void;
+	getChanConnections(): Promise<Array<ChanConnection> | undefined>;
 }
 
 declare module "vue/types/vue" {
@@ -29,28 +31,49 @@ Vue.prototype.chat = <chatInterface>{
 		return ret;
 	},
 	async createChannel(chan: Channel) {
-		// Vue.prototype
 		await Vue.prototype.api.post("/channels", chan, null, (chan: Channel) => {
 			this.joinChannel(chan);
 		});
 	},
 	async joinChannel(chan: Channel): Promise<Channel | undefined> {
-		let ret;
+		let ret: Channel | undefined;
 		await Vue.prototype.api.post(
 			"/channels/" + chan.id + "/join",
 			null,
 			null,
-			(d = { data: { channel: Channel } }) => {
+			(d = { data: { channel: new Channel() } }) => {
 				ret = d.data.channel;
 			},
 		);
+		if (ret !== undefined) {
+			await Vue.prototype.api.get("/channels/" + chan.id, null, (d = { data: new Channel() }) => {
+				ret = d.data;
+				chatStore.updateCurrentChannel(d.data);
+			});
+		}
 		return ret;
 	},
-	async getChannels(): Promise<Channel | undefined> {
-		let ret;
+	async getChannels() {
 		await Vue.prototype.api.get("/channels", null, (r: { data: Channel[] }) => {
 			chatStore.updateChannels(r.data);
 		});
+	},
+	async getChanConnections(): Promise<Array<ChanConnection> | undefined> {
+		let ret: Array<ChanConnection> | undefined;
+		if (chatStore.currentChannel.id === undefined) return ret;
+		await Vue.prototype.api.get(
+			"/channels/" + chatStore.currentChannel.id + "/chan_connections",
+			null,
+			(r: { data: ChanConnection[] }) => {
+				const connections = [] as ChanConnection[];
+				r.data.forEach((connection: ChanConnection) => {
+					connections.push(connection);
+				});
+				ret = connections;
+				chatStore.updateChanConnections(connections);
+			},
+		);
+
 		return ret;
 	},
 };

@@ -40,7 +40,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { Message } from "@/models/Message";
-import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "Chat",
@@ -78,9 +77,10 @@ export default Vue.extend({
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			this.$nuxt.$emit("JC", messages);
+			this.chat.getChanConnections();
 		});
 		this.socket.on("updateUsers", () => {
-			this.$nuxt.$emit("updateUsers");
+			// TODO: emit event to notify others components to update users list etc...
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.$nuxt.$emit("MSG", message);

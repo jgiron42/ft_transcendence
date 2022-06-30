@@ -101,6 +101,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				.getMany();
 			messages.sort((a: Message, b: Message): number => a.created_at.getTime() - b.created_at.getTime());
 			client.emit("JC", messages);
+			client.emit("updateUsers");
 		}
 	}
 
