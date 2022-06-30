@@ -18,6 +18,8 @@ services:
         volumes:
             # Mount code to avoid rebuild container to refresh code
             - ./client:/app
+            # Ignore node_modules/
+            - /app/node_modules
 
         healthcheck:
             disable: false
