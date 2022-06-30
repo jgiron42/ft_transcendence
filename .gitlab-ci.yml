@@ -79,12 +79,10 @@ build_prod_api:
   variables:
     stage: api
   script:
-  - current_time="$(date +%s)"
-  - echo "Version $current_time"
-  - docker build --tag "api:$current_time" --build-arg "buildtarget=production" .
+  - docker build --tag "ft_transcendance_api:latest" --build-arg "buildtarget=production" .
 #  Save image to cached path
   - mkdir -p docker_images
-  - docker image save "api:$current_time" -o "docker_images/api.docker"
+  - docker image save "ft_transcendance_api:latest" -o "docker_images/api.docker"
 
 build_prod_client:
   stage: build_prod
@@ -99,12 +97,10 @@ build_prod_client:
   variables:
     stage: client
   script:
-  - current_time="$(date +%s)"
-  - echo "Version $current_time"
-  - docker build --tag "client:$current_time" --build-arg "buildtarget=production" .
+  - docker build --tag "ft_transcendance_client:latest" --build-arg "buildtarget=production" .
 #  Save image to cached path
   - mkdir -p docker_images
-  - docker image save "client:$current_time" -o "docker_images/client.docker"
+  - docker image save "ft_transcendance_client:latest" -o "docker_images/client.docker"
 
 
 test_e2e_api:
@@ -133,8 +129,8 @@ test_e2e_api:
     done
   # Check if waiting loop ended because success or timeout
   - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
-  # needs:
-  # - build_prod_api 
+  needs:
+  - build_prod_api 
 
 test_e2e_client:
   stage: test
@@ -162,8 +158,8 @@ test_e2e_client:
     done
   # Check if waiting loop ended because success or timeout
   - docker-compose exec -T client curl --fail 127.0.0.1:4000 || (docker-compose logs && exit 1)
-  # needs:
-  # - build_prod_api
+  needs:
+  - build_prod_client
 
 deploy_api:
   stage: deploy
