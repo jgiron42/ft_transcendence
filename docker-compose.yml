@@ -4,7 +4,6 @@ version: "3.5"
 
 services:
     client:
-        container_name: ft_client
         image: ft_transcendance_client:latest
         build: ./client
         networks:
@@ -27,7 +26,6 @@ services:
         restart: always
     
     api:
-      container_name: ft_api
       image: ft_transcendance_api:latest
       build: ./api
       networks:
@@ -68,7 +66,6 @@ services:
             - '5432:5432'
 
     pgadmin:
-        container_name: pgadmin_container2727
         image: dpage/pgadmin4
         environment:
             - PGADMIN_DEFAULT_EMAIL=smaccary@student.42.fr
