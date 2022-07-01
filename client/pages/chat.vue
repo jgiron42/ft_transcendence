@@ -1,11 +1,11 @@
 <template>
 	<div class="w-full h-full flex flex-col">
 		<div class="chat-header flex flex-row h-fit">
-			<button id="show-list-btn" class="text-white font-bold rounded" @click="onShowChannels">
+			<button v-if="isOnChannel" id="show-list-btn" class="text-white font-bold rounded" @click="onShowChannels">
 				<i class="fas fa-plus">#</i>
 			</button>
 			<h1 id="chat-title" class="w-full text-center mt-auto mb-auto">Chat</h1>
-			<button id="show-list-btn" class="text-white font-bold rounded" @click="onShowUsers">
+			<button v-if="isOnChannel" id="show-list-btn" class="text-white font-bold rounded" @click="onShowUsers">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -29,9 +29,9 @@
 			</button>
 		</div>
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-			<ChatSelection v-if="showChannels" :socket="socket" />
-			<Chatbox :socket="socket" />
-			<ChanelProperties v-if="showUsers" :socket="socket" />
+			<ChatSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
+			<Chatbox v-if="isOnChannel" :socket="socket" />
+			<ChannelProperties v-if="showUsers && isOnChannel" />
 			<Popup name="create_channel" component="ChannelCreation" />
 		</div>
 	</div>
@@ -40,6 +40,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Message } from "@/models/Message";
+import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "Chat",
@@ -60,6 +61,13 @@ export default Vue.extend({
 			}),
 			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
+			get isOnChannel() {
+				const name = this.currentChannel.name;
+				return name !== undefined && name.length !== 0;
+			},
 		};
 	},
 	mounted() {
@@ -91,7 +99,7 @@ export default Vue.extend({
 			if (this.$device.isMobile) {
 				this.showUsers = false;
 			}
-			this.showChannels = !this.showChannels;
+			if (this.isOnChannel) this.showChannels = !this.showChannels;
 		},
 		onShowUsers() {
 			if (this.$device.isMobile) {

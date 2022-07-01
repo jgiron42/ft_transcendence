@@ -1,5 +1,5 @@
 <template>
-	<div id="chat-selection" class="h-full">
+	<div id="chat-selection" class="h-full" :class="isOnChannel ? 'on-channel' : ''">
 		<button class="chan-text items-center cut-text w-95 btn pr-3 pl-3" @click="$modal.show('create_channel')">
 			Create a channel
 		</button>
@@ -31,6 +31,10 @@ export default Vue.extend({
 		align: {
 			type: String,
 			default: "left",
+		},
+		isOnChannel: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	data() {
@@ -74,9 +78,18 @@ export default Vue.extend({
 #chat-selection {
 	overflow: auto;
 	padding: 0.5rem;
-	width: 240px;
-	min-width: 240px;
+	width: 35%;
+	min-width: min(500px, 100%);
+	margin-left: auto;
+	margin-right: auto;
 	background-color: #252525;
+}
+
+.on-channel {
+	margin-left: none !important;
+	margin-right: none !important;
+	width: 240px !important;
+	min-width: 240px !important;
 }
 
 .chan-text {
