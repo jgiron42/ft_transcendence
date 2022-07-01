@@ -1,73 +1,71 @@
 stages:
 - build
-- lint
-- build_prod
-- test
+- lint_and_test
 - deploy
 
 image: node:17.4.0
 
 cache: &global_cache
-  key: "${CI_PIPELINE_IID}-${stage}"
+  key: "${CI_PIPELINE_IID}-${APP_NAME}"
   paths:
-  - $stage/node_modules/
-  - $stage/dist/
-  - $stage/docker_images/
+  - $APP_NAME/node_modules/
+  - $APP_NAME/dist/
+  - $APP_NAME/docker_images/
 
 before_script:
-- cd $stage
+- cd $APP_NAME
 
-# build_api:
-#   stage: build
-#   variables:
-#     stage: api
-#   cache:
-#     <<: *global_cache
-#     policy: push
-#   script:
-#   - NODE_ENV=development npm install
-#   #- cp config-sample.json config.json
-#   - npm run build
+build_api:
+  stage: build
+  variables:
+    APP_NAME: api
+  cache:
+    <<: *global_cache
+    policy: push
+  script:
+  - NODE_ENV=development npm install
+  #- cp config-sample.json config.json
+  - npm run build
 
-# build_client:
-#   stage: build
-#   variables:
-#     stage: client
-#   cache:
-#     <<: *global_cache
-#     policy: push
-#   script:
-#   - mv .env-prod .env
-#   - NODE_ENV=development npm install
-#   - npm run generate
+build_client:
+  stage: build
+  variables:
+    APP_NAME: client
+  cache:
+    <<: *global_cache
+    policy: push
+  script:
+  - mv .env-prod .env
+  - NODE_ENV=development npm install
+  - npm run generate
 
-# eslint_api:
-#   stage: lint
-#   cache:
-#     <<: *global_cache
-#     policy: pull
-#   variables:
-#     stage: api
-#   script:
-#   #- cp config-sample.json config.json
-#   - npm run lint
-#   needs:
-#   - build_api
+eslint_api:
+  stage: lint_and_test
+  cache:
+    <<: *global_cache
+    policy: pull
+  variables:
+    APP_NAME: api
+  script:
+  #- cp config-sample.json config.json
+  - npm run lint
+  needs:
+  - build_api
 
-# eslint_client:
-#   stage: lint
-#   cache:
-#     <<: *global_cache
-#     policy: pull
-#   variables:
-#     stage: client
-#   script:
-#   - npm run lint
-#   needs:
-#   - build_client
+eslint_client:
+  stage: lint_and_test
+  cache:
+    <<: *global_cache
+    policy: pull
+  variables:
+    APP_NAME: client
+  script:
+  - npm run lint
+  needs:
+  - build_client
 
 build_prod_api:
-  stage: build_prod
+  stage: build
   image: docker:18.03
   services:
   - name: docker:18.03-dind
@@ -77,15 +75,15 @@ build_prod_api:
     <<: *global_cache
     policy: push
   variables:
-    stage: api
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: api
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker push "$IMAGE_TAG"
 
 build_prod_client:
-  stage: build_prod
+  stage: build
   image: docker:18.03
   services:
   - name: docker:18.03-dind
@@ -95,8 +93,8 @@ build_prod_client:
     <<: *global_cache
     policy: push
   variables:
-    stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: client
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -104,7 +102,7 @@ build_prod_client:
 
 
 test_e2e_api:
-  stage: test
+  stage: lint_and_test
   image: docker/compose
   cache:
     <<: *global_cache
@@ -114,8 +112,8 @@ test_e2e_api:
     command: ["--tls=false"]
     alias: docker
   variables:
-    stage: api
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: api
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
     DUMMY_MOUNT: /disabled
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -136,7 +134,7 @@ test_e2e_api:
   - build_prod_api
 
 test_e2e_client:
-  stage: test
+  stage: lint_and_test
   image: docker/compose
   cache:
     <<: *global_cache
@@ -146,8 +144,8 @@ test_e2e_client:
     command: ["--tls=false"]
     alias: docker
   variables:
-    stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: client
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
     DUMMY_MOUNT: /disabled
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -170,7 +168,7 @@ test_e2e_client:
 # deploy_api:
 #   stage: deploy
 #   variables:
-#     stage: api
+#     APP_NAME: api
 #   script:
 #   - chmod 600 "$ID_RSA"
 #   - echo '' >> "$ID_RSA"
@@ -184,7 +182,7 @@ test_e2e_client:
 # deploy_client:
 #   stage: deploy
 #   variables:
-#     stage: client
+#     APP_NAME: client
 #   script:
 #   - chmod 600 "$ID_RSA"
 #   - echo '' >> "$ID_RSA"
@@ -198,7 +196,7 @@ test_e2e_client:
 # deploy_db:
 #   stage: deploy
 #   variables:
-#     stage: db
+#     APP_NAME: db
 #   script:
 #   - chmod 600 "$ID_RSA"
 #   - echo '' >> "$ID_RSA"
@@ -212,7 +210,7 @@ test_e2e_client:
 # deploy_proxy:
 #   stage: deploy
 #   variables:
-#     stage: proxy
+#     APP_NAME: proxy
 #   script:
 #   - chmod 600 "$ID_RSA"
 #   - echo '' >> "$ID_RSA"
