@@ -17,72 +17,72 @@ cache: &global_cache
 before_script:
 - cd $stage
 
-build_api:
-  stage: build
-  variables:
-    stage: api
-  cache:
-    <<: *global_cache
-    policy: push
-  script:
-  - NODE_ENV=development npm install
-  #- cp config-sample.json config.json
-  - npm run build
+# build_api:
+#   stage: build
+#   variables:
+#     stage: api
+#   cache:
+#     <<: *global_cache
+#     policy: push
+#   script:
+#   - NODE_ENV=development npm install
+#   #- cp config-sample.json config.json
+#   - npm run build
 
-build_client:
-  stage: build
-  variables:
-    stage: client
-  cache:
-    <<: *global_cache
-    policy: push
-  script:
-  - mv .env-prod .env
-  - NODE_ENV=development npm install
-  - npm run generate
+# build_client:
+#   stage: build
+#   variables:
+#     stage: client
+#   cache:
+#     <<: *global_cache
+#     policy: push
+#   script:
+#   - mv .env-prod .env
+#   - NODE_ENV=development npm install
+#   - npm run generate
 
-eslint_api:
-  stage: lint
-  cache:
-    <<: *global_cache
-    policy: pull
-  variables:
-    stage: api
-  script:
-  #- cp config-sample.json config.json
-  - npm run lint
-  needs:
-  - build_api
+# eslint_api:
+#   stage: lint
+#   cache:
+#     <<: *global_cache
+#     policy: pull
+#   variables:
+#     stage: api
+#   script:
+#   #- cp config-sample.json config.json
+#   - npm run lint
+#   needs:
+#   - build_api
 
-eslint_client:
-  stage: lint
-  cache:
-    <<: *global_cache
-    policy: pull
-  variables:
-    stage: client
-  script:
-  - npm run lint
-  needs:
-  - build_client
+# eslint_client:
+#   stage: lint
+#   cache:
+#     <<: *global_cache
+#     policy: pull
+#   variables:
+#     stage: client
+#   script:
+#   - npm run lint
+#   needs:
+#   - build_client
 
-build_prod_api:
-  stage: build_prod
-  image: docker:18.03
-  services:
-  - name: docker:18.03-dind
-    command: ["--tls=false"]
-    alias: docker
-  cache:
-    <<: *global_cache
-    policy: push
-  variables:
-    stage: api
-  script:
-  - docker build --tag "ft_transcendance_api:latest" --build-arg "buildtarget=production" .
-#  Save image to cached path
-  - mkdir -p docker_images
-  - docker image save "ft_transcendance_api:latest" -o "docker_images/api.docker"
+# build_prod_api:
+#   stage: build_prod
+#   image: docker:18.03
+#   services:
+#   - name: docker:18.03-dind
+#     command: ["--tls=false"]
+#     alias: docker
+#   cache:
+#     <<: *global_cache
+#     policy: push
+#   variables:
+#     stage: api
+#   script:
+#   - docker build --tag "ft_transcendance_api:latest" --build-arg "buildtarget=production" .
+# #  Save image to cached path
+#   - mkdir -p docker_images
+#   - docker image save "ft_transcendance_api:latest" -o "docker_images/api.docker"
 
 build_prod_client:
   stage: build_prod
@@ -103,34 +103,34 @@ build_prod_client:
   - docker image save "ft_transcendance_client:latest" -o "docker_images/client.docker"
 
 
-test_e2e_api:
-  stage: test
-  image: docker:20.10.6
-  cache:
-    <<: *global_cache
-    policy: pull
-  services:
-  - name: docker:18.03-dind
-    command: ["--tls=false"]
-    alias: docker
-  variables:
-    stage: api
-  script:
-  - docker load < "docker_images/api.docker"
-  - cd ..
-  - apk add docker-compose
-  - docker-compose up -d api db  # db
-  # Waiting for service to be up
-  - |
-    for i in $(seq 0 120)
-    do
-      docker-compose exec -T api curl --fail 127.0.0.1:3000>/dev/null 2>&1 && break
-      sleep 1
-    done
-  # Check if waiting loop ended because success or timeout
-  - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
-  needs:
-  - build_prod_api 
+# test_e2e_api:
+#   stage: test
+#   image: docker:20.10.6
+#   cache:
+#     <<: *global_cache
+#     policy: pull
+#   services:
+#   - name: docker:18.03-dind
+#     command: ["--tls=false"]
+#     alias: docker
+#   variables:
+#     stage: api
+#   script:
+#   - docker load < "docker_images/api.docker"
+#   - cd ..
+#   - apk add docker-compose
+#   - docker-compose up -d api db  # db
+#   # Waiting for service to be up
+#   - |
+#     for i in $(seq 0 120)
+#     do
+#       docker-compose exec -T api curl --fail 127.0.0.1:3000>/dev/null 2>&1 && break
+#       sleep 1
+#     done
+#   # Check if waiting loop ended because success or timeout
+#   - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
+#   needs:
+#   - build_prod_api 
 
 test_e2e_client:
   stage: test
@@ -161,59 +161,59 @@ test_e2e_client:
   needs:
   - build_prod_client
 
-deploy_api:
-  stage: deploy
-  variables:
-    stage: api
-  script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh api"
-  environment:
-    name: production
-  only:
-   - main
-  when: manual
+# deploy_api:
+#   stage: deploy
+#   variables:
+#     stage: api
+#   script:
+#   - chmod 600 "$ID_RSA"
+#   - echo '' >> "$ID_RSA"
+#   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh api"
+#   environment:
+#     name: production
+#   only:
+#    - main
+#   when: manual
 
-deploy_client:
-  stage: deploy
-  variables:
-    stage: client
-  script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh client"
-  environment:
-    name: production
-  only:
-  - main
-  when: manual
+# deploy_client:
+#   stage: deploy
+#   variables:
+#     stage: client
+#   script:
+#   - chmod 600 "$ID_RSA"
+#   - echo '' >> "$ID_RSA"
+#   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh client"
+#   environment:
+#     name: production
+#   only:
+#   - main
+#   when: manual
 
-deploy_db:
-  stage: deploy
-  variables:
-    stage: db
-  script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh db"
-  environment:
-    name: production
-  only:
-   - main
-  when: manual
+# deploy_db:
+#   stage: deploy
+#   variables:
+#     stage: db
+#   script:
+#   - chmod 600 "$ID_RSA"
+#   - echo '' >> "$ID_RSA"
+#   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh db"
+#   environment:
+#     name: production
+#   only:
+#    - main
+#   when: manual
 
-deploy_proxy:
-  stage: deploy
-  variables:
-    stage: proxy
-  script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh ft_proxy"
-  environment:
-    name: production
-  only:
-  - main
-  when: manual
+# deploy_proxy:
+#   stage: deploy
+#   variables:
+#     stage: proxy
+#   script:
+#   - chmod 600 "$ID_RSA"
+#   - echo '' >> "$ID_RSA"
+#   - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh ft_proxy"
+#   environment:
+#     name: production
+#   only:
+#   - main
+#   when: manual
 
