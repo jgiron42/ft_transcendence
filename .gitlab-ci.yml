@@ -16,6 +16,7 @@ cache: &global_cache
 
 before_script:
 - cd $stage
+- mkdir -p docker_images/
 
 # build_api:
 #   stage: build
