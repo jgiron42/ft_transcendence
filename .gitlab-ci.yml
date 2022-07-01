@@ -15,7 +15,7 @@ cache: &global_cache
 before_script:
 - cd $APP_NAME
 
-build_api:
+build_api_dev:
   stage: build
   variables:
     APP_NAME: api
@@ -27,7 +27,7 @@ build_api:
   #- cp config-sample.json config.json
   - npm run build
 
-build_client:
+build_client_dev:
   stage: build
   variables:
     APP_NAME: client
@@ -50,7 +50,7 @@ eslint_api:
   #- cp config-sample.json config.json
   - npm run lint
   needs:
-  - build_api
+  - build_api_dev
 
 eslint_client:
   stage: lint_and_test
@@ -62,9 +62,9 @@ eslint_client:
   script:
   - npm run lint
   needs:
-  - build_client
+  - build_client_dev
 
-build_prod_api:
+build_api_prod:
   stage: build
   image: docker:18.03
   services:
@@ -82,7 +82,7 @@ build_prod_api:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker push "$IMAGE_TAG"
 
-build_prod_client:
+build_client_prod:
   stage: build
   image: docker:18.03
   services:
@@ -131,7 +131,7 @@ test_e2e_api:
   # Check if waiting loop ended because success or timeout
   - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
   needs:
-  - build_prod_api
+  - build_api_prod
 
 test_e2e_client:
   stage: lint_and_test
@@ -163,7 +163,7 @@ test_e2e_client:
   # Check if waiting loop ended because success or timeout
   - docker-compose exec -T client curl --fail 127.0.0.1:4000 || (docker-compose logs && exit 1)
   needs:
-  - build_prod_client
+  - build_client_prod
 
 # deploy_api:
 #   stage: deploy
