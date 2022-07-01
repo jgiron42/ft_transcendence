@@ -96,7 +96,7 @@ build_prod_client:
     policy: push
   variables:
     stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE-$CI_COMMIT_REF_SLUG-$CI_COMMIT_TIMESTAMP-$stage
+    IMAGE_TAG: $CI_REGISTRY_IMAGE-$CI_PIPELINE_IID-$stage
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
@@ -144,7 +144,7 @@ test_e2e_client:
     alias: docker
   variables:
     stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE-$CI_COMMIT_REF_SLUG-$CI_COMMIT_TIMESTAMP-$stage
+    IMAGE_TAG: $CI_REGISTRY_IMAGE-$CI_PIPELINE_IID-$stage
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker pull  "$IMAGE_TAG"
