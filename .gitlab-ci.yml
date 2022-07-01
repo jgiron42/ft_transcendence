@@ -149,7 +149,7 @@ test_e2e_client:
     stage: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
   script:
-  - docker load "docker_images/client.docker"
+  - docker load < "docker_images/client.docker"
   # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   # - docker pull  "$IMAGE_TAG"
   # - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
