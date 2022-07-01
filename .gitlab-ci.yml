@@ -16,7 +16,6 @@ cache: &global_cache
 
 before_script:
 - cd $stage
-- mkdir -p docker_images/
 
 # build_api:
 #   stage: build
@@ -101,6 +100,7 @@ build_prod_client:
     IMAGE_TAG: "ft_transcendance_client:latest"
   script:
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
+  - mkdir -p docker_images/
   - docker save "$IMAGE_TAG" -o "docker_images/client.docker"
   # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   # - docker push "$IMAGE_TAG"
