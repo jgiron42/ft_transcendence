@@ -96,11 +96,13 @@ build_prod_client:
     policy: push
   variables:
     stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    # IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    IMAGE_TAG: "ft_transcendance_client:latest"
   script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
-  - docker push "$IMAGE_TAG"
+  - docker save "$IMAGE_TAG" -o "docker_images/client.docker"
+  # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  # - docker push "$IMAGE_TAG"
 
 
 # test_e2e_api:
@@ -146,9 +148,10 @@ test_e2e_client:
     stage: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
   script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker pull  "$IMAGE_TAG"
-  - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
+  - docker load "docker_images/client.docker"
+  # - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  # - docker pull  "$IMAGE_TAG"
+  # - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
   - cd ..
   - apk add docker-compose
   - docker-compose up -d client  # db
