@@ -148,6 +148,7 @@ test_e2e_client:
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker pull  "$IMAGE_TAG"
+  - docker tag "IMAGE_TAG" "ft_transcendance_client:latest"
   - cd ..
   - apk add docker-compose
   - docker-compose up -d client  # db
