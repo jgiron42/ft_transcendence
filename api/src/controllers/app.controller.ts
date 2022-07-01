@@ -48,26 +48,4 @@ export class AppController {
 		ses.user = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
 		return this.userService.findAll();
 	}
-
-	@Get("/newUserExample")
-	async testDB(@Query() data: { pseudo: string }, @Session() ses: SessionT): Promise<User[]> {
-		const usr = {
-			pseudo: data.pseudo,
-			path_avatar: data.pseudo,
-			mdp: "test",
-			mail: "test",
-			phone: "test",
-			nb_game: 0,
-			nb_win: 0,
-			OAuth: false,
-			status: 0,
-			totp_key: "test",
-			date_register: new Date(),
-		} as User;
-		await this.userService.create(usr);
-		ses.ftIdentified = 9999999999999;
-		ses.totpIdentified = true;
-		ses.user = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
-		return this.userService.findAll();
-	}
 }

@@ -24,7 +24,6 @@
 		"@nestjs/typeorm": "^8.1.2",
 		"@nestjs/websockets": "^8.4.7",
 		"@types/bcrypt": "^5.0.0",
-		"@nestjs/testing": "^8.2.1",
 		"@types/dotenv-parse-variables": "^2.0.1",
 		"@types/express-session": "^1.17.4",
 		"@types/faker": "^5.5.9",
