@@ -148,7 +148,7 @@ test_e2e_client:
   - docker load < "docker_images/client.docker"
   - cd ..
   - apk add docker-compose
-  - docker-compose up -d client --build # db
+  - docker-compose up -d client  # db
   # Waiting for service to be up
   - |
     for i in $(seq 0 120)
