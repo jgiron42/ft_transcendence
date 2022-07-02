@@ -18,7 +18,7 @@
 				<!-- option value="DM">direct message</option -->
 				<option value="PRIVATE">private</option>
 			</select>
-			<div v-if="channel.type === 1">
+			<div v-if="selectedType === 1">
 				<div class="flex flex-col">
 					<p class="ml-2">Enter the password:</p>
 					<div class="area-chan-name p-2">
@@ -46,16 +46,15 @@ export default Vue.extend({
 	name: "ChannelCreation",
 	data() {
 		return {
-			channel: new Channel(),
+			channel: { name: "", type: ChannelType.PUBLIC } as Channel,
+			selectedType: ChannelType.PUBLIC,
 		};
-	},
-	mounted() {
-		this.channel.type = ChannelType.PUBLIC;
 	},
 	methods: {
 		selectCategory(event: Event) {
-			this.channel.type = (ChannelType as any)[(event.target as HTMLInputElement).value];
-			this.$forceUpdate();
+			this.selectedType = ChannelType[(event.target as HTMLInputElement).value];
+			this.channel.type = this.selectedType;
+			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
 		createChannel() {
 			this.api.post("/channels", this.channel, null, () => this.$modal.hide("create_channel"));
