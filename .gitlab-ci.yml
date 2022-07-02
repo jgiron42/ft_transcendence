@@ -5,14 +5,17 @@ stages:
 
 image: node:17.4.0
 
-cache: &global_cache
-  key: "${CI_PIPELINE_IID}-${APP_NAME}"
-  paths:
-  - $APP_NAME/node_modules/
-  - $APP_NAME/dist/
-
 before_script:
 - cd $APP_NAME
+
+dummy:
+  stage: build
+  cache: &global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
+    paths:
+    - $APP_NAME/node_modules/
+    - $APP_NAME/dist/
+  script: [""]
 
 build_api_dev:
   stage: build
