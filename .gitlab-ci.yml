@@ -10,8 +10,6 @@ cache: &global_cache
   paths:
   - $APP_NAME/node_modules/
   - $APP_NAME/dist/
-  - $APP_NAME/docker_images/
-
 before_script:
 - cd $APP_NAME
 
@@ -69,9 +67,6 @@ build_api_prod:
   - name: docker:18.03-dind
     command: ["--tls=false"]
     alias: docker
-  cache:
-    <<: *global_cache
-    policy: push
   variables:
     APP_NAME: api
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
@@ -87,9 +82,6 @@ build_client_prod:
   - name: docker:18.03-dind
     command: ["--tls=false"]
     alias: docker
-  cache:
-    <<: *global_cache
-    policy: push
   variables:
     APP_NAME: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
@@ -102,9 +94,6 @@ build_client_prod:
 test_e2e_api:
   stage: lint_and_test
   image: docker/compose
-  cache:
-    <<: *global_cache
-    policy: pull
   services:
   - name: docker:18.03-dind
     command: ["--tls=false"]
@@ -134,9 +123,6 @@ test_e2e_api:
 test_e2e_client:
   stage: lint_and_test
   image: docker/compose
-  cache:
-    <<: *global_cache
-    policy: pull
   services:
   - name: docker:18.03-dind
     command: ["--tls=false"]
