@@ -6,18 +6,18 @@ stages:
 image: node:17.4.0
 
 cache: &global_cache
-  key: "${CI_PIPELINE_IID}-${stage}"
+  key: "${CI_PIPELINE_IID}-${APP_NAME}"
   paths:
-  - $stage/node_modules/
-  - $stage/dist/
+  - $APP_NAME/node_modules/
+  - $APP_NAME/dist/
 
 before_script:
-- cd $stage
+- cd $APP_NAME
 
 build_api_dev:
   stage: build
   variables:
-    stage: api
+    APP_NAME: api
   cache:
     <<: *global_cache
     policy: push
@@ -28,7 +28,7 @@ build_api_dev:
 build_client_dev:
   stage: build
   variables:
-    stage: client
+    APP_NAME: client
   cache:
     <<: *global_cache
     policy: push
@@ -42,7 +42,7 @@ eslint_api:
     <<: *global_cache
     policy: pull
   variables:
-    stage: api
+    APP_NAME: api
   script:
   - npm run lint
   needs:
@@ -54,7 +54,7 @@ eslint_client:
     <<: *global_cache
     policy: pull
   variables:
-    stage: client
+    APP_NAME: client
   script:
   - ls -la
   - npm run lint
@@ -69,8 +69,8 @@ build_api_prod:
     command: ["--tls=false"]
     alias: docker
   variables:
-    stage: api
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: api
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -84,8 +84,8 @@ build_client_prod:
     command: ["--tls=false"]
     alias: docker
   variables:
-    stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: client
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
   - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -99,8 +99,8 @@ test_e2e_api:
     command: ["--tls=false"]
     alias: docker
   variables:
-    stage: api
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: api
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
     DUMMY_MOUNT: /disabled
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -128,8 +128,8 @@ test_e2e_client:
     command: ["--tls=false"]
     alias: docker
   variables:
-    stage: client
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/$stage-$CI_PIPELINE_IID
+    APP_NAME: client
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
     DUMMY_MOUNT: /disabled
   script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -152,7 +152,7 @@ test_e2e_client:
 deploy_api:
   stage: deploy
   variables:
-    stage: api
+    APP_NAME: api
   script:
   - chmod 600 "$ID_RSA"
   - echo '' >> "$ID_RSA"
@@ -166,7 +166,7 @@ deploy_api:
 deploy_client:
   stage: deploy
   variables:
-    stage: client
+    APP_NAME: client
   script:
   - chmod 600 "$ID_RSA"
   - echo '' >> "$ID_RSA"
@@ -180,7 +180,7 @@ deploy_client:
 deploy_db:
   stage: deploy
   variables:
-    stage: db
+    APP_NAME: db
   script:
   - chmod 600 "$ID_RSA"
   - echo '' >> "$ID_RSA"
@@ -194,7 +194,7 @@ deploy_db:
 deploy_proxy:
   stage: deploy
   variables:
-    stage: proxy
+    APP_NAME: proxy
   script:
   - chmod 600 "$ID_RSA"
   - echo '' >> "$ID_RSA"
