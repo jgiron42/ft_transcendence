@@ -52,9 +52,9 @@ export default Vue.extend({
 	},
 	methods: {
 		selectCategory(event: Event) {
-			this.selectedType = ChannelType[(event.target as HTMLInputElement).value];
+			this.selectedType = (ChannelType as any)[(event.target as HTMLInputElement).value];
 			this.channel.type = this.selectedType;
-			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
+			if (this.selectedType !== ChannelType.PRIVATE) this.channel.password = "";
 		},
 		createChannel() {
 			this.api.post("/channels", this.channel, null, () => this.$modal.hide("create_channel"));

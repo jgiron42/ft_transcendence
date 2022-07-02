@@ -11,4 +11,5 @@ export class Channel {
 	name: string;
 	type: ChannelType;
 	owner: User | string;
+	password: string;
 }
