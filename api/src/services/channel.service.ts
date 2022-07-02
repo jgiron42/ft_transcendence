@@ -5,8 +5,7 @@ import { Channel } from "@src/entities/channel.entity";
 import { Container } from "typedi";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChannelQuery } from "@src/queries/channelQuery";
-import { SocketService } from "@services/socket.service";
-import * as bcrypt from "bcrypt";
+import { compare, hash, genSalt } from "bcrypt";
 
 @Injectable()
 export class ChannelService {
@@ -21,12 +20,11 @@ export class ChannelService {
 	}
 
 	static async checkPassword(password: string, passwordHash: string): Promise<void> {
-		if (!password || !(await bcrypt.compare(password, passwordHash)))
-			throw new BadRequestException("Invalid password");
+		if (!password || !(await compare(password, passwordHash))) throw new BadRequestException("Invalid password");
 	}
 
 	static async hashPassword(password: string): Promise<string> {
-		return bcrypt.hash(password, await bcrypt.genSalt());
+		return hash(password, await genSalt());
 	}
 
 	getQuery() {
@@ -51,7 +49,7 @@ export class ChannelService {
 		await this.getQuery().remove(id);
 	}
 
-	async create(channel: Channel): Promise<Channel> {
+	create(channel: Channel): Promise<Channel> {
 		const chan = this.ChannelRepository.create(channel);
 		this.socketService.sendMessage("updateChannels", null, "realm");
 		return this.save(chan);

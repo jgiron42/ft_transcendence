@@ -19,7 +19,6 @@ export class ChanConnection {
 		this.role = 0;
 		this.muted = false;
 		this.created_at = new Date();
-		void ChannelRole;
 	}
 
 	@PrimaryGeneratedColumn()
@@ -43,7 +42,7 @@ export class ChanConnection {
 	})
 	@Column()
 	@SetMode("cru")
-	role: ChannelRole;
+	role: number;
 
 	// use to know if the user is mute in the channel
 	@Column()

@@ -21,9 +21,6 @@ export class GameService {
 	findAll(page = 1, itemByPage = 10): Promise<Game[]> {
 		return this.getQuery().paginate(page, itemByPage).getMany();
 	}
-	findAllAndCount(page = 1, itemByPage = 10): Promise<[Game[], number]> {
-		return this.getQuery().paginate(page, itemByPage).getManyAndCount();
-	}
 
 	findOne(id: number): Promise<Game> {
 		return this.getQuery().getOne(id);

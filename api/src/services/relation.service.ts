@@ -4,6 +4,8 @@ import { Repository } from "typeorm";
 import { Relation } from "@src/entities/relation.entity";
 import { Container } from "typedi";
 import { RelationQuery } from "@src/queries/relationQuery";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { DeepPartial } from "typeorm/common/DeepPartial";
 
 @Injectable()
 export class RelationService {
@@ -22,10 +24,6 @@ export class RelationService {
 		return this.getReq().in_relation(userId).paginate(page, itemByPage).getMany();
 	}
 
-	findAllAndCount(userId: string, page = 1, itemByPage = 10): Promise<[Relation[], number]> {
-		return this.getReq().in_relation(userId).paginate(page, itemByPage).getManyAndCount();
-	}
-
 	findOne(id: number): Promise<Relation> {
 		return this.getReq().getOne(id);
 	}
@@ -34,15 +32,15 @@ export class RelationService {
 		await this.getReq().remove(id);
 	}
 
-	create(relation: Relation): Promise<Relation> {
-		return this.save(this.RelationRepository.create(relation));
+	create(relation: DeepPartial<Relation>) {
+		return this.getReq().create(relation);
 	}
 
 	async save(relation: Relation): Promise<Relation> {
 		return await this.RelationRepository.save(relation);
 	}
 
-	update(id: number, relation: Relation) {
+	update(id: number, relation: QueryDeepPartialEntity<Relation>) {
 		return this.getReq().update(id, relation);
 	}
 	findByUser(id: string): Promise<Relation[]> {

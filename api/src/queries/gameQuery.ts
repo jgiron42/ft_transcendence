@@ -13,6 +13,9 @@ export class GameQuery extends QueryCooker<Game> {
 		);
 	}
 
+	/**
+	 * select only the games in which userId participated
+	 */
 	in_game(userId: string) {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>

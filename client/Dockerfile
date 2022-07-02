@@ -5,22 +5,22 @@ FROM node:17.4.0
 # ENV NUXT_ENV_SENTRY_DISABLED ${NUXT_ENV_SENTRY_DISABLED}
 # ENV NUXT_ENV_SENTRY_DSN ${NUXT_ENV_SENTRY_DSN}
 
-ARG buildtarget
+ARG NODE_ENV=production
+
+ARG CLIENT_PORT=4000
 
 WORKDIR /app
 
 COPY package.json .
 
-ENV DOCKER_NODE_ENV=${buildtarget}
-
 RUN npm install
 
 COPY . .
 
-RUN NODE_ENV=$DOCKER_NODE_ENV npm run build
+RUN npm run build
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
-EXPOSE 4000
+EXPOSE ${CLIENT_PORT}
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl --fail 127.0.0.1:4000 > /dev/null 2>&1 || pkill node
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl --fail 127.0.0.1:${CLIENT_PORT} > /dev/null 2>&1 || pkill node

@@ -5,6 +5,7 @@ import { User } from "@entities/user.entity";
 import { Container } from "typedi";
 import { resourceService } from "@src/types/resource-service";
 import { UserQuery } from "@src/queries/userQuery";
+import { PaginatedResponse } from "@src/types/paginated-response";
 
 @Injectable()
 export class UserService implements resourceService<User> {
@@ -22,7 +23,7 @@ export class UserService implements resourceService<User> {
 	findAll(page = 1, itemByPage = 10): Promise<User[]> {
 		return this.getQuery().paginate(page, itemByPage).getMany();
 	}
-	findAllAndCount(page = 1, itemByPage = 10): Promise<[User[], number]> {
+	findAllAndCount(page = 1, itemByPage = 10): Promise<PaginatedResponse<User>> {
 		return this.getQuery().paginate(page, itemByPage).getManyAndCount();
 	}
 

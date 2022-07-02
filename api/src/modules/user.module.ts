@@ -9,12 +9,14 @@ import { GameModule } from "@modules/game.module";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { RelationModule } from "@modules/relation.module";
 import { MessageModule } from "@modules/message.module";
+import { ChannelModule } from "@modules/channel.module";
 import { AuthModule } from "./auth.module";
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([User]),
 		forwardRef(() => AuthModule),
+		forwardRef(() => ChannelModule),
 		GameModule,
 		ChanConnectionModule,
 		RelationModule,

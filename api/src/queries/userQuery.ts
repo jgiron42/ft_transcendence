@@ -7,6 +7,9 @@ export class UserQuery extends QueryCooker<User> {
 		super(entityRepository, entityRepository.createQueryBuilder("user"));
 	}
 
+	/**
+	 * select only the user matching id
+	 */
 	is(userId: string) {
 		this.query = this.query.where("user.id = :userId", { userId });
 		return this;

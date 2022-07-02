@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "@src/controllers/app.controller";
 import { UserService } from "@services/user.service";
@@ -7,12 +7,17 @@ import { Channel } from "@entities/channel.entity";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanConnection } from "@entities/chan_connection.entity";
-import { SocketService } from "@services/socket.service";
 import { AuthModule } from "./auth.module";
+import { UserModule } from "./user.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([ChanConnection, Channel, User]), AuthModule, ChanConnectionModule],
-	providers: [ChannelService, UserService, SocketService],
+	imports: [
+		TypeOrmModule.forFeature([ChanConnection, Channel, User]),
+		forwardRef(() => AuthModule),
+		ChanConnectionModule,
+		forwardRef(() => UserModule),
+	],
+	providers: [ChannelService, UserService],
 	controllers: [AppController],
 	exports: [ChannelService, UserService],
 })

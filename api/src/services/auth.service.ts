@@ -1,7 +1,10 @@
+import { Injectable } from "@nestjs/common";
 import { promisify } from "util";
 import { ExecutionContext, Injectable } from "@nestjs/common";
 import { SessionT } from "@src/types/session";
 import config from "@config/api.config";
+import { User } from "@src/entities/user.entity";
+import { Request } from "@src/types/request";
 import { MemoryStore, SessionData } from "express-session";
 import { User } from "@src/entities/user.entity";
 import { Request } from "@src/types/request";
@@ -36,9 +39,7 @@ export class AuthService {
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	hasTOTP(user: User): boolean {
-		void user;
-		return true;
-		// return user.totp_enabled;
+		return user.totp_enabled;
 	}
 
 	/**

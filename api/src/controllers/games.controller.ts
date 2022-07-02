@@ -5,7 +5,6 @@ import {
 	ParseIntPipe,
 	Post,
 	Req,
-	Res,
 	UseFilters,
 	UseGuards,
 	UseInterceptors,
@@ -18,17 +17,18 @@ import { getPostPipeline } from "@utils/getPostPipeline";
 import { MyRequestPipe } from "@utils/myRequestPipe";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { SessionGuard } from "@guards/session.guard";
-import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { Request } from "@src/types/request";
 import { User } from "@src/entities/user.entity";
 import { ValidationError } from "@src/exceptions/validationError.exception";
+import { PaginatedResponse } from "@src/types/paginated-response";
+import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 
 @Controller("games")
 @UseGuards(...SessionGuard)
-@UseInterceptors(CrudFilterInterceptor)
+@UseInterceptors(CrudFilterInterceptor, PaginationInterceptor)
 @UseFilters(TypeormErrorFilter)
 export class GamesController {
 	constructor(private gameService: GameService) {}
@@ -37,15 +37,8 @@ export class GamesController {
 	 * get all games
 	 */
 	@Get()
-	async getAll(
-		@Page() page: number,
-		@PerPage() per_page: number,
-		@Res({ passthrough: true }) res: Response,
-	): Promise<object> {
-		const [ret, total] = await this.gameService.getQuery().paginate(page, per_page).getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
+	async getAll(@Page() page: number, @PerPage() per_page: number): Promise<PaginatedResponse<Game>> {
+		return this.gameService.getQuery().paginate(page, per_page).getManyAndCount();
 	}
 
 	/**

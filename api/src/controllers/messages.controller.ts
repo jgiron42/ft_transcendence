@@ -1,13 +1,14 @@
-import { Controller, Get, Param, ParseIntPipe, Req, Res, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Req, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
 import { MessageExistGuard } from "@src/guards/message-exist.guard";
 import { SessionGuard } from "@guards/session.guard";
 import { MessageService } from "@services/message.service";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
-import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { Request } from "@src/types/request";
+import { PaginatedResponse } from "@src/types/paginated-response";
+import { Message } from "@entities/message.entity";
 
 @Controller("messages")
 @UseGuards(...SessionGuard)
@@ -23,17 +24,9 @@ export class MessagesController {
 	async getAll(
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
-	): Promise<object> {
-		const [ret, total] = await this.messageService
-			.getQuery()
-			.see_message(req.user.id)
-			.paginate(page, per_page)
-			.getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
+	): Promise<PaginatedResponse<Message>> {
+		return this.messageService.getQuery().see_message(req.user.id).paginate(page, per_page).getManyAndCount();
 	}
 
 	/**

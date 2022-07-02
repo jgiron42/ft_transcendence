@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	Controller,
 	Delete,
 	Get,
@@ -8,7 +9,6 @@ import {
 	Put,
 	Query,
 	Req,
-	Res,
 	UseFilters,
 	UseGuards,
 	UseInterceptors,
@@ -16,10 +16,9 @@ import {
 } from "@nestjs/common";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
-import { ChannelRole } from "@entities/chan_connection.entity";
 import { MessageService } from "@services/message.service";
 import { ChanInvitationService } from "@services/chan_invitation.service";
-import { Channel } from "@entities/channel.entity";
+import { Channel, ChannelType } from "@entities/channel.entity";
 import { MyRequestPipe } from "@utils/myRequestPipe";
 import { getValidationPipe } from "@utils/getValidationPipe";
 import { getPostPipeline } from "@utils/getPostPipeline";
@@ -30,15 +29,17 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Request } from "@src/types/request";
 import { Groups } from "@utils/groupsDecorator";
 import { SessionGuard } from "@guards/session.guard";
-import { Response } from "express";
 import { DevelopmentGuard } from "@src/guards/development.guard";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
+import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
+import { PaginatedResponse } from "@src/types/paginated-response";
+import { ChanConnection } from "@entities/chan_connection.entity";
 
 @Controller("channels")
 @UseGuards(...SessionGuard)
-@UseInterceptors(CrudFilterInterceptor)
+@UseInterceptors(CrudFilterInterceptor, PaginationInterceptor)
 @UseFilters(TypeormErrorFilter)
 export class ChannelsController {
 	constructor(
@@ -51,27 +52,20 @@ export class ChannelsController {
 	 * return all channels visible by the user
 	 */
 	@Get()
+	@UseInterceptors(PaginationInterceptor)
 	async getAll(
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
-	): Promise<object> {
-		const [ret, total] = await this.channelService
-			.getQuery()
-			.see_channel(req.user.id)
-			.paginate(page, per_page)
-			.getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
+	): Promise<PaginatedResponse<Channel>> {
+		return this.channelService.getQuery().see_channel(req.user.id).paginate(page, per_page).getManyAndCount();
 	}
 
 	/**
 	 * return a channel if the user can see it
 	 */
 	@Get(":id")
-	getOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
+	getOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<Channel> {
 		return this.channelService.getQuery().see_channel(req.user.id).getOne(id);
 	}
 
@@ -82,22 +76,23 @@ export class ChannelsController {
 	@UsePipes(getValidationPipe(Channel))
 	async create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @Req() req: Request) {
 		channel.owner = req.user;
-		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
-		const ret = await this.channelService.create(channel);
-		return this.chanConnectionService.create({ user: req.user, channel: ret, role: ChannelRole.OWNER });
-		return ret;
+		if (channel.type === ChannelType.DM) throw new BadRequestException("use user/:id/dm to create a dm channel");
+		if (channel.type === ChannelType.PASSWORD)
+			channel.password = await ChannelService.hashPassword(channel.password);
+		return this.channelService.create(channel);
 	}
 
 	/**
 	 * update a channel if the user is the owner
 	 */
 	@Put(":id")
-	update(
+	async update(
 		@Param("id", ParseIntPipe) id: number,
 		@MyRequestPipe(...getPutPipeline(Channel)) channel: Channel,
 		@Req() req: Request,
-	): Promise<object> {
-		return this.channelService.getQuery().own_channel(req.user.id).update(id, channel);
+	) {
+		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
+		await this.channelService.getQuery().own_channel(req.user.id).update(id, channel);
 	}
 
 	/**
@@ -116,18 +111,14 @@ export class ChannelsController {
 		@Param("id", ParseIntPipe) id: number,
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
-	): Promise<object> {
-		const [ret, total] = await this.chanConnectionService
+	): Promise<PaginatedResponse<ChanConnection>> {
+		return await this.chanConnectionService
 			.getQuery()
 			.see_connection(req.user.id)
 			.channel(id)
 			.paginate(page, per_page)
 			.getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
 	}
 
 	@Post(":id/join")
@@ -138,10 +129,7 @@ export class ChannelsController {
 		@Query("password") password: string,
 	): Promise<object> {
 		const channel = await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
-		if (channel.password !== "") await ChannelService.checkPassword(password, channel.password);
-		if (await this.chanConnectionService.isOnChannel(req.user.id, id)) {
-			return await this.chanConnectionService.findOneByConnection(req.user.id, id);
-		}
+		if (channel.type === ChannelType.PASSWORD) await ChannelService.checkPassword(password, channel.password);
 		return this.chanConnectionService.create({ user: req.user, channel });
 	}
 
@@ -153,19 +141,15 @@ export class ChannelsController {
 	async getMessage(
 		@Param("id", ParseIntPipe) id: number,
 		@Page() page: number,
-		@Res({ passthrough: true }) res: Response,
 		@PerPage() per_page: number,
 		@Req() req: Request,
-	): Promise<object> {
-		const [ret, total] = await this.messageService
+	): Promise<PaginatedResponse<Message>> {
+		return await this.messageService
 			.getQuery()
 			.see_message(req.user.id)
 			.channel(id)
 			.paginate(page, per_page)
 			.getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
 	}
 
 	/**
@@ -179,7 +163,6 @@ export class ChannelsController {
 		@Req() req: Request,
 	): Promise<object> {
 		message.channel = await this.channelService.getQuery().on_channel(req.user.id).getOneOrFail(id);
-		message.user = req.user.id;
 		return this.messageService.create(message);
 	}
 
@@ -191,18 +174,10 @@ export class ChannelsController {
 		@Param("id", ParseIntPipe) id: number,
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
 	): Promise<object> {
 		await this.channelService.getQuery().on_channel(req.user.id).getOneOrFail(id);
-		const [ret, total] = await this.chanInvitationService
-			.getQuery()
-			.channel(id)
-			.paginate(page, per_page)
-			.getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
+		return await this.chanInvitationService.getQuery().channel(id).paginate(page, per_page).getManyAndCount();
 	}
 
 	/**

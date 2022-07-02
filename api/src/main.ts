@@ -6,6 +6,8 @@ import morgan from "morgan";
 import config from "@config/api.config";
 import session, { MemoryStore } from "express-session";
 import { Container } from "typedi";
+import session from "express-session";
+import { useContainer } from "class-validator";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
@@ -37,8 +39,8 @@ import { Container } from "typedi";
 	// Enable morgan for clean logs
 	app.use(morgan("combined"));
 
-	// //	class-validator
-	// useContainer(app.select(AppModule), { fallbackOnErrors: true });
+	//	class-validator
+	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
 	// Start server and listen for requests
 	await app.listen(config.apiPort);

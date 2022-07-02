@@ -41,10 +41,4 @@ export class ChanInvitationService {
 	update(id: number, chanInvitation: ChanInvitation) {
 		return this.getQuery().update(id, chanInvitation);
 	}
-	async findByChannel(id: number): Promise<ChanInvitation[]> {
-		return this.getQuery().channel(id).getMany();
-	}
-	async findByChannelAndCount(id: number, page = 1, itemByPage = 10): Promise<[ChanInvitation[], number]> {
-		return this.getQuery().channel(id).paginate(page, itemByPage).getManyAndCount();
-	}
 }

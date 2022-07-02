@@ -10,6 +10,7 @@ import { SetMode } from "@utils/set-mode";
 
 export enum ChannelType {
 	PUBLIC,
+	PASSWORD,
 	PRIVATE,
 	DM,
 }
@@ -44,7 +45,7 @@ export class Channel {
 	password: string;
 
 	// owner  (and creator) of the channel
-	@ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE" })
+	@ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE", nullable: true })
 	@Validate(UserExistsRule) // class-validator
 	@setService(UserService)
 	@SetMode("ru")

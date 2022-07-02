@@ -18,10 +18,11 @@ import { MyRequestPipe } from "@utils/myRequestPipe";
 import { getPutPipeline } from "@utils/getPutPipeline";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
+import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 
 @Controller("connections")
 @UseGuards(...SessionGuard)
-@UseInterceptors(CrudFilterInterceptor)
+@UseInterceptors(CrudFilterInterceptor, PaginationInterceptor)
 @UseFilters(TypeormErrorFilter)
 export class ChanConnectionsController {
 	constructor(private chanConnectionService: ChanConnectionService) {}
@@ -32,12 +33,12 @@ export class ChanConnectionsController {
 	}
 
 	@Put(":id")
-	update(
+	async update(
 		@Param("id", ParseIntPipe) id: number,
 		@MyRequestPipe(...getPutPipeline(ChanConnection)) chanConnection: ChanConnection,
 		@Req() req: Request,
 	) {
-		return this.chanConnectionService.getQuery().connection_chan_owner(req.user.id).update(id, chanConnection);
+		await this.chanConnectionService.getQuery().connection_chan_owner(req.user.id).update(id, chanConnection);
 	}
 
 	@Delete(":id")

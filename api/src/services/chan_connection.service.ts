@@ -19,20 +19,8 @@ export class ChanConnectionService {
 		return new ChanConnectionQuery(this.ChanConnectionRepository);
 	}
 
-	findAllAndCount(userid: string, page = 1, itemByPage = 10): Promise<[ChanConnection[], number]> {
-		return this.getQuery().user(userid).paginate(page, itemByPage).getManyAndCount();
-	}
-
-	findAllAndCountByChannel(channelId: number, page = 1, itemByPage = 10): Promise<[ChanConnection[], number]> {
-		return this.getQuery().channel(channelId).paginate(page, itemByPage).getManyAndCount();
-	}
-
 	findOne(id: number): Promise<ChanConnection> {
 		return this.getQuery().getOne(id);
-	}
-
-	async findOneByConnection(userId: string, channelId: number): Promise<ChanConnection> {
-		return await this.getQuery().channel(channelId).user(userId).query.getOne();
 	}
 
 	async remove(id: number): Promise<void> {

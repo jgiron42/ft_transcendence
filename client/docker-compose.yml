@@ -5,11 +5,16 @@ version: "3.5"
 services:
     client:
         container_name: ft_transcendance_client
-        build: .
+        build:
+            context: .
+            args:
+                NODE_ENV: ${NODE_ENV:-production}
         networks:
             - ft_transcendance
         ports:
-            - 4000:4000
+            - 127.0.0.1:4000:${CLIENT_PORT:-4000}
+        env_file:
+            - ".env"
         environment:
             TZ: Europe/Paris
         volumes:
@@ -29,7 +34,6 @@ services:
             - ./tsconfig.json:/app/tsconfig.json
             - ./layouts:/app/layouts
             - ./assets:/app/assets
-
         healthcheck:
             disable: false
         restart: unless-stopped

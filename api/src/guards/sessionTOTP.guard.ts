@@ -7,23 +7,44 @@ import { Request } from "@src/types/request";
  */
 @Injectable()
 export class SessionGuardTOTP implements CanActivate {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService) {
+	}
 
 	canActivate(context: ExecutionContext): boolean {
-		// Nest js manipulation to access the underlying express request object
-		const req: Request = context.switchToHttp().getRequest();
-		// Allow access if the session is TOTP validated
-		if (this.authService.isTOTPLogged(req)) {
-			// Put the user object in the session
-			// req.user = req.session.user;
-			// Allow access
-			return true;
+		switch (context.getType()) {
+			case "http": {
+				// Nest js manipulation to access the underlying express request object
+				const req: Request = context.switchToHttp().getRequest();
+				// Allow access if the session is TOTP validated
+				if (this.authService.isTOTPLogged(req.session)) {
+					// Put the user object in the session
+					req.user = req.session.user;
+					// Allow access
+					return true;
+				}
+				// Throw an HTTP 401 error
+				throw new UnauthorizedException({
+					statusCode: 401,
+					error: "Unauthorized",
+					reason: "not authenticated",
+					authMethod: "TOTP",
+				});
+			}
+			case "ws": {
+				await this.authService.wsLoadSession(context);
+				const socket: Socket = context.switchToWs().getClient<Socket>();
+				if (socket.session && this.authService.isTOTPLogged(socket.session)) {
+					return true;
+				}
+				throw new WsException({
+					error: "Unauthorized",
+					reason: "not authenticated",
+					authMethod: "TOTP",
+				});
+			}
+			default:
+				throw new Error(`Fatal: executionContext type ${context.getType()} is not supported`);
+
 		}
-		throw new UnauthorizedException({
-			statusCode: 401,
-			error: "Unauthorized",
-			reason: "not authenticated",
-			authMethod: "TOTP",
-		});
 	}
 }

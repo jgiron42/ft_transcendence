@@ -16,10 +16,6 @@ import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
-import { RelationsController } from "@controllers/relations.controller";
-import { MessagesController } from "@controllers/messages.controller";
-import { ChannelsController } from "@controllers/channels.controller";
-import { GamesController } from "@controllers/games.controller";
 import { ChatModule } from "@modules/chat.module";
 
 @Module({
@@ -45,6 +41,6 @@ import { ChatModule } from "@modules/chat.module";
 		AuthModule,
 		ChatModule,
 	],
-	controllers: [AppController, RelationsController, MessagesController, ChannelsController, GamesController],
+	controllers: [AppController],
 })
 export class AppModule {}

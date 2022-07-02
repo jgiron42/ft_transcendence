@@ -6,14 +6,12 @@ import {
 	ParseIntPipe,
 	UseGuards,
 	UseInterceptors,
-	Res,
 	UseFilters,
 	Req,
 	Post,
 } from "@nestjs/common";
 import { SessionGuard } from "@guards/session.guard";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
-import { Response } from "express";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
@@ -21,10 +19,13 @@ import { Request } from "@src/types/request";
 import { ChanInvitationService } from "@services/chan_invitation.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { User } from "@src/entities/user.entity";
+import { PaginatedResponse } from "@src/types/paginated-response";
+import { ChanInvitation } from "@entities/chan_invitation.entity";
+import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 
 @Controller("invitations")
 @UseGuards(...SessionGuard)
-@UseInterceptors(CrudFilterInterceptor)
+@UseInterceptors(CrudFilterInterceptor, PaginationInterceptor)
 @UseFilters(TypeormErrorFilter)
 export class InvitationsController {
 	constructor(private chanInvitationService: ChanInvitationService, private chanConnection: ChanConnectionService) {}
@@ -36,17 +37,13 @@ export class InvitationsController {
 	async getAll(
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
-	): Promise<object> {
-		const [ret, total] = await this.chanInvitationService
+	): Promise<PaginatedResponse<ChanInvitation>> {
+		return this.chanInvitationService
 			.getQuery()
 			.in_invitation(req.user.id)
 			.paginate(page, per_page)
 			.getManyAndCount();
-		res.setHeader("total_entities", total);
-		res.setHeader("total_pages", Math.ceil(total / per_page));
-		return ret;
 	}
 
 	/**

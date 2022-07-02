@@ -14,6 +14,9 @@ export class InviteQuery extends QueryCooker<ChanInvitation> {
 		);
 	}
 
+	/**
+	 * select only the invitations to and from userId
+	 */
 	in_invitation(userId: string) {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
@@ -23,11 +26,17 @@ export class InviteQuery extends QueryCooker<ChanInvitation> {
 		return this;
 	}
 
+	/**
+	 * select only the invitations to userId
+	 */
 	invited(userId: string) {
-		this.query = this.query.andWhere("invited.id = :userId", { userId });
+		this.query = this.query.andWhere("invited.id = :userId2", { userId2: userId });
 		return this;
 	}
 
+	/**
+	 * select only the invitations from userId
+	 */
 	channel(channelId: number) {
 		this.query = this.query.andWhere("channel.id = channelId", { channelId });
 		return this;
