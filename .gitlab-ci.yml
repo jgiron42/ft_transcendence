@@ -35,7 +35,7 @@ build_client_dev:
     policy: push
   script:
   - NODE_ENV=development npm install
-  - npm run generate
+  - npm run build
 
 eslint_api:
   stage: lint_and_test
@@ -57,6 +57,7 @@ eslint_client:
   variables:
     APP_NAME: client
   script:
+  - ls -la
   - npm run lint
   needs:
   - build_client_dev
