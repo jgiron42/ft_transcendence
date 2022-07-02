@@ -8,21 +8,15 @@ image: node:17.4.0
 before_script:
 - cd $APP_NAME
 
-dummy:
-  stage: build
-  cache: &global_cache
-    key: "${CI_PIPELINE_IID}-${APP_NAME}"
-    paths:
-    - $APP_NAME/node_modules/
-    - $APP_NAME/dist/
-  script: [""]
-
 build_api_dev:
   stage: build
   variables:
     APP_NAME: api
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    paths:
+    - $APP_NAME/node_modules/
+    - $APP_NAME/dist/
     policy: push
   script:
   - NODE_ENV=development npm install
@@ -33,7 +27,10 @@ build_client_dev:
   variables:
     APP_NAME: client
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    paths:
+    - $APP_NAME/node_modules/
+    - $APP_NAME/dist/
     policy: push
   script:
   - NODE_ENV=development npm install
@@ -42,7 +39,10 @@ build_client_dev:
 eslint_api:
   stage: lint_and_test
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    paths:
+    - $APP_NAME/node_modules/
+    - $APP_NAME/dist/
     policy: pull
   variables:
     APP_NAME: api
@@ -54,7 +54,10 @@ eslint_api:
 eslint_client:
   stage: lint_and_test
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    paths:
+    - $APP_NAME/node_modules/
+    - $APP_NAME/dist/
     policy: pull
   variables:
     APP_NAME: client
