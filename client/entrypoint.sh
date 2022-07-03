@@ -15,8 +15,6 @@ then
 	fi
 fi
 
-ls -la
-
 # Check if another command is provided & execute them
 if [[ ! -z "$@" ]]
 then
