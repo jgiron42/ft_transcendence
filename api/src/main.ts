@@ -6,7 +6,6 @@ import morgan from "morgan";
 import config from "@config/api.config";
 import session, { MemoryStore } from "express-session";
 import { Container } from "typedi";
-import session from "express-session";
 import { useContainer } from "class-validator";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import { promisify } from "util";
 import { ExecutionContext, Injectable } from "@nestjs/common";
 import { SessionT } from "@src/types/session";
@@ -6,8 +5,6 @@ import config from "@config/api.config";
 import { User } from "@src/entities/user.entity";
 import { Request } from "@src/types/request";
 import { MemoryStore, SessionData } from "express-session";
-import { User } from "@src/entities/user.entity";
-import { Request } from "@src/types/request";
 import * as cookieParser from "cookie-parser";
 import { Container } from "typedi";
 import { Socket } from "@src/types/socket";
@@ -73,9 +70,9 @@ export class AuthService {
 	 * check if a session is logged with TOTP or not
 	 * @param req
 	 */
-	isTOTPLogged(req: Request): boolean {
+	isTOTPLogged(req: Request | Socket): boolean {
 		// Ensure user has TOTP enabled and is authenticated.
-		return !this.hasTOTP(req.user) || req.session.totpIdentified;
+		return !this.hasTOTP(req.user as User) || req.session.totpIdentified;
 	}
 
 	/**

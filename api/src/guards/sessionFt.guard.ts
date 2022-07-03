@@ -50,6 +50,7 @@ export class SessionGuardFt implements CanActivate {
 							const user = new User();
 							user.id = socket.session.user.id;
 							user.username = socket.session.user.firstName ?? socket.session.user.id;
+							socket.user = await this.userService.create(user);
 						}
 						return true;
 					}

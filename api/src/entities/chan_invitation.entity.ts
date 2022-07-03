@@ -35,7 +35,7 @@ export class ChanInvitation {
 	@ManyToOne(() => Channel, (channel) => channel.id, { eager: true, onDelete: "CASCADE" })
 	// @Validate(ChannelExistRule) // class-validator
 	@setService(ChannelService)
-	@SetMode("rcu")
+	@SetMode("ru")
 	channel: Channel;
 
 	// date of invitation

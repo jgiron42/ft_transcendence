@@ -6,6 +6,7 @@ import { Channel } from "@entities/channel.entity";
 import { Container } from "typedi";
 import { MessageQuery } from "@src/queries/messageQuery";
 import { SocketService } from "@services/socket.service";
+import { PaginatedResponse } from "@src/types/paginated-response";
 
 @Injectable()
 export class MessageService {
@@ -25,7 +26,7 @@ export class MessageService {
 		return this.getQuery().see_message(userId).paginate(page, itemByPage).getMany();
 	}
 
-	async findAllAndCount(userId: string, page = 1, itemByPage = 10): Promise<[Message[], number]> {
+	async findAllAndCount(userId: string, page = 1, itemByPage = 10): Promise<PaginatedResponse<Message>> {
 		return this.getQuery().see_message(userId).paginate(page, itemByPage).getManyAndCount();
 	}
 

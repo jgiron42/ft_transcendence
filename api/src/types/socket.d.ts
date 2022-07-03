@@ -10,4 +10,5 @@ export interface Socket<
 > extends io.Socket<EmitEvents, ServerSideEvents, SocketData, SocketData> {
 	token: string;
 	session: SessionT;
+	user: User;
 }

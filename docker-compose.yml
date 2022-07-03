@@ -52,6 +52,7 @@ services:
       args:
         NODE_ENV: ${NODE_ENV:-production}
     networks:
+      - default
       - ft_transcendance
     expose:
       - ${CLIENT_PORT:-4000}

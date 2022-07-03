@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { Container } from "typedi";
 import { InviteQuery } from "@src/queries/inviteQuery";
+import { DeepPartial } from "typeorm/common/DeepPartial";
 
 @Injectable()
 export class ChanInvitationService {
@@ -30,7 +31,7 @@ export class ChanInvitationService {
 		await this.getQuery().remove(id);
 	}
 
-	create(chanInvitation: ChanInvitation): Promise<ChanInvitation> {
+	create(chanInvitation: DeepPartial<ChanInvitation>): Promise<ChanInvitation> {
 		return this.save(this.ChanInvitationRepository.create(chanInvitation));
 	}
 

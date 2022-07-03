@@ -6,6 +6,7 @@ import { Container } from "typedi";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChannelQuery } from "@src/queries/channelQuery";
 import { compare, hash, genSalt } from "bcrypt";
+import { SocketService } from "@services/socket.service";
 
 @Injectable()
 export class ChannelService {
