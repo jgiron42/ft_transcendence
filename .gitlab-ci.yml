@@ -101,9 +101,9 @@ test_e2e_api:
   stage: lint_and_test
   image: docker/compose
   services:
-  - name: docker:18.03-dind
-    command: ["--tls=false"]
-    alias: docker
+    - name: docker:18.03-dind
+      command: ["--tls=false"]
+      alias: docker
   variables:
     APP_NAME: api
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
@@ -130,9 +130,9 @@ test_e2e_client:
   stage: lint_and_test
   image: docker/compose
   services:
-  - name: docker:18.03-dind
-    command: ["--tls=false"]
-    alias: docker
+    - name: docker:18.03-dind
+      command: ["--tls=false"]
+      alias: docker
   variables:
     APP_NAME: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
@@ -160,13 +160,13 @@ deploy_api:
   variables:
     APP_NAME: api
   script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh api"
+    - chmod 600 "$ID_RSA"
+    - echo '' >> "$ID_RSA"
+    - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh api"
   environment:
     name: production
   only:
-   - main
+    - main
   when: manual
 
 deploy_client:
@@ -174,13 +174,13 @@ deploy_client:
   variables:
     APP_NAME: client
   script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh client"
+    - chmod 600 "$ID_RSA"
+    - echo '' >> "$ID_RSA"
+    - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh client"
   environment:
     name: production
   only:
-  - main
+    - main
   when: manual
 
 deploy_db:
@@ -188,13 +188,13 @@ deploy_db:
   variables:
     APP_NAME: db
   script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh db"
+    - chmod 600 "$ID_RSA"
+    - echo '' >> "$ID_RSA"
+    - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh db"
   environment:
     name: production
   only:
-   - main
+    - main
   when: manual
 
 deploy_proxy:
@@ -202,12 +202,11 @@ deploy_proxy:
   variables:
     APP_NAME: proxy
   script:
-  - chmod 600 "$ID_RSA"
-  - echo '' >> "$ID_RSA"
-  - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh ft_proxy"
+    - chmod 600 "$ID_RSA"
+    - echo '' >> "$ID_RSA"
+    - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh ft_proxy"
   environment:
     name: production
   only:
-  - main
+    - main
   when: manual
-

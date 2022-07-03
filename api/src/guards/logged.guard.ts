@@ -2,7 +2,6 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 
 import { Request } from "@src/types/request";
 import { AuthService } from "@services/auth.service";
-import { SessionT } from "@src/types/session";
 
 /**
  * Allows access to the guarded route if the session is NOT logged in
@@ -13,10 +12,8 @@ export class LoggedGuard implements CanActivate {
 	canActivate(context: ExecutionContext): boolean {
 		// Nest js manipulation to access the underlying express request object
 		const req: Request = context.switchToHttp().getRequest();
-		// Get the session object in the request
-		const ses: SessionT = req.session;
 		// Allow access to the page if the user is not authenticated
-		if (!this.authservice.isLoggedIn(ses)) {
+		if (!this.authservice.isLoggedIn(req)) {
 			return true;
 		}
 		// Throw an HTTP 401 error
