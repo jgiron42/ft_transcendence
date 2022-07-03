@@ -26,7 +26,7 @@ server {
 
 	location /pgadmin/ {
 		proxy_set_header X-Script-Name /pgadmin;
-        proxy_set_header Host $host;
+		proxy_set_header Host $host;
 
 		proxy_pass http://${PGADMIN_HOST}:${PGADMIN_PORT}/;
 
