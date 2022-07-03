@@ -2,14 +2,6 @@
 
 # Script to easily launch the project in dev mode
 
-# Configure proxy with a 80/HTTP only template
-cd proxy
-mv templates/default.conf.template default.conf.template.old
-cp dev.default.conf.template templates/default.conf.template
-
-# Go back to project root
-cd ..
-
 # Setup pgadmin volume to work correctly with docker
 sudo chown -R 5050:5050 pgadmin/
 
