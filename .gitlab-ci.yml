@@ -13,7 +13,7 @@ build_api_dev:
   variables:
     APP_NAME: api
   cache:
-    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
     - $APP_NAME/node_modules/
     - $APP_NAME/dist/
@@ -27,7 +27,7 @@ build_client_dev:
   variables:
     APP_NAME: client
   cache:
-    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
     - $APP_NAME/node_modules/
     - $APP_NAME/dist/
@@ -39,7 +39,7 @@ build_client_dev:
 eslint_api:
   stage: lint_and_test
   cache:
-    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
     - $APP_NAME/node_modules/
     - $APP_NAME/dist/
@@ -54,7 +54,7 @@ eslint_api:
 eslint_client:
   stage: lint_and_test
   cache:
-    key: "${CI_PIPELINE_IID}-${APP_NAME}-dev"
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
     - $APP_NAME/node_modules/
     - $APP_NAME/dist/
