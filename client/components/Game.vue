@@ -9,6 +9,7 @@
 <script lang="ts">
 import Vue from "vue";
 
+// Simple vector class
 class Vector2D {
 	x: number;
 	y: number;
@@ -18,14 +19,51 @@ class Vector2D {
 	}
 }
 
+// check if q is on Segment pr
+function onSegment(p: Vector2D, q: Vector2D, r: Vector2D) {
+	if (
+		q.x <= Math.max(p.x, r.x) &&
+		q.x >= Math.min(p.x, r.x) &&
+		q.x <= Math.max(p.y, r.y) &&
+		q.y >= Math.min(p.y, r.y)
+	)
+		return true;
+}
+
+// Check intersectoin orientation
+function orientation(p: Vector2D, q: Vector2D, r: Vector2D) {
+	const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.x);
+	if (val === 0) return 0;
+	return val > 0 ? 1 : 2;
+}
+
+// Check intersection depending on orientation
+
+function intersect(p1: Vector2D, q1: Vector2D, p2: Vector2D, q2: Vector2D) {
+	const o1 = orientation(p1, q1, p2);
+	const o2 = orientation(p1, q1, q2);
+	const o3 = orientation(p2, q2, p1);
+	const o4 = orientation(p2, q2, q1);
+
+	if (o1 !== o2 && o3 !== o4) return true;
+
+	// Cas speciaux
+	if (o1 === 0 && onSegment(p1, p2, q1)) return true;
+	if (o2 === 0 && onSegment(p1, q2, q1)) return true;
+	if (o3 === 0 && onSegment(p2, p1, q2)) return true;
+	if (o4 === 0 && onSegment(p2, q1, q2)) return true;
+	return false;
+}
+
 class Player {
 	pos: Vector2D;
 	speed: number;
 	size: Vector2D;
+
 	constructor(res: Vector2D, x: number) {
 		this.size = new Vector2D(20, 100);
 		this.pos = new Vector2D(x, res.y / 2 - 100 / 2);
-		this.speed = 10;
+		this.speed = 5;
 	}
 
 	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D) {
@@ -48,87 +86,119 @@ class Player {
 		ctx.fill();
 		ctx.closePath();
 	}
-
-	get_width() {
-		return this.size.x;
-	}
-
-	get_height() {
-		return this.size.y;
-	}
 }
 
 class Ball {
 	speed: number;
 	pos: Vector2D;
 	dir: Vector2D;
-	ballradius: number;
+	size: Vector2D;
 	constructor(res: Vector2D) {
 		this.speed = 5;
+		// Set ball in middle of the screen
 		this.pos = new Vector2D(res.x / 2, res.y / 2);
 		this.dir = new Vector2D(this.speed, 0);
-		this.ballradius = 10;
+		this.size = new Vector2D(20, 20);
 	}
 
-	update(res: Vector2D) {
-		if (this.pos.y + this.dir.y < this.ballradius / 2 + 10 || this.pos.y + this.dir.y > res.y - this.ballradius / 2)
+	update(res: Vector2D, players: Array<Player>) {
+		if (this.pos.y + this.dir.y < 10 || this.pos.y + this.dir.y > res.y - this.size.x - 10)
 			this.dir.y = -this.dir.y;
 
 		this.pos.x += this.dir.x;
 		this.pos.y += this.dir.y;
+		for (let i = 0; i < players.length; i++) {
+			this.collide(players[i], res);
+		}
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
 		ctx.beginPath();
-		ctx.arc(this.pos.x + 2, this.pos.y + 2, this.ballradius, 0, 2 * Math.PI, false);
-		ctx.fillStyle = "#ff0000";
+		ctx.rect(this.pos.x + 2, this.pos.y + 2, this.size.x, this.size.x);
+		ctx.fillStyle = "#0000FF";
 		ctx.fill();
 		ctx.closePath();
 		ctx.beginPath();
-		ctx.arc(this.pos.x, this.pos.y, this.ballradius, 0, 2 * Math.PI, false);
-		ctx.fillStyle = "#ffffff";
+		ctx.rect(this.pos.x, this.pos.y, this.size.x, this.size.x);
+		ctx.fillStyle = "#FFFFFF";
 		ctx.fill();
 		ctx.closePath();
 	}
 
-	bounce(x: number, y: number) {
-		this.dir.x *= x;
-		this.dir.y *= y;
+	rightVerticalCol(pad: Player) {
+		this.dir.x = -this.dir.x;
+		let part = 0;
+		if (
+			this.pos.y + this.dir.y + this.size.x / 2 > pad.pos.y + pad.size.y / 3 &&
+			this.pos.y + this.dir.y + this.size.x / 2 < pad.pos.y + (2 * pad.size.y) / 3
+		)
+			part = 1;
+		else if (this.pos.y + this.dir.y + this.size.x / 2 >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
+		if (part === 0) this.dir.y = -1;
+		else if (part === 1) this.dir.y = 0;
+		else this.dir.y = 1;
+	}
+
+	leftVerticalCol(pad: Player) {
+		this.dir.x = -this.dir.x;
+		let part = 0;
+		if (
+			this.pos.y + this.dir.y + this.size.x / 2 > pad.pos.y + pad.size.y / 3 &&
+			this.pos.y + this.dir.y + this.size.x / 2 < pad.pos.y + (2 * pad.size.y) / 3
+		)
+			part = 1;
+		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
+		if (part === 0) this.dir.y = -1;
+		else if (part === 1) this.dir.y = 0;
+		else this.dir.y = 1;
+	}
+
+	topHorizontalCol(pad: Player) {
+		if (
+			intersect(
+				this.pos,
+				new Vector2D(this.pos.x + this.dir.x + this.size.x / 2, this.pos.y + this.dir.y + this.size.x / 2),
+				pad.pos,
+				new Vector2D(pad.pos.x + pad.size.x, pad.pos.y),
+			) === true
+		) {
+			if (this.dir.y > 0) this.dir.y = -this.dir.y;
+		}
+	}
+
+	bottomHorizontalCol(pad: Player) {
+		if (
+			intersect(
+				this.pos,
+				new Vector2D(this.pos.x + this.dir.x + this.size.x / 2, this.pos.y + this.dir.y + this.size.x / 2),
+				new Vector2D(pad.pos.x, pad.pos.y + pad.size.y),
+				new Vector2D(pad.pos.x + pad.size.x, pad.pos.y + pad.size.y),
+			) === true
+		) {
+			if (this.dir.y < 0) this.dir.y = -this.dir.y;
+		}
 	}
 
 	collide(pad: Player, res: Vector2D) {
-		// Colision pad right
-		if (this.pos.y + this.dir.y >= pad.pos.y && this.pos.y + this.dir.y <= pad.pos.y + pad.size.y) {
-			if (this.pos.x > res.x / 2) {
-				if (this.pos.x < pad.pos.x && this.pos.x + this.dir.x > pad.pos.x) {
-					this.dir.x = -this.dir.x;
-					let part = 0;
-					if (
-						this.pos.y + this.dir.y > pad.pos.y + pad.size.y / 3 &&
-						this.pos.y + this.dir.y < pad.pos.y + (2 * pad.size.y) / 3
-					)
-						part = 1;
-					else if (this.pos.y + this.dir.y >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
-					if (part === 0) this.dir.y = -1;
-					else if (part === 1) this.dir.y = 0;
-					else this.dir.y = 1;
-				}
-			} else if (this.pos.x < res.x / 2) {
-				if (this.pos.x > pad.pos.x + pad.size.x && this.pos.x + this.dir.x < pad.pos.x + pad.size.x) {
-					this.dir.x = -this.dir.x;
-					let part = 0;
-					if (
-						this.pos.y + this.dir.y > pad.pos.y + pad.size.y / 3 &&
-						this.pos.y + this.dir.y < pad.pos.y + (2 * pad.size.y) / 3
-					)
-						part = 1;
-					else if (this.pos.y + this.dir.y >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
-					if (part === 0) this.dir.y = -1;
-					else if (part === 1) this.dir.y = 0;
-					else this.dir.y = 1;
-				}
+		// Collisions verticales
+		if (
+			this.pos.y + this.dir.y + this.size.x / 2 >= pad.pos.y &&
+			this.pos.y + this.dir.y + this.size.x / 2 <= pad.pos.y + pad.size.y
+		) {
+			if (this.pos.x + this.size.x / 2 > res.x / 2) {
+				if (this.pos.x + this.size.x / 2 < pad.pos.x && this.pos.x + this.dir.x + this.size.x / 2 > pad.pos.x)
+					this.rightVerticalCol(pad);
+			} else if (this.pos.x + this.size.x / 2 < res.x / 2) {
+				if (
+					this.pos.x + this.size.x / 2 > pad.pos.x + pad.size.x &&
+					this.pos.x + this.dir.x + this.size.x / 2 < pad.pos.x + pad.size.x
+				)
+					this.leftVerticalCol(pad);
 			}
 		}
+		// Collisions horizontales
+		this.topHorizontalCol(pad);
+		this.bottomHorizontalCol(pad);
 	}
 }
 
@@ -143,16 +213,23 @@ export default Vue.extend({
 		score_p2: 0,
 		res: null as Vector2D | null,
 		ball: new Ball(new Vector2D(450, 300)),
-		p1: null as Player | null,
-		p2: null as Player | null,
+		players: null as Array<Player> | null,
 	}),
 	mounted() {
 		// Init Canvas and apply ratio
 		this.canvas = document.getElementById("game") as HTMLCanvasElement;
 		this.res = new Vector2D(this.canvas.width, this.canvas.height);
-		this.p2 = new Player(this.res, this.res.x - this.res.x / 10);
-		if (this.p2) this.p1 = new Player(this.res, this.res.x / 10 - this.p2.size.x);
 
+		// Setup player's array
+		const p2 = new Player(this.res, this.res.x - this.res.x / 10);
+		const p1 = new Player(this.res, this.res.x / 10 - p2.size.x);
+		this.players = new Array(2);
+		if (p1 && p2 && this.players) {
+			this.players[0] = p1;
+			this.players[1] = p2;
+		}
+
+		// Init canvas ctx
 		this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
 		// Adding event hooks
@@ -165,8 +242,23 @@ export default Vue.extend({
 	methods: {
 		// Rendering loop
 		draw() {
-			if (this.ctx && this.p1 && this.ball && this.res && this.p2) {
-				// update
+			if (this.ctx && this.players && this.ball && this.res) {
+				this.update();
+				this.redraw();
+			}
+		},
+		redraw() {
+			// render
+			if (this.ctx && this.players) {
+				this.clear();
+				this.ball.draw(this.ctx);
+				this.players[0].draw(this.ctx);
+				this.players[1].draw(this.ctx);
+			}
+		},
+		// Check if ball oob & update score
+		scorePoint() {
+			if (this.res) {
 				if (this.ball.pos.x + this.ball.dir.x <= 0) {
 					this.score_p2 += 1;
 					this.ball.pos.x = this.res.x / 2;
@@ -180,23 +272,25 @@ export default Vue.extend({
 					this.ball.dir.y = -1;
 					this.ball.speed = 5;
 				}
-				this.p1.update(this.vkUp, this.vkDown, this.res);
-				if (this.ball.pos.y + this.ball.dir.y < this.p2.pos.y + this.p2.size.y / 2)
-					this.p2.update(true, false, this.res);
-				else if (this.ball.pos.y + this.ball.dir.y > this.p2.pos.y + this.p2.size.y / 2)
-					this.p2.update(false, true, this.res);
-				this.ball.update(this.res);
-				this.ball.collide(this.p1, this.res);
-				this.ball.collide(this.p2, this.res);
-				// render
-				this.clear();
-				this.ball.draw(this.ctx);
-				this.p1.draw(this.ctx);
-				this.p2.draw(this.ctx);
 			}
 		},
+		update() {
+			// update
+			if (this.res && this.players) {
+				this.scorePoint();
 
-		// Refresh what is drawn to the screen
+				// Update Players
+				this.players[0].update(this.vkUp, this.vkDown, this.res);
+				// 	Simulate p2 input
+				if (this.ball.pos.y + this.ball.dir.y < this.players[1].pos.y + this.players[1].size.y / 2)
+					this.players[1].update(true, false, this.res);
+				else if (this.ball.pos.y + this.ball.dir.y > this.players[1].pos.y + this.players[1].size.y / 2)
+					this.players[1].update(false, true, this.res);
+				// Update ball
+				this.ball.update(this.res, this.players);
+			}
+		},
+		// display background, playground and scores
 		clear() {
 			if (this.ctx && this.res) {
 				this.ctx.beginPath();
@@ -215,6 +309,7 @@ export default Vue.extend({
 				}
 			}
 		},
+		// Keyboard event Handler
 		handleKeyPress(event: KeyboardEvent) {
 			if (event.key === "Up" || event.key === "ArrowUp") this.vkUp = true;
 			else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = true;
