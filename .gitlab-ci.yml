@@ -78,7 +78,7 @@ build_api_prod:
     APP_NAME: api
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
-  - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
+  - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker push "$IMAGE_TAG"
 
@@ -93,7 +93,7 @@ build_client_prod:
     APP_NAME: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
-  - docker build --tag "$IMAGE_TAG" --build-arg "buildtarget=production" .
+  - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker push "$IMAGE_TAG"
 
