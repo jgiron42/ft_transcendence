@@ -78,6 +78,7 @@ build_api_prod:
     APP_NAME: api
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
+  # Build and push the image in the built-in gitlab docker registry
   - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker push "$IMAGE_TAG"
@@ -93,6 +94,7 @@ build_client_prod:
     APP_NAME: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
+  # Build and push the image in the built-in gitlab docker registry
   - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker push "$IMAGE_TAG"
@@ -107,12 +109,16 @@ test_e2e_api:
   variables:
     APP_NAME: api
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
+    # Volume is broken when the image didn't build in the same job,
+    # so we get rid of it
     DUMMY_MOUNT: /disabled
   script:
+  # Pull the image from the built-in gitlab docker registry
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker pull "$IMAGE_TAG"
   - docker tag "$IMAGE_TAG" "ft_transcendance_api:latest"
   - cd ..
+  # Launch the required services
   - docker-compose up -d api db
   # Waiting for service to be up
   - |
@@ -138,10 +144,12 @@ test_e2e_client:
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
     DUMMY_MOUNT: /disabled
   script:
+  # Pull the image from the built-in gitlab docker registry
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker pull "$IMAGE_TAG"
   - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
   - cd ..
+  # Launch the required services
   - docker-compose up -d client
   # Waiting for service to be up
   - |
