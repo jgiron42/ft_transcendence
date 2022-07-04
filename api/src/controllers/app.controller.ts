@@ -1,10 +1,11 @@
-import { Controller, Get, UseGuards, Query, Session } from "@nestjs/common";
+import { Controller, Get, UseGuards, Query, Session, UseInterceptors } from "@nestjs/common";
 import config from "@config/api.config";
 import { SessionGuard } from "@guards/session.guard";
 import { UserService } from "@src/services/user.service";
 import { User } from "@entities/user.entity";
 import { SessionT } from "@src/types/session";
 import { GetUser } from "@utils/get-user";
+import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 
 @Controller()
 export class AppController {
@@ -23,6 +24,7 @@ export class AppController {
 		return "user is correctly authenticated";
 	}
 
+	@UseInterceptors(CrudFilterInterceptor)
 	@UseGuards(...SessionGuard)
 	@Get("me")
 	me(@GetUser() user: User): User {
