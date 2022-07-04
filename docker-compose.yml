@@ -25,34 +25,31 @@ services:
         restart: always
     
     api:
-      image: ft_transcendance_api:latest
-      build: ./api
-      networks:
-      - default
-      - ft_transcendance
-      ports:
-      - 0.0.0.0:3000:3000
-      environment:
-    # Values from parent shell, overriden by values from .env
-        - INTRA42_UID=${INTRA42_UID-0}
-        - INTRA42_SECRET=${INTRA42_SECRET-0}
-        - API_BASE_URL=${API_BASE_URL-http://localhost:3000}
-        - WSS_BASE_URL=${WSS_BASE_URL-wss://localhost:3000}
-    # Config file containing credentials values
-        - CONFIG_FILE=/opt/.env
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=postgres
-        - POSTGRES_DB=ft_db
-      volumes:
-  # Add env config file
-      - ./api/.env:/opt/.env
-  # Mount code to avoid rebuild container to refresh code
-      - ./api/src:/app/src
-      - ./api/config.json:/app/api/config.json
-      healthcheck:
-        disable: false
-      restart: always
-  
+        build:
+            context: .
+            args:
+                NODE_ENV: ${NODE_ENV:-production}
+        networks:
+            - default
+            - ft_transcendance
+        ports:
+            - 0.0.0.0:${API_PORT:-3000}:3000
+        env_file:
+            - ".env"
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=ft_db
+        volumes:
+            # Mount code to avoid rebuild container to refresh code
+            - ./src:/app/src
+            - ./tsconfig.json:/app/tsconfig.json
+            - ./tsconfig.build.json:/app/tsconfig.build.json
+            - ./config.json:/app/config.json
+        healthcheck:
+            disable: false
+        restart: unless-stopped
+
     db:
         image: postgres:14.1-alpine
         restart: always
@@ -61,7 +58,8 @@ services:
             - POSTGRES_PASSWORD=postgres
             - POSTGRES_DB=ft_db
         ports:
-            - '5432:5432'
+            - "5432:5432"
+
 
     pgadmin:
         image: dpage/pgadmin4
