@@ -15,7 +15,7 @@ export class QueryCooker<Entity extends EntityInterface> {
 
 	paginate(page = 1, itemByPage = 10) {
 		this.per_page = itemByPage;
-		this.query = this.query.skip((page - 1) * itemByPage).limit(itemByPage);
+		this.query = this.query.skip((page - 1) * itemByPage).take(itemByPage);
 		return this;
 	}
 
