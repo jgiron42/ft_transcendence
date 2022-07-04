@@ -65,7 +65,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage("HC")
 	async onHelloConnection(@ConnectedSocket() socket: Socket) {
 		if (socket.session === undefined) return;
-		const usr = await this.userService.findOne(socket.session.user.id);
+		const usr = await this.userService.findOne(socket.session.sessionUser.id);
 		if (usr) {
 			this.socketService.addClient(socket, usr);
 			await socket.join("realm");
@@ -88,7 +88,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async joinChannel(client: Socket, chan_id: number): Promise<void> {
 		const chan = await this.channelService.findOne(chan_id);
 		if (chan === undefined) this.socketService.sendError("Channel not found.");
-		else if (!(await this.chanConnectionService.isOnChannel(client.session.user.id, chan.id)))
+		else if (!(await this.chanConnectionService.isOnChannel(client.session.sessionUser.id, chan.id)))
 			this.socketService.sendError("User not in channel.");
 		else {
 			await this.leaveChannel(client);
@@ -96,7 +96,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			await client.join(chan.name);
 			const messages = await this.messageService
 				.getQuery()
-				.see_message(client.session.user.id)
+				.see_message(client.session.sessionUser.id)
 				.channel(chan.id)
 				.getMany();
 			messages.sort((a: Message, b: Message): number => a.created_at.getTime() - b.created_at.getTime());

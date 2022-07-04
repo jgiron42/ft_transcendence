@@ -1,10 +1,10 @@
-import { Controller, Get, Req, UseGuards, Query, Session } from "@nestjs/common";
+import { Controller, Get, UseGuards, Query, Session } from "@nestjs/common";
 import config from "@config/api.config";
 import { SessionGuard } from "@guards/session.guard";
 import { UserService } from "@src/services/user.service";
 import { User } from "@entities/user.entity";
-import { Request } from "@src/types/request";
 import { SessionT } from "@src/types/session";
+import { GetUser } from "@utils/get-user";
 
 @Controller()
 export class AppController {
@@ -25,8 +25,8 @@ export class AppController {
 
 	@UseGuards(...SessionGuard)
 	@Get("me")
-	me(@Req() req: Request) {
-		return req.user;
+	me(@GetUser() user: User): User {
+		return user;
 	}
 
 	@Get("/newUserExample")
@@ -45,7 +45,7 @@ export class AppController {
 		await this.userService.create(usr);
 		ses.ftIdentified = 9999999999999;
 		ses.totpIdentified = true;
-		ses.user = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
+		ses.sessionUser = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
 		return this.userService.findAll();
 	}
 }

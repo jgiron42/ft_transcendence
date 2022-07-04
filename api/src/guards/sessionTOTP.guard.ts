@@ -17,9 +17,7 @@ export class SessionGuardTOTP implements CanActivate {
 				// Nest js manipulation to access the underlying express request object
 				const req: Request = context.switchToHttp().getRequest();
 				// Allow access if the session is TOTP validated
-				if (this.authService.isTOTPLogged(req)) {
-					// Put the user object in the session
-					// req.user = req.session.user;
+				if (this.authService.isTOTPLogged(req.session)) {
 					// Allow access
 					return true;
 				}
@@ -34,7 +32,7 @@ export class SessionGuardTOTP implements CanActivate {
 			case "ws": {
 				await this.authService.wsLoadSession(context);
 				const socket: Socket = context.switchToWs().getClient<Socket>();
-				if (socket.session && this.authService.isTOTPLogged(socket)) {
+				if (socket.session && this.authService.isTOTPLogged(socket.session)) {
 					return true;
 				}
 				throw new WsException({

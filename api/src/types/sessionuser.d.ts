@@ -1,7 +1,7 @@
 /**
  * user stored in a session
  */
-export declare type sessionUser = {
+export declare type SessionUser = {
 	id: string; // The id of a session user (42 login)
 	accessToken: string; // The 42 OAuth access token of a session user
 	refreshToken: string; // The 42 OAuth refresh token of a session user

@@ -8,11 +8,12 @@ import { MemoryStore, SessionData } from "express-session";
 import * as cookieParser from "cookie-parser";
 import { Container } from "typedi";
 import { Socket } from "@src/types/socket";
+import { UserService } from "@services/user.service";
 
 @Injectable()
 export class AuthService {
 	private sessionStore: MemoryStore;
-	constructor() {
+	constructor(private userService: UserService) {
 		this.sessionStore = Container.get("SessionStore");
 	}
 
@@ -34,9 +35,8 @@ export class AuthService {
 	 * Ensures a user has TOTP enabled
 	 * @param_id user id
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	hasTOTP(user: User): boolean {
-		return user.totp_enabled;
+	hasTOTP(ses: SessionT): boolean {
+		return ses.user.totp_enabled;
 	}
 
 	/**
@@ -68,11 +68,10 @@ export class AuthService {
 
 	/**
 	 * check if a session is logged with TOTP or not
-	 * @param req
 	 */
-	isTOTPLogged(req: Request | Socket): boolean {
+	isTOTPLogged(session: SessionT): boolean {
 		// Ensure user has TOTP enabled and is authenticated.
-		return !this.hasTOTP(req.user as User) || req.session.totpIdentified;
+		return !this.hasTOTP(session) || session.totpIdentified;
 	}
 
 	/**
@@ -81,7 +80,7 @@ export class AuthService {
 	 */
 	isLoggedIn(req: Request): boolean {
 		// Ensure session is authenticated with 42 OAuth and with TOTP
-		return this.isFtLogged(req.session) && this.isTOTPLogged(req);
+		return this.isFtLogged(req.session) && this.isTOTPLogged(req.session);
 	}
 
 	getSession(token: string): Promise<SessionT> {
@@ -106,6 +105,16 @@ export class AuthService {
 			socket.token = context.switchToWs().getData<{ token: string }>()?.token ?? socket.token;
 			if (socket?.token) socket.session = await this.getSession(socket.token);
 			else socket.session = {} as SessionT;
+		}
+	}
+
+	async updateOrCreateSessionUser(session: SessionT) {
+		session.user = await this.userService.findOne(session.sessionUser.id);
+		if (!session.user) {
+			session.user = await this.userService.create({
+				id: session.sessionUser.id,
+				username: session.sessionUser.firstName ?? session.sessionUser.id,
+			});
 		}
 	}
 }

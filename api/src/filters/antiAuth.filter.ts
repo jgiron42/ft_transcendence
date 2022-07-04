@@ -11,6 +11,6 @@ export class antiAuthFilter implements ExceptionFilter {
 		const ctx = host.switchToHttp();
 		const response: Response = ctx.getResponse<Response>();
 		// Redirect user to the app root
-		response.redirect(config.baseUrl);
+		response.redirect(`${config.baseUrl}/`);
 	}
 }

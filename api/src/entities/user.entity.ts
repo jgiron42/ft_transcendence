@@ -51,8 +51,8 @@ export class User {
 	@SetMode("cru")
 	status: number;
 
-	// totp key of the user
-	@Column({ length: 20 })
+	// totp key of the user in hexadecimal
+	@Column({ length: 40 })
 	@SetMode("cu")
 	totp_key: string;
 

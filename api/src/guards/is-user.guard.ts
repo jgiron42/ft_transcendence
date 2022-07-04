@@ -12,6 +12,6 @@ export class IsUserGuard implements CanActivate {
 		const req: Request = context.switchToHttp().getRequest();
 		// Get the session in the request
 		const ses = req.session;
-		return ses.user.id && ses.user.id === req?.params?.id;
+		return ses.sessionUser.id && ses.sessionUser.id === req?.params?.id;
 	}
 }
