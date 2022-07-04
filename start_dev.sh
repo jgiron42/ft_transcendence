@@ -15,14 +15,11 @@ if ! [ -z "$GITPOD_WORKSPACE_ID" ];then
     export NGINX_DEV_HOST="$GITPOD_WORKSPACE_HOST"
 fi
 
-# If we're relaunching everything, ensure services aren't already running.
-if [ "$#" -eq 0 ];then docker-compose down; fi
-
 export NODE_ENV=development
 
 cp .env.sample .env
 cp api.env.sample api.env
 cp db.env.sample db.env
 
-# Launch services.
-docker-compose up $@
+# (re)Launch services.
+docker-compose restart $@ && docker-compose logs -f $@ --tail 10
