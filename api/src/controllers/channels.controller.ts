@@ -128,6 +128,8 @@ export class ChannelsController {
 		@Query("password") password: string,
 	): Promise<object> {
 		const channel = await this.channelService.getQuery().see_channel(req.user.id).getOneOrFail(id);
+		const existing = await this.chanConnectionService.getQuery().channel(id).user(req.user.id).getOne();
+		if (existing) return existing;
 		if (channel.type === ChannelType.PASSWORD) await ChannelService.checkPassword(password, channel.password);
 		return this.chanConnectionService.create({ user: req.user, channel });
 	}
