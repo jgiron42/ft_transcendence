@@ -62,7 +62,6 @@ eslint_client:
   variables:
     APP_NAME: client
   script:
-  - ls -la
   - npm run lint
   needs:
   - build_client_dev
