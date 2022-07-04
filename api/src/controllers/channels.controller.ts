@@ -90,6 +90,7 @@ export class ChannelsController {
 		@MyRequestPipe(...getPutPipeline(Channel)) channel: Channel,
 		@Req() req: Request,
 	) {
+		if (channel.type === ChannelType.DM) throw new BadRequestException("use user/:id/dm to create a dm channel");
 		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
 		await this.channelService.getQuery().own_channel(req.user.id).update(id, channel);
 	}
