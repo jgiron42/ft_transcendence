@@ -10,7 +10,8 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 			entityRepository
 				.createQueryBuilder("chan_connection")
 				.leftJoinAndSelect("chan_connection.user", "user")
-				.leftJoinAndSelect("chan_connection.channel", "channel"),
+				.leftJoinAndSelect("chan_connection.channel", "channel")
+				.leftJoinAndSelect("channel.owner", "chanOwner"),
 		);
 	}
 
