@@ -35,7 +35,6 @@ export class SessionGuardFt implements CanActivate {
 				});
 			}
 			case "ws": {
-				await this.authService.wsLoadSession(context);
 				const socket: Socket = context.switchToWs().getClient<Socket>();
 				if (socket.session) {
 					if (this.authService.isFtLogged(socket.session)) {

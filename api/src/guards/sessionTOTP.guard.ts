@@ -11,7 +11,7 @@ import { WsException } from "@nestjs/websockets";
 export class SessionGuardTOTP implements CanActivate {
 	constructor(private authService: AuthService) {}
 
-	async canActivate(context: ExecutionContext): Promise<boolean> {
+	canActivate(context: ExecutionContext): boolean {
 		switch (context.getType()) {
 			case "http": {
 				// Nest js manipulation to access the underlying express request object
@@ -30,7 +30,6 @@ export class SessionGuardTOTP implements CanActivate {
 				});
 			}
 			case "ws": {
-				await this.authService.wsLoadSession(context);
 				const socket: Socket = context.switchToWs().getClient<Socket>();
 				if (socket.session && this.authService.isTOTPLogged(socket.session)) {
 					return true;
