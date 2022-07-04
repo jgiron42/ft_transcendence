@@ -27,7 +27,6 @@ import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { getPutPipeline } from "@utils/getPutPipeline";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Request } from "@src/types/request";
-import { Groups } from "@utils/groupsDecorator";
 import { SessionGuard } from "@guards/session.guard";
 import { DevelopmentGuard } from "@src/guards/development.guard";
 import { Page } from "@utils/Page";
@@ -137,7 +136,6 @@ export class ChannelsController {
 	 * return all messages from a channel if the user is on this channel
 	 */
 	@Get(":id/messages")
-	@Groups("on_channel")
 	async getMessage(
 		@Param("id", ParseIntPipe) id: number,
 		@Page() page: number,
