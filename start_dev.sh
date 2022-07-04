@@ -6,7 +6,7 @@
 sudo chown -R 5050:5050 pgadmin/
 
 # Automatically set env values when in a gitpod workspace
-if ! [ -z "$GITPOD_WORKSPACE_ID" ];then
+if [ -n "$GITPOD_WORKSPACE_ID" ];then
     export API_PORT=8080
     export GITPOD_WORKSPACE_HOST="$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST"
     echo "Running on a gitpod instance: $GITPOD_WORKSPACE_HOST"
