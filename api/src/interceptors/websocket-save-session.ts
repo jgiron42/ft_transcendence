@@ -8,7 +8,6 @@ export class WebsocketSaveSession implements NestInterceptor {
 	constructor(private authService: AuthService) {}
 
 	async intercept(context: ExecutionContext, next: CallHandler<any>): Promise<Observable<any>> {
-		await this.authService.wsLoadSession(context);
 		const ret = next.handle();
 		const client = context.switchToWs().getClient<Socket>();
 		await this.authService.setSession(client.token, client.session);
