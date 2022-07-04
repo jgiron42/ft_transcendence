@@ -20,9 +20,6 @@ if [ "$#" -eq 0 ];then docker-compose down; fi
 
 export NODE_ENV=development
 
-# Remove dir created by empty volume
-rm -rf api/.env/
-
 cp .env.sample .env
 cp api.env.sample api.env
 cp db.env.sample db.env
