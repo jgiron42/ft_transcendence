@@ -12,7 +12,6 @@ services:
             - 4000
         env_file:
             - ".env"
-
         environment:
             - TZ=Europe/Paris
             - API_BASE_URL=${API_BASE_URL-http://localhost:8080/api}
@@ -49,9 +48,6 @@ services:
             - ./api/tsconfig.json:/app/tsconfig.json
             - ./api/tsconfig.build.json:/app/tsconfig.build.json
             - ./api/config.json:/app/config.json
-
-        healthcheck:
-            disable: false
         restart: unless-stopped
         depends_on:
           - "db"
