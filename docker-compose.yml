@@ -21,9 +21,6 @@ services:
             - ${DUMMY_MOUNT:-./client:/app/client} # DUMMY_MOUNT allows to disable the volume
             # Ignore node_modules/
             - /app/node_modules
-
-        healthcheck:
-            disable: false
         restart: unless-stopped
 
     api:
