@@ -34,7 +34,6 @@ services:
             - "api.env"
             - "db.env"
             - ".env"
-
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
