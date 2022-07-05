@@ -8,12 +8,10 @@ services:
             context: client
             args:
                 NODE_ENV: ${NODE_ENV:-production}
-        networks:
-        - ft_transcendance
         expose:
-        - 4000
+            - 4000
         env_file:
-        - ".env"
+            - ".env"
 
         environment:
             - TZ=Europe/Paris
@@ -28,15 +26,12 @@ services:
         healthcheck:
             disable: false
         restart: unless-stopped
-    
+
     api:
         build:
             context: api
             args:
                 NODE_ENV: ${NODE_ENV:-production}
-        networks:
-            - default
-            - ft_transcendance
         expose:
             - 3000
         env_file:
@@ -65,14 +60,15 @@ services:
         image: postgres:14.1-alpine
         restart: always
         env_file:
-        - "db.env"
-        - ".env"
+            - "db.env"
+            - ".env"
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
             - POSTGRES_DB=ft_db
         expose:
-        - 5432
+          - 5432
+
     pgadmin:
         image: dpage/pgadmin4
         environment:
@@ -82,7 +78,8 @@ services:
         volumes:
             - ./pgadmin:/var/lib/pgadmin:rw
         expose:
-            - "80"
+            - 80
+
     ft_proxy:
         image: nginx
         volumes:
@@ -91,9 +88,6 @@ services:
         ports:
             - "8080:80"
             - "4443:443"
-        networks:
-            - default
-            - ft_transcendance
         environment:
             - NGINX_PROD_HOST=transcendance.nollium.com
             - NGINX_DEV_HOST=${NGINX_DEV_HOST:-localhost}
@@ -114,6 +108,3 @@ services:
             - "api"
             - "client"
             - "pgadmin"
-networks:
-    ft_transcendance:
-        external: false
