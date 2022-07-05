@@ -22,5 +22,5 @@ cp api.env.sample api.env
 cp db.env.sample db.env
 
 # Can't use docker restart because I want to be able to use --build flags and logs attached out-of-the-box
-docker-compose down $@
+docker-compose stop $@
 docker-compose up $@
