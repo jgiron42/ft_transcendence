@@ -6,6 +6,9 @@ stages:
 image: node:17.4.0
 
 before_script:
+- cp .env.sample .env
+- cp api.env.sample api.env
+- cp db.env.sample db.env
 - cd $APP_NAME
 
 build_api_dev:
