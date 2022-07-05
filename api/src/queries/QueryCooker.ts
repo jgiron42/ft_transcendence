@@ -39,15 +39,15 @@ export class QueryCooker<Entity extends EntityInterface> {
 		return this.query.getOneOrFail();
 	}
 
-	async update(id: Entity["id"], value: QueryDeepPartialEntity<Entity>) {
-		return this.entityRepository.update(await this.getOneOrFail(id), value);
+	async update(value: QueryDeepPartialEntity<Entity>, id?: Entity["id"]) {
+		return this.entityRepository.update({ id: (await this.getOneOrFail(id)).id as Entity["id"] }, value);
 	}
 
 	async create(value: DeepPartial<Entity>) {
 		return await this.entityRepository.save(this.entityRepository.create(value));
 	}
 
-	async remove(id: Entity["id"]) {
+	async remove(id?: Entity["id"]) {
 		return this.entityRepository.remove(await this.getOneOrFail(id));
 	}
 }

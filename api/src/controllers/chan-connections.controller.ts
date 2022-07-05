@@ -38,7 +38,7 @@ export class ChanConnectionsController {
 		@MyRequestPipe(...getPutPipeline(ChanConnection)) chanConnection: ChanConnection,
 		@GetUser() user: User,
 	) {
-		await this.chanConnectionService.getQuery().connection_chan_owner(user.id).update(id, chanConnection);
+		await this.chanConnectionService.getQuery().connection_chan_admin(user.id).update(chanConnection, id);
 	}
 
 	@Delete(":id")

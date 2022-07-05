@@ -32,7 +32,7 @@ import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 import { PaginatedResponse } from "@src/types/paginated-response";
-import { ChanConnection } from "@entities/chan_connection.entity";
+import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { User } from "@entities/user.entity";
 import { GetUser } from "@utils/get-user";
 
@@ -92,7 +92,7 @@ export class ChannelsController {
 	) {
 		if (channel.type === ChannelType.DM) throw new BadRequestException("use user/:id/dm to create a dm channel");
 		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
-		await this.channelService.getQuery().own_channel(user.id).update(id, channel);
+		await this.channelService.getQuery().own_channel(user.id).update(channel, id);
 	}
 
 	/**
@@ -164,6 +164,7 @@ export class ChannelsController {
 		@GetUser() user: User,
 	): Promise<object> {
 		message.channel = await this.channelService.getQuery().on_channel(user.id).getOneOrFail(id);
+		message.user = user;
 		return this.messageService.create(message);
 	}
 
@@ -194,5 +195,40 @@ export class ChannelsController {
 		chanInvitation.invited_by = user;
 		chanInvitation.channel = await this.channelService.getQuery().on_channel(user.id).getOneOrFail(id);
 		return this.chanInvitationService.create(chanInvitation);
+	}
+
+	/**
+	 * create an invitation for a channel if the user is on this channel
+	 */
+	@Post(":chan_id/invite/:user_id")
+	@UsePipes(getValidationPipe(ChanInvitation))
+	async invite(
+		@Param("chan_id", ParseIntPipe) chanId: number,
+		@Param("user_id") userId: string,
+		@GetUser() user: User,
+	): Promise<object> {
+		return this.chanInvitationService.create({
+			user: { id: userId },
+			channel: await this.channelService.getQuery().on_channel(user.id).getOneOrFail(chanId),
+			invited_by: user,
+		});
+	}
+
+	/**
+	 * create an invitation for a channel if the user is on this channel
+	 */
+	@Post(":chan_id/ban/:user_id")
+	@UsePipes(getValidationPipe(ChanInvitation))
+	async ban(
+		@Param("chan_id", ParseIntPipe) chanId: number,
+		@Param("user_id") userId: string,
+		@GetUser() user: User,
+	): Promise<void> {
+		await this.chanConnectionService
+			.getQuery()
+			.connection_chan_admin(user.id)
+			.channel(chanId)
+			.user(userId)
+			.update({ role: ChannelRole.BANNED });
 	}
 }

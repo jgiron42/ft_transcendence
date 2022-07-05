@@ -24,7 +24,7 @@ export class Message {
 
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id, { eager: true, onDelete: "CASCADE" })
-	@SetMode("cru")
+	@SetMode("ru")
 	channel: Channel | number;
 
 	// content of the messsage

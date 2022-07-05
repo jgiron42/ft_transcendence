@@ -40,6 +40,6 @@ export class ChanInvitationService {
 	}
 
 	update(id: number, chanInvitation: ChanInvitation) {
-		return this.getQuery().update(id, chanInvitation);
+		return this.getQuery().update(chanInvitation, id);
 	}
 }

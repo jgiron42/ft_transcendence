@@ -6,6 +6,7 @@ import { SetMode } from "@utils/set-mode";
 //    This entity is use in order to know who have access to which channel
 
 export enum ChannelRole {
+	BANNED,
 	USER,
 	ADMIN,
 	OWNER,
@@ -16,7 +17,7 @@ export enum ChannelRole {
 @Unique("unique_connection", ["channel", "user"])
 export class ChanConnection {
 	constructor() {
-		this.role = 0;
+		this.role = ChannelRole.USER;
 		this.muted = false;
 		this.created_at = new Date();
 	}
@@ -42,7 +43,7 @@ export class ChanConnection {
 	})
 	@Column()
 	@SetMode("cru")
-	role: number;
+	role: ChannelRole;
 
 	// use to know if the user is mute in the channel
 	@Column()
