@@ -9,8 +9,6 @@ services:
             context: .
             args:
                 NODE_ENV: ${NODE_ENV:-production}
-        networks:
-            - ft_transcendance
         ports:
             - 127.0.0.1:4000:4000
         env_file:
@@ -34,10 +32,4 @@ services:
             - ./tsconfig.json:/app/tsconfig.json
             - ./layouts:/app/layouts
             - ./assets:/app/assets
-        healthcheck:
-            disable: false
         restart: unless-stopped
-
-networks:
-    ft_transcendance:
-        external: false

@@ -7,9 +7,6 @@ services:
             context: .
             args:
                 NODE_ENV: ${NODE_ENV:-production}
-        networks:
-            - default
-            - ft_transcendance
         ports:
             - 0.0.0.0:3000:3000
         env_file:
@@ -24,8 +21,6 @@ services:
             - ./tsconfig.json:/app/tsconfig.json
             - ./tsconfig.build.json:/app/tsconfig.build.json
             - ./config.json:/app/config.json
-        healthcheck:
-            disable: false
         restart: unless-stopped
 
     db:
@@ -38,6 +33,3 @@ services:
         ports:
             - "5432:5432"
 
-networks:
-    ft_transcendance:
-        external: false
