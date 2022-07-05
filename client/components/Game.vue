@@ -61,15 +61,15 @@ class Player {
 	size: Vector2D;
 
 	constructor(res: Vector2D, x: number) {
-		this.size = new Vector2D(20, 100);
+		this.size = new Vector2D(0.025 * res.y, 0.1 * res.y);
 		this.pos = new Vector2D(x, res.y / 2 - 100 / 2);
-		this.speed = 5;
+		this.speed = 7;
 	}
 
 	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D) {
-		if (vkUp && this.pos.y - this.speed > 10) {
+		if (vkUp && this.pos.y - this.speed > 40) {
 			this.pos.y -= this.speed;
-		} else if (vkDown && this.pos.y + this.speed < res.y - this.size.y - 10) {
+		} else if (vkDown && this.pos.y + this.speed < res.y - this.size.y - 40) {
 			this.pos.y += this.speed;
 		}
 	}
@@ -90,15 +90,22 @@ class Player {
 
 class Ball {
 	speed: number;
+	minspd: number;
+	maxspd: number;
 	pos: Vector2D;
 	dir: Vector2D;
 	size: Vector2D;
+	acc: number;
 	constructor(res: Vector2D) {
 		this.speed = 5;
 		// Set ball in middle of the screen
 		this.pos = new Vector2D(res.x / 2, res.y / 2);
+
 		this.dir = new Vector2D(this.speed, 0);
-		this.size = new Vector2D(20, 20);
+		this.size = new Vector2D(0.05 * res.y, 0.05 * res.y);
+		this.minspd = 5;
+		this.maxspd = 10;
+		this.acc = 0.05;
 	}
 
 	update(res: Vector2D, players: Array<Player>) {
@@ -126,38 +133,40 @@ class Ball {
 	}
 
 	rightVerticalCol(pad: Player) {
-		this.dir.x = -this.dir.x;
+		this.speed += this.acc;
+		this.dir.x = -this.dir.x * (1 + this.acc);
 		let part = 0;
 		if (
-			this.pos.y + this.dir.y + this.size.x / 2 > pad.pos.y + pad.size.y / 3 &&
-			this.pos.y + this.dir.y + this.size.x / 2 < pad.pos.y + (2 * pad.size.y) / 3
-		)
-			part = 1;
-		else if (this.pos.y + this.dir.y + this.size.x / 2 >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
-		if (part === 0) this.dir.y = -1;
-		else if (part === 1) this.dir.y = 0;
-		else this.dir.y = 1;
-	}
-
-	leftVerticalCol(pad: Player) {
-		this.dir.x = -this.dir.x;
-		let part = 0;
-		if (
-			this.pos.y + this.dir.y + this.size.x / 2 > pad.pos.y + pad.size.y / 3 &&
+			this.pos.y + this.dir.y > pad.pos.y + pad.size.y / 3 &&
 			this.pos.y + this.dir.y + this.size.x / 2 < pad.pos.y + (2 * pad.size.y) / 3
 		)
 			part = 1;
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
-		if (part === 0) this.dir.y = -1;
+		if (part === 0) this.dir.y = -1 * this.speed;
 		else if (part === 1) this.dir.y = 0;
-		else this.dir.y = 1;
+		else this.dir.y = 1 * this.speed;
+	}
+
+	leftVerticalCol(pad: Player) {
+		this.speed += this.acc;
+		this.dir.x = -this.dir.x * 1 + this.acc;
+		let part = 0;
+		if (
+			this.pos.y + this.dir.y + this.size.x > pad.pos.y + pad.size.y / 3 &&
+			this.pos.y + this.dir.y + this.size.x / 2 < pad.pos.y + (2 * pad.size.y) / 3
+		)
+			part = 1;
+		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
+		if (part === 0) this.dir.y = -1 * this.speed;
+		else if (part === 1) this.dir.y = 0;
+		else this.dir.y = 1 * this.speed;
 	}
 
 	topHorizontalCol(pad: Player) {
 		if (
 			intersect(
 				this.pos,
-				new Vector2D(this.pos.x + this.dir.x + this.size.x / 2, this.pos.y + this.dir.y + this.size.x / 2),
+				new Vector2D(this.pos.x + this.dir.x, this.pos.y + this.dir.y + this.size.x),
 				pad.pos,
 				new Vector2D(pad.pos.x + pad.size.x, pad.pos.y),
 			) === true
@@ -170,7 +179,7 @@ class Ball {
 		if (
 			intersect(
 				this.pos,
-				new Vector2D(this.pos.x + this.dir.x + this.size.x / 2, this.pos.y + this.dir.y + this.size.x / 2),
+				new Vector2D(this.pos.x + this.dir.x + this.size.x, this.pos.y + this.dir.y),
 				new Vector2D(pad.pos.x, pad.pos.y + pad.size.y),
 				new Vector2D(pad.pos.x + pad.size.x, pad.pos.y + pad.size.y),
 			) === true
@@ -186,12 +195,12 @@ class Ball {
 			this.pos.y + this.dir.y + this.size.x / 2 <= pad.pos.y + pad.size.y
 		) {
 			if (this.pos.x + this.size.x / 2 > res.x / 2) {
-				if (this.pos.x + this.size.x / 2 < pad.pos.x && this.pos.x + this.dir.x + this.size.x / 2 > pad.pos.x)
+				if (this.pos.x + this.dir.x < pad.pos.x && this.pos.x + this.dir.x + this.size.x > pad.pos.x)
 					this.rightVerticalCol(pad);
 			} else if (this.pos.x + this.size.x / 2 < res.x / 2) {
 				if (
-					this.pos.x + this.size.x / 2 > pad.pos.x + pad.size.x &&
-					this.pos.x + this.dir.x + this.size.x / 2 < pad.pos.x + pad.size.x
+					this.pos.x + this.size.x + this.dir.x > pad.pos.x + pad.size.x &&
+					this.pos.x + this.dir.x < pad.pos.x + pad.size.x
 				)
 					this.leftVerticalCol(pad);
 			}
@@ -204,6 +213,7 @@ class Ball {
 
 export default Vue.extend({
 	data: () => ({
+		ingame: false,
 		canvas: null as HTMLCanvasElement | null,
 		ctx: null as CanvasRenderingContext2D | null,
 		interval: 5,
@@ -264,11 +274,16 @@ export default Vue.extend({
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
 					this.ball.dir.y = 1;
+					if (this.ball.dir.x < 0) this.ball.dir.x = -5;
+					else this.ball.dir.x = 5;
+					this.ball.dir.x = 5;
 					this.ball.speed = 5;
 				} else if (this.ball.pos.x + this.ball.dir.x >= this.res.x) {
 					this.score_p1 += 1;
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
+					if (this.ball.dir.x < 0) this.ball.dir.x = -5;
+					else this.ball.dir.x = 5;
 					this.ball.dir.y = -1;
 					this.ball.speed = 5;
 				}
