@@ -22,4 +22,4 @@ cp api.env.sample api.env
 cp db.env.sample db.env
 
 # (re)Launch services.
-docker-compose restart $@ && docker-compose logs -f $@ --tail 10
+( docker-compose restart $@ && docker-compose logs -f $@ --tail 10 ) || docker-compose up $@
