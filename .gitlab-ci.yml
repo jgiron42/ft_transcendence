@@ -1,15 +1,15 @@
 stages:
-- build
-- lint_and_test
-- deploy
+  - build
+  - lint_and_test
+  - deploy
 
 image: node:17.4.0
 
 before_script:
-- cp .env.sample .env
-- cp api.env.sample api.env
-- cp db.env.sample db.env
-- cd $APP_NAME
+  - cp .env.sample .env
+  - cp api.env.sample api.env
+  - cp db.env.sample db.env
+  - cd $APP_NAME
 
 build_api_dev:
   stage: build
@@ -18,12 +18,12 @@ build_api_dev:
   cache:
     key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
-    - $APP_NAME/node_modules/
-    - $APP_NAME/dist/
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: push
   script:
-  - NODE_ENV=development npm install
-  - npm run build
+    - NODE_ENV=development npm install
+    - npm run build
 
 build_client_dev:
   stage: build
@@ -32,74 +32,74 @@ build_client_dev:
   cache:
     key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
-    - $APP_NAME/node_modules/
-    - $APP_NAME/dist/
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: push
   script:
-  - NODE_ENV=development npm install
-  - npm run build
+    - NODE_ENV=development npm install
+    - npm run build
 
 eslint_api:
   stage: lint_and_test
   cache:
     key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
-    - $APP_NAME/node_modules/
-    - $APP_NAME/dist/
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: pull
   variables:
     APP_NAME: api
   script:
-  - npm run lint
+    - npm run lint
   needs:
-  - build_api_dev
+    - build_api_dev
 
 eslint_client:
   stage: lint_and_test
   cache:
     key: "${CI_PIPELINE_IID}-${APP_NAME}"
     paths:
-    - $APP_NAME/node_modules/
-    - $APP_NAME/dist/
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: pull
   variables:
     APP_NAME: client
   script:
-  - npm run lint
+    - npm run lint
   needs:
-  - build_client_dev
+    - build_client_dev
 
 build_api_prod:
   stage: build
   image: docker:18.03
   services:
-  - name: docker:18.03-dind
-    command: ["--tls=false"]
-    alias: docker
+    - name: docker:18.03-dind
+      command: ["--tls=false"]
+      alias: docker
   variables:
     APP_NAME: api
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
-  # Build and push the image in the built-in gitlab docker registry
-  - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker push "$IMAGE_TAG"
+    # Build and push the image in the built-in gitlab docker registry
+    - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push "$IMAGE_TAG"
 
 build_client_prod:
   stage: build
   image: docker:18.03
   services:
-  - name: docker:18.03-dind
-    command: ["--tls=false"]
-    alias: docker
+    - name: docker:18.03-dind
+      command: ["--tls=false"]
+      alias: docker
   variables:
     APP_NAME: client
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
-  # Build and push the image in the built-in gitlab docker registry
-  - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker push "$IMAGE_TAG"
+    # Build and push the image in the built-in gitlab docker registry
+    - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push "$IMAGE_TAG"
 
 test_e2e_api:
   stage: lint_and_test
@@ -115,24 +115,24 @@ test_e2e_api:
     # so we get rid of it
     DUMMY_MOUNT: /disabled
   script:
-  # Pull the image from the built-in gitlab docker registry
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker pull "$IMAGE_TAG"
-  - docker tag "$IMAGE_TAG" "ft_transcendance_api:latest"
-  - cd ..
-  # Launch the required services
-  - docker-compose up -d api db
-  # Waiting for service to be up
-  - |
-    for i in $(seq 0 120)
-    do
-      docker-compose exec -T api curl --fail 127.0.0.1:3000>/dev/null 2>&1 && break
-      sleep 1
-    done
-  # Check if waiting loop ended because success or timeout
-  - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
+    # Pull the image from the built-in gitlab docker registry
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull "$IMAGE_TAG"
+    - docker tag "$IMAGE_TAG" "ft_transcendance_api:latest"
+    - cd ..
+    # Launch the required services
+    - docker-compose up -d api db
+    # Waiting for service to be up
+    - |
+      for i in $(seq 0 120)
+      do
+        docker-compose exec -T api curl --fail 127.0.0.1:3000>/dev/null 2>&1 && break
+        sleep 1
+      done
+    # Check if waiting loop ended because success or timeout
+    - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
   needs:
-  - build_api_prod
+   - build_api_prod
 
 test_e2e_client:
   stage: lint_and_test
@@ -146,24 +146,24 @@ test_e2e_client:
     IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
     DUMMY_MOUNT: /disabled
   script:
-  # Pull the image from the built-in gitlab docker registry
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker pull "$IMAGE_TAG"
-  - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
-  - cd ..
-  # Launch the required services
-  - docker-compose up -d client
-  # Waiting for service to be up
-  - |
-    for i in $(seq 0 120)
-    do
-      docker-compose exec -T client curl --fail 127.0.0.1:4000>/dev/null 2>&1 && break
-      sleep 1
-    done
-  # Check if waiting loop ended because success or timeout
-  - docker-compose exec -T client curl --fail 127.0.0.1:4000 || (docker-compose logs && exit 1)
+    # Pull the image from the built-in gitlab docker registry
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull "$IMAGE_TAG"
+    - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
+    - cd ..
+    # Launch the required services
+    - docker-compose up -d client
+    # Waiting for service to be up
+    - |
+      for i in $(seq 0 120)
+      do
+        docker-compose exec -T client curl --fail 127.0.0.1:4000>/dev/null 2>&1 && break
+        sleep 1
+      done
+    # Check if waiting loop ended because success or timeout
+    - docker-compose exec -T client curl --fail 127.0.0.1:4000 || (docker-compose logs && exit 1)
   needs:
-  - build_client_prod
+    - build_client_prod
 
 deploy_api:
   stage: deploy
