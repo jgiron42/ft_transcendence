@@ -34,10 +34,6 @@ services:
             - "api.env"
             - "db.env"
             - ".env"
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=ft_db
         volumes:
             # Mount code to avoid rebuild container to refresh code
             - ./api/src:/app/src
@@ -54,10 +50,6 @@ services:
         env_file:
             - "db.env"
             - ".env"
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=ft_db
         expose:
           - 5432
 
