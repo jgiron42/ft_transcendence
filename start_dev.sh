@@ -21,5 +21,6 @@ cp .env.sample .env
 cp api.env.sample api.env
 cp db.env.sample db.env
 
-# (re)Launch services.
-( docker-compose restart $@ && docker-compose logs -f $@ --tail 10 ) || docker-compose up $@
+# Can't use docker restart because I want to be able to use --build flags and logs attached out-of-the-box
+docker-compose down $@
+docker-compose up $@
