@@ -12,7 +12,7 @@ services:
         networks:
             - ft_transcendance
         ports:
-            - 127.0.0.1:4000:${CLIENT_PORT:-4000}
+            - 127.0.0.1:4000:4000
         env_file:
             - ".env"
         environment:
