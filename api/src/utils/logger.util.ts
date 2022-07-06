@@ -30,7 +30,7 @@ const format = winston.format.combine(
 	winston.format.colorize({ all: true }),
 	winston.format.printf(
 		(info: winston.Logform.TransformableInfo) =>
-			`[${info.level}] - ${colors.white(info.timestamp as string)} ${info.message}`,
+			`[${info.level}] - ${colors.white(info.timestamp as string)} ${info.message as string}`,
 	),
 );
 

@@ -16,6 +16,8 @@
 	},
 	"dependencies": {
 		"@nuxtjs/device": "^2.1.0",
+		"@nuxtjs/stylelint-module": "^4.1.0",
+		"@nuxtjs/tailwindcss": "^4.2.1",
 		"axios": "^0.27.2",
 		"cookie-universal-nuxt": "^2.2.1",
 		"core-js": "^3.19.3",
@@ -27,10 +29,7 @@
 		"vue-property-decorator": "^9.1.2",
 		"vue-server-renderer": "^2.6.14",
 		"vue-template-compiler": "^2.6.14",
-		"webpack": "^4.46.0",
-		"@nuxtjs/stylelint-module": "^4.1.0",
-		"@nuxtjs/tailwindcss": "^4.2.1",
-		"@nuxt/typescript-build": "^2.1.0"
+		"webpack": "^4.46.0"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.16.3",

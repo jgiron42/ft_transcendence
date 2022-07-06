@@ -164,6 +164,7 @@ export class ChannelsController {
 		@GetUser() user: User,
 	): Promise<object> {
 		message.channel = await this.channelService.getQuery().on_channel(user.id).getOneOrFail(id);
+		message.user = user.id;
 		return this.messageService.create(message);
 	}
 

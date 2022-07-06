@@ -14,7 +14,7 @@ import Vue from "vue";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
-	name: "ChatSelection",
+	name: "UsersInChannel",
 	data() {
 		return {
 			get chanConnections() {

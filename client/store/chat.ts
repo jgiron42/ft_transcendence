@@ -5,7 +5,8 @@ import { Channel } from "@/models/Channel";
 
 export interface ChatInterface {
 	me: User;
-	channels: Array<Channel>;
+	myChannels: Array<Channel>;
+	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
 	chanConnections: Array<ChanConnection>;
 }
@@ -13,9 +14,19 @@ export interface ChatInterface {
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
 export default class Chat extends VuexModule implements ChatInterface {
 	me: User = new User();
-	channels: Channel[] = [];
+	visibleChannels: Channel[] = [];
+	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
+
+	@Mutation
+	resetAll() {
+		this.me = new User();
+		this.visibleChannels = [];
+		this.myChannels = [];
+		this.currentChannel = new Channel();
+		this.chanConnections = [] as ChanConnection[];
+	}
 
 	@Mutation
 	updateMe(user: User) {
@@ -38,7 +49,21 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
-	updateChannels(chans: Channel[]) {
-		this.channels = chans;
+	updateVisibleChannels(chans: Channel[]) {
+		this.visibleChannels = chans;
+	}
+
+	@Mutation pushVisibleChannels(chan: Channel) {
+		this.visibleChannels.push(chan);
+	}
+
+	@Mutation
+	updateMyChannels(chans: Channel[]) {
+		this.myChannels = chans;
+	}
+
+	@Mutation
+	pushMyChannels(chan: Channel) {
+		this.myChannels.push(chan);
 	}
 }

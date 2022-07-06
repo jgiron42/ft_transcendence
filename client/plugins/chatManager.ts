@@ -11,7 +11,8 @@ interface chatInterface {
 	whoAmI(): Promise<User | undefined>;
 	createChannel(chan: Channel): void;
 	joinChannel(chan: Channel): Promise<Channel | undefined>;
-	getChannels(): void;
+	getVisibleChannels(): void;
+	getMyChannels(): void;
 	getChanConnections(): Promise<Array<ChanConnection> | undefined>;
 }
 
@@ -49,13 +50,23 @@ Vue.prototype.chat = <chatInterface>{
 			await Vue.prototype.api.get("/channels/" + chan.id, null, (d = { data: new Channel() }) => {
 				ret = d.data;
 				chatStore.updateCurrentChannel(d.data);
+				this.getChanConnections();
 			});
 		}
 		return ret;
 	},
-	async getChannels() {
+	async getVisibleChannels() {
 		await Vue.prototype.api.get("/channels", null, (r: { data: Channel[] }) => {
-			chatStore.updateChannels(r.data);
+			chatStore.updateVisibleChannels(r.data);
+		});
+	},
+	async getMyChannels() {
+		const id = await chatStore.me.id;
+		await Vue.prototype.api.get("/users/" + id + "/chan_connections", null, (r: { data: ChanConnection[] }) => {
+			chatStore.updateMyChannels([] as Channel[]);
+			for (const connection of r.data) {
+				chatStore.pushMyChannels(connection.channel);
+			}
 		});
 	},
 	async getChanConnections(): Promise<Array<ChanConnection> | undefined> {
@@ -73,7 +84,6 @@ Vue.prototype.chat = <chatInterface>{
 				chatStore.updateChanConnections(connections);
 			},
 		);
-
 		return ret;
 	},
 };

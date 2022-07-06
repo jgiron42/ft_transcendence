@@ -69,6 +69,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (usr) {
 			this.socketService.addClient(socket, usr);
 			await socket.join("realm");
+			socket.emit("Hello");
 			socket.emit("updateChannels");
 		} else {
 			this.socketService.sendError("User not found.");
@@ -101,7 +102,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				.getMany();
 			messages.sort((a: Message, b: Message): number => a.created_at.getTime() - b.created_at.getTime());
 			client.emit("JC", messages);
-			client.emit("updateUsers");
 		}
 	}
 
@@ -111,16 +111,4 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			await client.leave(chan.name);
 		}
 	}
-
-	// async getChannelBySocketId(socketId: string): Promise<Channel> {
-	// 	if (!this.channelMap.has(socketId)) {
-	// 		throw new Error("Socket not in channel");
-	// 	}
-	// 	const chanName = this.channelMap.get(socketId);
-	// 	const chan = await this.findByName(chanName);
-	// 	if (!chan) {
-	// 		throw new Error("Channel not found");
-	// 	}
-	// 	return chan;
-	// }
 }

@@ -43,6 +43,10 @@ export default Vue.extend({
 			this.messages.push(message);
 		});
 	},
+	destroyed() {
+		this.$nuxt.$off("JC");
+		this.$nuxt.$off("MSG");
+	},
 });
 </script>
 

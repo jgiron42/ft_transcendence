@@ -1,18 +1,47 @@
 <template>
 	<div id="chat-selection" class="h-full" :class="isOnChannel ? 'on-channel' : ''">
-		<button class="chan-text items-center cut-text w-95 btn pr-3 pl-3" @click="$modal.show('create_channel')">
-			Create a channel
-		</button>
-		<div v-for="(chan, index) of channels" :key="index">
+		<div class="flex flex-row">
+			<div id="channel-title" class="pl-11 w-full text-center mt-auto mb-auto">Channels</div>
 			<button
-				class="chan-name cut-text btn text-left"
-				:class="chan.id == currentChannel.id ? 'selected' : ''"
-				@click="joinChannel(chan)"
+				id="channel-creation"
+				class="items-center cut-text w-95 btn pr-3 pl-3"
+				@click="$modal.show('create_channel')"
 			>
-				#
-				<b>{{ chan.name }}</b>
+				+
 			</button>
 		</div>
+		<div class="flex flex-col">
+			<div class="flex pb-2">
+				<button
+					class="btn-group btn-left"
+					:class="selection === 0 ? 'btn-selected' : ''"
+					@click.prevent="selection = 0"
+				>
+					mine
+				</button>
+				<button
+					class="btn-group btn-right"
+					:class="selection === 1 ? 'btn-selected' : ''"
+					@click.prevent="selection = 1"
+				>
+					list
+				</button>
+			</div>
+			<!--UsersInChannel v-if="selection === 0" :socket="socket" />
+			<AdminPanel v-if="selection === 1" /-->
+		</div>
+		<ListChannels
+			v-if="selection === 0"
+			:channels="myChannels"
+			:current-channel="currentChannel"
+			:join-channel="joinChannel"
+		/>
+		<ListChannels
+			v-if="selection === 1"
+			:channels="visibleChannels"
+			:current-channel="currentChannel"
+			:join-channel="joinChannel"
+		/>
 	</div>
 </template>
 
@@ -22,7 +51,7 @@ import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
-	name: "ChatSelection",
+	name: "ChannelSelection",
 	props: {
 		socket: {
 			type: Object,
@@ -39,12 +68,16 @@ export default Vue.extend({
 	},
 	data() {
 		return {
-			get channels() {
-				return chatStore.channels;
+			get visibleChannels() {
+				return chatStore.visibleChannels;
+			},
+			get myChannels() {
+				return chatStore.myChannels;
 			},
 			get currentChannel() {
 				return chatStore.currentChannel;
 			},
+			selection: 0,
 		};
 	},
 	mounted() {
@@ -60,14 +93,24 @@ export default Vue.extend({
 			this.onUpdateChannels();
 		});
 	},
+	destroyed() {
+		this.$nuxt.$off("updateChannels");
+	},
 	methods: {
-		onUpdateChannels() {
-			this.chat.getChannels();
+		async onUpdateChannels() {
+			await this.chat.getMyChannels();
+			if (this.myChannels.length === 0 && this.visibleChannels.length === 0) {
+				this.selection = 1;
+			}
+			this.chat.getVisibleChannels();
 		},
 		async joinChannel(chan: Channel) {
 			const tmp = await this.chat.joinChannel(chan);
 			if (tmp) {
-				this.socket.emit("JC", tmp.id);
+				await Vue.prototype.api.get("/channels/" + chan.id, null, (d = { data: new Channel() }) => {
+					chatStore.updateCurrentChannel(d.data);
+					this.socket.emit("JC", tmp.id);
+				});
 			}
 		},
 	},
@@ -140,5 +183,19 @@ export default Vue.extend({
 
 .selected {
 	background-color: #424242;
+}
+
+#channel-title {
+	vertical-align: middle;
+	color: #d5d5d5;
+}
+
+#channel-creation {
+	height: fit-content;
+	font-size: 30px;
+	font-family: Arial, sans-serif;
+	color: white;
+	width: 45px;
+	flex-shrink: 0;
 }
 </style>

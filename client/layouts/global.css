@@ -25,3 +25,25 @@ html {
 	height: fit-content !important;
 	padding-bottom: 10px;
 }
+
+.btn-group {
+	color: #95b5df;
+	font: 1em "Open Sans", sans-serif;
+	width: 100%;
+	background-color: #364157;
+	align-content: center;
+	padding: 10px;
+}
+
+.btn-left {
+	border-radius: 10px 0 0 10px;
+}
+
+.btn-right {
+	border-radius: 0 10px 10px 0;
+}
+
+.btn-selected {
+	background-color: #97add9;
+	color: #2c3548;
+}
