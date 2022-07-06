@@ -41,8 +41,7 @@ services:
             - ./api/tsconfig.build.json:/app/tsconfig.build.json
             - ./api/config.json:/app/config.json
         restart: unless-stopped
-        depends_on:
-          - "db"
+        depends_on: [db]
 
     db:
         image: postgres:14.1-alpine
@@ -63,6 +62,7 @@ services:
             - ./pgadmin:/var/lib/pgadmin:rw
         expose:
             - 80
+        depends_on: [db]
 
     proxy:
         image: nginx
@@ -88,3 +88,4 @@ services:
             - SSL_NGINX_OPTIONS=/etc/letsencrypt/options-ssl-nginx.conf
             - SSL_NGINX_DHPARAM=/etc/letsencrypt/ssl-dhparams.pem
         restart: always
+        depends_on: [client] # NGINX wont boot if client can't be resolved
