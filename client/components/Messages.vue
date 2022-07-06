@@ -19,7 +19,6 @@
 import Vue from "vue";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
-import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "Messages",
