@@ -69,6 +69,7 @@ export default Vue.extend({
 	data() {
 		return {
 			get visibleChannels() {
+				console.log(JSON.stringify(chatStore.visibleChannels));
 				return chatStore.visibleChannels;
 			},
 			get myChannels() {
