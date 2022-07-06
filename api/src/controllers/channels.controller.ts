@@ -74,11 +74,16 @@ export class ChannelsController {
 	@Post()
 	@UsePipes(getValidationPipe(Channel))
 	async create(@MyRequestPipe(...getPostPipeline(Channel)) channel: Channel, @GetUser() user: User) {
-		channel.owner = user;
 		if (channel.type === ChannelType.DM) throw new BadRequestException("use user/:id/dm to create a dm channel");
 		if (channel.type === ChannelType.PASSWORD)
 			channel.password = await ChannelService.hashPassword(channel.password);
-		return this.channelService.create(channel);
+		const chan = await this.channelService.create(channel);
+		await this.chanConnectionService.create({
+			user: { id: user.id },
+			channel: { id: chan.id },
+			role: ChannelRole.OWNER,
+		});
+		return chan;
 	}
 
 	/**
@@ -216,7 +221,7 @@ export class ChannelsController {
 	}
 
 	/**
-	 * create an invitation for a channel if the user is on this channel
+	 * ban a user from a channel if the user is admin on this channel
 	 */
 	@Post(":chan_id/ban/:user_id")
 	@UsePipes(getValidationPipe(ChanInvitation))

@@ -1,9 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { User } from "@entities/user.entity";
-import { Validate } from "class-validator";
-import { UserExistsRule } from "@src/validators/userExist.validator";
-import { setService } from "@utils/setFinalType.decorator";
-import { UserService } from "@services/user.service";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { SetMode } from "@utils/set-mode";
 
 // entity use to describe the channel
@@ -44,12 +39,12 @@ export class Channel {
 	@SetMode("cu")
 	password: string;
 
-	// owner  (and creator) of the channel
-	@ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE", nullable: true })
-	@Validate(UserExistsRule) // class-validator
-	@setService(UserService)
-	@SetMode("ru")
-	owner: User | string;
+	// // owner  (and creator) of the channel
+	// @ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE", nullable: true })
+	// @Validate(UserExistsRule) // class-validator
+	// @setService(UserService)
+	// @SetMode("ru")
+	// owner: User | string;
 
 	// date of the message
 	@Column()

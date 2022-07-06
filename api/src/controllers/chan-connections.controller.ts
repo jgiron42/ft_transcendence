@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	Controller,
 	Delete,
 	Get,
@@ -14,7 +15,7 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { MyRequestPipe } from "@utils/myRequestPipe";
 import { getPutPipeline } from "@utils/getPutPipeline";
-import { ChanConnection } from "@entities/chan_connection.entity";
+import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 import { GetUser } from "@utils/get-user";
@@ -38,11 +39,13 @@ export class ChanConnectionsController {
 		@MyRequestPipe(...getPutPipeline(ChanConnection)) chanConnection: ChanConnection,
 		@GetUser() user: User,
 	) {
+		if (chanConnection.role === ChannelRole.OWNER)
+			throw new BadRequestException("You can't change the role to owner");
 		await this.chanConnectionService.getQuery().connection_chan_admin(user.id).update(chanConnection, id);
 	}
 
 	@Delete(":id")
 	remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return this.chanConnectionService.getQuery().connection_owner(user.id).remove(id);
+		return this.chanConnectionService.getQuery().user(user.id).remove(id);
 	}
 }

@@ -9,8 +9,7 @@ export class ChannelQuery extends QueryCooker<Channel> {
 			entityRepository,
 			entityRepository
 				.createQueryBuilder("channel")
-				.leftJoin(ChanConnection, "chan_connection", "chan_connection.channelId = channel.id")
-				.leftJoinAndSelect("channel.owner", "user"),
+				.leftJoin(ChanConnection, "chan_connection", "chan_connection.channelId = channel.id"),
 		);
 	}
 
@@ -21,7 +20,6 @@ export class ChannelQuery extends QueryCooker<Channel> {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
 				qb
-					.where(`channel.owner = :${this.newId}`, { [this.currentId]: userId })
 					.orWhere(
 						new Brackets((qb2) => {
 							qb2.where(`chan_connection.userId = :${this.newId}`, { [this.currentId]: userId }).andWhere(
@@ -41,7 +39,12 @@ export class ChannelQuery extends QueryCooker<Channel> {
 	 * select only the channels owned by userId
 	 */
 	own_channel(userId: string) {
-		this.query = this.query.andWhere(`channel.owner = :${this.newId}`, { [this.currentId]: userId });
+		const alias = `chan_connection${this.newId}`;
+
+		this.query = this.query
+			.leftJoin(ChanConnection, alias, `${alias}.channelId = channel.id`)
+			.andWhere(`${alias}.userId = :${this.newId}`, { [this.currentId]: userId })
+			.andWhere(`${alias} = :ownerType`, { ownerType: ChannelRole.OWNER });
 		return this;
 	}
 
