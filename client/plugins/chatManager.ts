@@ -57,7 +57,7 @@ Vue.prototype.chat = <chatInterface>{
 	},
 	async getVisibleChannels() {
 		await Vue.prototype.api.get("/channels", null, (r: { data: Channel[] }) => {
-			chatStore.updateVisibleChannels(r.data);
+			if (r.data instanceof Array) chatStore.updateVisibleChannels(r.data);
 		});
 	},
 	async getMyChannels() {
