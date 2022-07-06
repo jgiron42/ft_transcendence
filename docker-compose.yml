@@ -18,7 +18,7 @@ services:
             - WSS_BASE_URL=${WSS_BASE_URL-wss://localhost:8080/api}
         volumes:
             # Mount code to avoid rebuild container to refresh code
-            - ${DUMMY_MOUNT:-./client:/app/client} # DUMMY_MOUNT allows to disable the volume
+            - ${DUMMY_MOUNT:-./client:/app/} # DUMMY_MOUNT allows to disable the volume
             # Ignore node_modules/
             - /app/node_modules
         restart: unless-stopped
