@@ -43,6 +43,6 @@ export class GameService {
 	}
 
 	update(id: number, game: Game) {
-		return this.getQuery().update(id, game);
+		return this.getQuery().update(game, id);
 	}
 }

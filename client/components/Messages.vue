@@ -36,10 +36,6 @@ export default Vue.extend({
 			this.messages = messages;
 		});
 		this.$nuxt.$on("MSG", (message: Message) => {
-			const u = new User();
-			u.id = message.user as string;
-			u.username = message.user as string;
-			message.user = u;
 			this.messages.push(message);
 		});
 	},

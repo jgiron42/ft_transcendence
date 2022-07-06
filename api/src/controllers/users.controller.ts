@@ -69,7 +69,7 @@ export class UsersController {
 		@MyRequestPipe(...getPutPipeline(User)) user: User,
 		@GetUser() requestUser: User,
 	) {
-		await this.userService.getQuery().is(requestUser.id).update(id, user);
+		await this.userService.getQuery().is(requestUser.id).update(user, id);
 	}
 
 	/**
@@ -107,7 +107,7 @@ export class UsersController {
 		// if the chan does not exist yet, create it and put the users in it
 		if (!chan) {
 			chan = await this.channelService.getQuery().create({ type: ChannelType.DM, name: `${user.id} - ${id}` });
-			await this.chanConnectionService.getQuery().create({ channel: chan, user });
+			await this.chanConnectionService.getQuery().create({ channel: chan, user: { id: user.id } });
 			await this.chanConnectionService.getQuery().create({ channel: chan, user: { id } });
 		}
 		return chan;

@@ -47,6 +47,6 @@ export class UserService implements resourceService<User> {
 	}
 
 	update(id: string, user: User) {
-		return this.getQuery().update(id, user);
+		return this.getQuery().update(user, id);
 	}
 }

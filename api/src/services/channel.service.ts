@@ -61,6 +61,6 @@ export class ChannelService {
 	}
 
 	update(id: number, channel: Channel) {
-		return this.getQuery().update(id, channel);
+		return this.getQuery().update(channel, id);
 	}
 }

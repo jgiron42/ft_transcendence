@@ -78,8 +78,10 @@ export default Vue.extend({
 			});
 		});
 		this.socket.on("Hello", async () => {
-			const tmp = await this.chat.joinChannel(this.currentChannel);
-			if (tmp) this.socket.emit("JC", tmp.id);
+			if (this.currentChannel !== undefined && this.currentChannel.id !== undefined) {
+				const tmp = await this.chat.joinChannel(this.currentChannel);
+				if (tmp) this.socket.emit("JC", tmp.id);
+			}
 		});
 		this.socket.on("connect", () => {
 			this.$nuxt.$emit("initSocket");

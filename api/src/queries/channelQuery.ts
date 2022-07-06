@@ -1,4 +1,4 @@
-import { ChanConnection } from "@entities/chan_connection.entity";
+import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { Channel, ChannelType } from "@entities/channel.entity";
 import { Brackets, Repository } from "typeorm";
 import { QueryCooker } from "@src/queries/QueryCooker";
@@ -22,7 +22,14 @@ export class ChannelQuery extends QueryCooker<Channel> {
 			new Brackets((qb) =>
 				qb
 					.where("channel.owner = :userid1", { userid1: userId })
-					.orWhere("chan_connection.userId = :userid2", { userid2: userId })
+					.orWhere(
+						new Brackets((qb2) => {
+							qb2.where("chan_connection.userId = :userid2", { userid2: userId }).andWhere(
+								"chan_connection.role <> :bannedType",
+								{ bannedType: ChannelRole.BANNED },
+							);
+						}),
+					)
 					.orWhere("channel.type = :visibleType1", { visibleType1: ChannelType.PUBLIC })
 					.orWhere("channel.type = :visibleType2", { visibleType2: ChannelType.PASSWORD }),
 			),
@@ -42,7 +49,9 @@ export class ChannelQuery extends QueryCooker<Channel> {
 	 * select only the channels in which userId is
 	 */
 	on_channel(userId: string) {
-		this.query = this.query.andWhere("chan_connection.userId = :userid4", { userid4: userId });
+		this.query = this.query
+			.andWhere("chan_connection.userId = :userid4", { userid4: userId })
+			.andWhere("chan_connection.role <> :bannedType", { bannedType: ChannelRole.BANNED });
 		return this;
 	}
 

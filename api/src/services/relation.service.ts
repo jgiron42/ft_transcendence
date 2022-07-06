@@ -41,7 +41,7 @@ export class RelationService {
 	}
 
 	update(id: number, relation: QueryDeepPartialEntity<Relation>) {
-		return this.getReq().update(id, relation);
+		return this.getReq().update(relation, id);
 	}
 	findByUser(id: string): Promise<Relation[]> {
 		return this.getReq().in_relation(id).getMany();
