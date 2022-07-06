@@ -21,10 +21,10 @@ export class ChannelQuery extends QueryCooker<Channel> {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
 				qb
-					.where("channel.owner = :userid1", { userid1: userId })
+					.where(`channel.owner = :${this.newId}`, { [this.currentId]: userId })
 					.orWhere(
 						new Brackets((qb2) => {
-							qb2.where("chan_connection.userId = :userid2", { userid2: userId }).andWhere(
+							qb2.where(`chan_connection.userId = :${this.newId}`, { [this.currentId]: userId }).andWhere(
 								"chan_connection.role <> :bannedType",
 								{ bannedType: ChannelRole.BANNED },
 							);
@@ -41,7 +41,7 @@ export class ChannelQuery extends QueryCooker<Channel> {
 	 * select only the channels owned by userId
 	 */
 	own_channel(userId: string) {
-		this.query = this.query.andWhere("channel.owner = :userid3", { userid3: userId });
+		this.query = this.query.andWhere(`channel.owner = :${this.newId}`, { [this.currentId]: userId });
 		return this;
 	}
 
@@ -49,9 +49,13 @@ export class ChannelQuery extends QueryCooker<Channel> {
 	 * select only the channels in which userId is
 	 */
 	on_channel(userId: string) {
+		const chan_connection = `chan_connection${this.newId}`;
 		this.query = this.query
-			.andWhere("chan_connection.userId = :userid4", { userid4: userId })
-			.andWhere("chan_connection.role <> :bannedType", { bannedType: ChannelRole.BANNED });
+			.leftJoin(ChanConnection, chan_connection, `${chan_connection}.channelId = channel.id`)
+			.andWhere(`${chan_connection}.userId = :${this.newId}`, {
+				[this.currentId]: userId,
+			})
+			.andWhere(`${chan_connection}.role <> :bannedType`, { bannedType: ChannelRole.BANNED });
 		return this;
 	}
 

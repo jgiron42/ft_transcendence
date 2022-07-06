@@ -16,24 +16,24 @@ export class RelationService {
 		Container.set(this.constructor, this);
 	}
 
-	getReq() {
+	getQuery() {
 		return new RelationQuery(this.RelationRepository);
 	}
 
 	findAll(userId: string, page = 1, itemByPage = 10): Promise<Relation[]> {
-		return this.getReq().in_relation(userId).paginate(page, itemByPage).getMany();
+		return this.getQuery().in_relation(userId).paginate(page, itemByPage).getMany();
 	}
 
 	findOne(id: number): Promise<Relation> {
-		return this.getReq().getOne(id);
+		return this.getQuery().getOne(id);
 	}
 
 	async remove(id: number): Promise<void> {
-		await this.getReq().remove(id);
+		await this.getQuery().remove(id);
 	}
 
 	create(relation: DeepPartial<Relation>) {
-		return this.getReq().create(relation);
+		return this.getQuery().create(relation);
 	}
 
 	async save(relation: Relation): Promise<Relation> {
@@ -41,9 +41,9 @@ export class RelationService {
 	}
 
 	update(id: number, relation: QueryDeepPartialEntity<Relation>) {
-		return this.getReq().update(relation, id);
+		return this.getQuery().update(relation, id);
 	}
 	findByUser(id: string): Promise<Relation[]> {
-		return this.getReq().in_relation(id).getMany();
+		return this.getQuery().in_relation(id).getMany();
 	}
 }

@@ -207,10 +207,11 @@ export class ChannelsController {
 		@Param("user_id") userId: string,
 		@GetUser() user: User,
 	): Promise<object> {
-		return this.chanInvitationService.create({
+		await this.channelService.getQuery().on_channel(user.id).getOneOrFail(chanId);
+		return this.chanInvitationService.getQuery().findOrCreate({
 			user: { id: userId },
-			channel: await this.channelService.getQuery().on_channel(user.id).getOneOrFail(chanId),
-			invited_by: user,
+			channel: { id: chanId },
+			invited_by: { id: user.id },
 		});
 	}
 
