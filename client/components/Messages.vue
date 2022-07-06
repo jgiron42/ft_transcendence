@@ -19,7 +19,6 @@
 import Vue from "vue";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
-import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "Messages",
@@ -36,12 +35,12 @@ export default Vue.extend({
 			this.messages = messages;
 		});
 		this.$nuxt.$on("MSG", (message: Message) => {
-			const u = new User();
-			u.id = message.user as string;
-			u.username = message.user as string;
-			message.user = u;
 			this.messages.push(message);
 		});
+	},
+	destroyed() {
+		this.$nuxt.$off("JC");
+		this.$nuxt.$off("MSG");
 	},
 });
 </script>

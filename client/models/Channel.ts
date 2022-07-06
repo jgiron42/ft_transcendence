@@ -2,6 +2,7 @@ import { User } from "@/models/User";
 
 export enum ChannelType {
 	PUBLIC,
+	PASSWORD,
 	PRIVATE,
 	DM,
 }

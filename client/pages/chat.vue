@@ -29,7 +29,7 @@
 			</button>
 		</div>
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-			<ChatSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
+			<ChannelSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
 			<Chatbox v-if="isOnChannel" :socket="socket" />
 			<ChannelProperties v-if="showUsers && isOnChannel" />
 			<Popup name="create_channel" component="ChannelCreation" />
@@ -39,11 +39,13 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Channel } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "Chat",
+	middleware: ["getUser", "auth"],
 	data() {
 		return {
 			socket: this.$nuxtSocket({
@@ -57,7 +59,6 @@ export default Vue.extend({
 				autoConnect: true,
 				transports: ["websocket"],
 				teardown: false,
-				forceNew: false,
 			}),
 			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
@@ -75,24 +76,37 @@ export default Vue.extend({
 			this.socket.emit("HC", {
 				token: this.$cookies.get("connect.sid"),
 			});
-			this.chat.whoAmI();
+		});
+		this.socket.on("Hello", async () => {
+			if (this.currentChannel !== undefined && this.currentChannel.id !== undefined) {
+				const tmp = await this.chat.joinChannel(this.currentChannel);
+				if (tmp) this.socket.emit("JC", tmp.id);
+			}
 		});
 		this.socket.on("connect", () => {
 			this.$nuxt.$emit("initSocket");
 		});
 		this.socket.on("updateChannels", () => {
 			this.$nuxt.$emit("updateChannels");
+			this.chat.getChanConnections();
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			this.$nuxt.$emit("JC", messages);
-			this.chat.getChanConnections();
+			this.$nuxt.$emit("updateChannels");
+		});
+		this.$nuxt.$on("createChannel", async (chan: Channel) => {
+			const c = await this.chat.joinChannel(chan);
+			if (c) this.socket.emit("JC", c.id);
 		});
 		this.socket.on("updateUsers", () => {
-			// TODO: emit event to notify others components to update users list etc...
+			this.chat.getChanConnections();
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.$nuxt.$emit("MSG", message);
 		});
+	},
+	destroyed() {
+		this.socket.disconnect();
 	},
 	methods: {
 		onShowChannels() {

@@ -57,7 +57,10 @@ export default Vue.extend({
 			if (this.selectedType !== ChannelType.PRIVATE) this.channel.password = "";
 		},
 		createChannel() {
-			this.api.post("/channels", this.channel, null, () => this.$modal.hide("create_channel"));
+			this.api.post("/channels", this.channel, null, (r: { data: Channel }) => {
+				this.$nuxt.$emit("createChannel", r.data);
+				this.$modal.hide("create_channel");
+			});
 		},
 	},
 });
