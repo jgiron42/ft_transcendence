@@ -1,5 +1,9 @@
 <template>
-	<div id="admin-panel" class="h-full">Admin panel</div>
+	<div id="admin-panel" class="h-full">
+		<ArrowDropdown name="admins list" />
+		<ArrowDropdown name="banned users" />
+		<ArrowDropdown name="mute users" />
+	</div>
 </template>
 
 <script lang="ts">

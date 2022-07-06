@@ -60,6 +60,11 @@ export default Vue.extend({
 			},
 		};
 	},
+	mounted() {
+		this.$nuxt.$on("JC", () => {
+			this.selection = 0;
+		});
+	},
 	methods: {
 		checkOwner(): boolean {
 			if (this.currentChannel.owner === undefined) return false;

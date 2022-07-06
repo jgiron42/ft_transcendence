@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ChanConnection } from "@entities/chan_connection.entity";
+import { ChannelRole } from "@entities/chan_connection.entity";
+import { User } from "@entities/user.entity";
 import { Container } from "typedi";
 import { ChanConnectionQuery } from "@src/queries/chanConnectionQuery";
 import { DeepPartial } from "typeorm/common/DeepPartial";
@@ -31,6 +33,9 @@ export class ChanConnectionService {
 
 	create(chanConnection: DeepPartial<ChanConnection>): Promise<ChanConnection> {
 		const connection = this.ChanConnectionRepository.create(chanConnection);
+		if (chanConnection.user.id === (chanConnection.channel.owner as User).id) {
+			connection.role = ChannelRole.OWNER;
+		}
 		this.socketService.sendMessage("updateUsers", null, connection.channel.name);
 		return this.save(connection);
 	}
