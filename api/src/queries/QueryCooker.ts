@@ -4,14 +4,31 @@ import { EntityInterface } from "@src/types/entityInterface";
 import { PaginatedResponse } from "@src/types/paginated-response";
 import { DeepPartial } from "typeorm/common/DeepPartial";
 
+function* idGen(prefix = "id"): Generator<string, string, boolean> {
+	let i = 0;
+	while (true) if (!(yield `${prefix}${i}`)) i++;
+}
+
 /**
  * wrapper of Repository and SelectQueryBuilder Used to provide a better interface to typeorm. this class is specially
  * designed to be extended by another class that provide methods to apply filters by editing the query property. (eg: MessageQuery)
  */
 export class QueryCooker<Entity extends EntityInterface> {
 	private per_page: number;
+	private getid: Generator<string, string, boolean>;
 
-	constructor(private entityRepository: Repository<Entity>, public query: SelectQueryBuilder<Entity>) {}
+	protected get newId(): string {
+		return this.getid.next().value;
+	}
+
+	protected get currentId(): string {
+		// tell getid to reuse the same id
+		return this.getid.next(true).value;
+	}
+
+	constructor(private entityRepository: Repository<Entity>, public query: SelectQueryBuilder<Entity>) {
+		this.getid = idGen("generatedId");
+	}
 
 	paginate(page = 1, itemByPage = 10) {
 		this.per_page = itemByPage;
@@ -45,6 +62,14 @@ export class QueryCooker<Entity extends EntityInterface> {
 
 	async create(value: DeepPartial<Entity>) {
 		return await this.entityRepository.save(this.entityRepository.create(value));
+	}
+
+	async findOrCreate(value: DeepPartial<Entity>) {
+		// TODO: redo this method
+		return (
+			(await this.entityRepository.findOneBy(value)) ??
+			(await this.entityRepository.save(this.entityRepository.create(value)))
+		);
 	}
 
 	async remove(id?: Entity["id"]) {

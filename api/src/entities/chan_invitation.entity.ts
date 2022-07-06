@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm";
 import { Channel } from "@entities/channel.entity";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -11,6 +11,7 @@ import { User } from "./user.entity";
 // entity use to manage the channel invitation
 
 @Entity()
+@Unique("unique_invitation", ["channel", "user", "invited_by"])
 export class ChanInvitation {
 	constructor() {
 		this.created_at = new Date();

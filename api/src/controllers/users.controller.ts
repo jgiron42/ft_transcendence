@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Post, Put, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+	BadRequestException,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Put,
+	UseFilters,
+	UseGuards,
+	UseInterceptors,
+} from "@nestjs/common";
 import { UserService } from "@services/user.service";
 import { DevelopmentGuard } from "@src/guards/development.guard";
 import { GameService } from "@services/game.service";
@@ -84,13 +94,26 @@ export class UsersController {
 	}
 
 	@Post(":id/invite_friend")
-	inviteFriend(@Param("id") id: string, @GetUser() user: User): Promise<object> {
-		return this.relationService.create({ type: RelationType.FRIEND_REQUEST, owner: user, target: { id } });
+	async inviteFriend(@Param("id") id: string, @GetUser() user: User): Promise<object> {
+		if (
+			await this.relationService
+				.getQuery()
+				.in_relation(id)
+				.in_relation(user.id)
+				.type(RelationType.FRIEND)
+				.getOne()
+		)
+			throw new BadRequestException("Friendship already exists");
+		return this.relationService
+			.getQuery()
+			.findOrCreate({ type: RelationType.FRIEND_REQUEST, owner: { id: user.id }, target: { id } });
 	}
 
 	@Post(":id/block")
 	block(@Param("id") id: string, @GetUser() user: User): Promise<object> {
-		return this.relationService.create({ type: RelationType.BLOCK, owner: user, target: { id } });
+		return this.relationService
+			.getQuery()
+			.findOrCreate({ type: RelationType.BLOCK, owner: { id: user.id }, target: { id } });
 	}
 
 	/**
@@ -136,7 +159,7 @@ export class UsersController {
 		@PerPage() per_page: number,
 	): Promise<PaginatedResponse<Relation>> {
 		return this.relationService
-			.getReq()
+			.getQuery()
 			.in_relation(user.id)
 			.in_relation(id)
 			.paginate(page, per_page)

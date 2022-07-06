@@ -43,7 +43,7 @@ export class RelationsController {
 		@PerPage() per_page: number,
 		@GetUser() user: User,
 	): Promise<PaginatedResponse<Relation>> {
-		return await this.relationService.getReq().see_relation(user.id).paginate(page, per_page).getManyAndCount();
+		return await this.relationService.getQuery().see_relation(user.id).paginate(page, per_page).getManyAndCount();
 	}
 
 	/**
@@ -51,7 +51,7 @@ export class RelationsController {
 	 */
 	@Get(":id")
 	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
-		return this.relationService.getReq().see_relation(user.id).getOne(id);
+		return this.relationService.getQuery().see_relation(user.id).getOne(id);
 	}
 
 	/**
@@ -71,7 +71,7 @@ export class RelationsController {
 	@Post(":id/accept_friend")
 	async accept(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
 		await this.relationService
-			.getReq()
+			.getQuery()
 			.target(user.id)
 			.type(RelationType.FRIEND_REQUEST)
 			.update({ type: RelationType.FRIEND }, id);
@@ -82,6 +82,6 @@ export class RelationsController {
 	 */
 	@Delete(":id")
 	remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return this.relationService.getReq().see_relation(user.id).remove(id);
+		return this.relationService.getQuery().see_relation(user.id).remove(id);
 	}
 }
