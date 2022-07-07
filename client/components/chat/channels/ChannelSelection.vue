@@ -35,12 +35,14 @@
 			:channels="myChannels"
 			:current-channel="currentChannel"
 			:join-channel="joinChannel"
+			chan-type="own"
 		/>
 		<ListChannels
 			v-if="selection === 1"
 			:channels="visibleChannels"
 			:current-channel="currentChannel"
 			:join-channel="joinChannel"
+			chan-type=""
 		/>
 	</div>
 </template>
@@ -69,7 +71,6 @@ export default Vue.extend({
 	data() {
 		return {
 			get visibleChannels() {
-				console.log(JSON.stringify(chatStore.visibleChannels));
 				return chatStore.visibleChannels;
 			},
 			get myChannels() {

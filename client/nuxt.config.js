@@ -28,9 +28,6 @@ export default {
 		{ src: "@/plugins/chatManager", mode: "client" },
 	],
 
-	// Auto import components: https://go.nuxtjs.dev/config-components
-	components: true,
-
 	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
 	buildModules: [
 		// https://go.nuxtjs.dev/typescript
@@ -62,5 +59,8 @@ export default {
 
 	env: {
 		apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
+	},
+	components: {
+		dirs: ["~/components", "~/components/chat", "~/components/chat/channels", "~/components/chat/users"],
 	},
 };

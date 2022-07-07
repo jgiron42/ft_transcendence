@@ -1,10 +1,11 @@
 import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 import { User } from "@/models/User";
-import { ChanConnection } from "@/models/ChanConnection";
+import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Channel } from "@/models/Channel";
 
 export interface ChatInterface {
 	me: User;
+	roleOnCurrentChannel: ChannelRole;
 	myChannels: Array<Channel>;
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
@@ -14,6 +15,7 @@ export interface ChatInterface {
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
 export default class Chat extends VuexModule implements ChatInterface {
 	me: User = new User();
+	roleOnCurrentChannel: ChannelRole = ChannelRole.USER;
 	visibleChannels: Channel[] = [];
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
@@ -31,6 +33,11 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	updateMe(user: User) {
 		this.me = user;
+	}
+
+	@Mutation
+	updateMyRole(role: ChannelRole) {
+		this.roleOnCurrentChannel = role;
 	}
 
 	@Mutation

@@ -78,6 +78,9 @@ Vue.prototype.chat = <chatInterface>{
 			(r: { data: ChanConnection[] }) => {
 				const connections = [] as ChanConnection[];
 				r.data.forEach((connection: ChanConnection) => {
+					if (connection.user.id === chatStore.me.id) {
+						chatStore.updateMyRole(connection.role);
+					}
 					connections.push(connection);
 				});
 				ret = connections;
