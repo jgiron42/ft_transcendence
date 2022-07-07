@@ -1,11 +1,6 @@
 <template>
 	<div id="user-selection" class="h-full">
-		<div v-for="(connection, index) of chanConnections" :key="index">
-			<!--button class="user-name cut-text btn text-left" @click="$modal.show('user_profile')"-->
-			<button class="user-name cut-text btn text-left">
-				<b>{{ connection.user.username }} {{ connection.role }}</b>
-			</button>
-		</div>
+		<ListUsers :connections="chanConnections" />
 	</div>
 </template>
 
@@ -19,9 +14,6 @@ export default Vue.extend({
 		return {
 			get chanConnections() {
 				return chatStore.chanConnections;
-			},
-			get me() {
-				return chatStore.me;
 			},
 		};
 	},

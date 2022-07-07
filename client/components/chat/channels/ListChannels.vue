@@ -53,7 +53,9 @@ export default Vue.extend({
 	methods: {
 		leaveChannel(chanId: number) {
 			this.api.post("/channels/" + chanId + "/leave", null, null, () => {
-				chatStore.resetCurrentChannel();
+				if (chanId === chatStore.currentChannel.id) {
+					chatStore.resetCurrentChannel();
+				}
 				this.$nuxt.$emit("updateChannels");
 			});
 		},

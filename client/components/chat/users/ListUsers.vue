@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div v-for="(connection, index) of connections" :key="index">
-			<button class="user-button cut-text btn text-left" @click="click">
+			<button class="user-button cut-text btn text-left" :class="margin ? 'pad-left' : ''" @click="click">
 				<b>{{ connection.user.username }} {{ connection.role }}</b>
 			</button>
 		</div>
@@ -22,17 +22,25 @@ export default Vue.extend({
 			type: Function,
 			default: () => {},
 		},
+		margin: {
+			type: Boolean,
+			default: false,
+		},
 	},
 });
 </script>
 
 <style scoped>
 .user-button {
-	padding-left: 28px;
+	padding-left: 0.75em;
 	color: #bdbdbd;
 	font: 0.9em "Open Sans", sans-serif;
 	width: 100%;
 	border-radius: 5px;
+}
+
+.pad-left {
+	padding-left: 28px;
 }
 
 .user-button:hover {
