@@ -56,28 +56,35 @@ Vue.prototype.chat = <chatInterface>{
 		return ret;
 	},
 	async getVisibleChannels() {
-		await Vue.prototype.api.get("/channels", null, (r: { data: Channel[] }) => {
+		await Vue.prototype.api.get("/channels", { page: 1, per_page: 100 }, (r: { data: Channel[] }) => {
 			if (r.data instanceof Array) chatStore.updateVisibleChannels(r.data);
 		});
 	},
 	async getMyChannels() {
 		const id = await chatStore.me.id;
-		await Vue.prototype.api.get("/users/" + id + "/chan_connections", null, (r: { data: ChanConnection[] }) => {
-			chatStore.updateMyChannels([] as Channel[]);
-			for (const connection of r.data) {
-				chatStore.pushMyChannels(connection.channel);
-			}
-		});
+		await Vue.prototype.api.get(
+			"/users/" + id + "/chan_connections",
+			{ page: 1, per_page: 100 },
+			(r: { data: ChanConnection[] }) => {
+				chatStore.updateMyChannels([] as Channel[]);
+				for (const connection of r.data) {
+					chatStore.pushMyChannels(connection.channel);
+				}
+			},
+		);
 	},
 	async getChanConnections(): Promise<Array<ChanConnection> | undefined> {
 		let ret: Array<ChanConnection> | undefined;
 		if (chatStore.currentChannel.id === undefined) return ret;
 		await Vue.prototype.api.get(
 			"/channels/" + chatStore.currentChannel.id + "/chan_connections",
-			null,
+			{ page: 1, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
 				const connections = [] as ChanConnection[];
 				r.data.forEach((connection: ChanConnection) => {
+					if (connection.user.id === chatStore.me.id) {
+						chatStore.updateMyRole(connection.role);
+					}
 					connections.push(connection);
 				});
 				ret = connections;

@@ -22,7 +22,6 @@
 					/>
 				</svg>
 			</button>
-			<!--button id="join" class="btn pr-3 pl-3" @click.prevent="joinRealm">Join..</button-->
 		</div>
 	</div>
 </template>

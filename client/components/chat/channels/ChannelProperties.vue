@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { User } from "@/models/User";
+import { ChannelRole } from "@/models/ChanConnection";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
@@ -58,6 +58,9 @@ export default Vue.extend({
 			get me() {
 				return chatStore.me;
 			},
+			get myRole() {
+				return chatStore.roleOnCurrentChannel;
+			},
 		};
 	},
 	mounted() {
@@ -67,8 +70,7 @@ export default Vue.extend({
 	},
 	methods: {
 		checkOwner(): boolean {
-			if (this.currentChannel.owner === undefined) return false;
-			return this.me.id === (this.currentChannel.owner as User).id;
+			return this.myRole === ChannelRole.OWNER;
 		},
 	},
 });

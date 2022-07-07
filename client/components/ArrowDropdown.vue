@@ -1,5 +1,5 @@
 <template>
-	<button class="arrow-button" @click="onClick">
+	<li class="arrow-button" @click="onClick">
 		<div class="flex w-full">
 			<svg
 				class="arrow-panel"
@@ -17,7 +17,7 @@
 			</svg>
 			<b>{{ name }}</b>
 		</div>
-	</button>
+	</li>
 </template>
 
 <script>
@@ -31,6 +31,10 @@ export default Vue.extend({
 			default: () => "",
 			required: true,
 		},
+		click: {
+			type: Function,
+			default: () => {},
+		},
 	},
 	data() {
 		return {
@@ -40,6 +44,7 @@ export default Vue.extend({
 	methods: {
 		onClick() {
 			this.selected = !this.selected;
+			this.click();
 		},
 	},
 });
@@ -49,14 +54,13 @@ export default Vue.extend({
 .arrow-button {
 	font: 1em "Open Sans", sans-serif;
 	width: 100%;
-	padding: 3px;
-	border-radius: 5px;
-	margin-bottom: 5px;
+	padding: 3px 3px 0;
 	color: #96989d;
 }
 
 .arrow-button:hover {
 	color: white;
+	cursor: pointer;
 }
 
 .arrow-panel:hover {
