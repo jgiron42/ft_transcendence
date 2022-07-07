@@ -15,7 +15,10 @@
 				<button
 					class="btn-group btn-left"
 					:class="selection === 0 ? 'btn-selected' : ''"
-					@click.prevent="selection = 0"
+					@click.prevent="
+						selection = 0;
+						showInvitations = false;
+					"
 				>
 					mine
 				</button>
@@ -30,6 +33,13 @@
 			<!--UsersInChannel v-if="selection === 0" :socket="socket" />
 			<AdminPanel v-if="selection === 1" /-->
 		</div>
+		<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" />
+		<ListChannels
+			v-if="selection === 0 && showInvitations && invitations.length !== 0"
+			:channels="invitations"
+			chan-type="invitation"
+		/>
+		<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
 		<ListChannels
 			v-if="selection === 0"
 			:channels="myChannels"
@@ -79,7 +89,12 @@ export default Vue.extend({
 			get currentChannel() {
 				return chatStore.currentChannel;
 			},
+			get invitations() {
+				// TODO: get invitations on chatStore
+				return [];
+			},
 			selection: 0,
+			showInvitations: false,
 		};
 	},
 	mounted() {
@@ -114,6 +129,9 @@ export default Vue.extend({
 					this.socket.emit("JC", tmp.id);
 				});
 			}
+		},
+		onShowInvitations() {
+			this.showInvitations = !this.showInvitations;
 		},
 	},
 });
@@ -199,5 +217,10 @@ export default Vue.extend({
 	color: white;
 	width: 45px;
 	flex-shrink: 0;
+}
+
+.empty-text {
+	color: #d5d5d5;
+	padding-left: 28px;
 }
 </style>
