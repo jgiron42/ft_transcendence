@@ -31,6 +31,14 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 	}
 
 	/**
+	 * same as channel exclude banned connections
+	 */
+	notBan() {
+		this.query = this.query.andWhere("chan_connection.role <> :bannedType", { bannedType: ChannelRole.BANNED });
+		return this;
+	}
+
+	/**
 	 * select only the connections visible by userId
 	 */
 	see_connection(userId: string) {
@@ -43,7 +51,14 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 						.orWhere("channel.type = :visibleType", { visibleType: ChannelType.PUBLIC });
 				}),
 			)
-			.andWhere("chan_connection.role <> :bannedType", { bannedType: ChannelRole.BANNED });
+			// exclude banned connections
+			.andWhere(
+				new Brackets((qb) => {
+					qb.where(`other_chan_connection.role = :ownerType`, { ownerType: ChannelRole.OWNER })
+						.orWhere(`other_chan_connection.role = :adminType`, { adminType: ChannelRole.ADMIN })
+						.orWhere("chan_connection.role <> :bannedType", { bannedType: ChannelRole.BANNED });
+				}),
+			);
 		return this;
 	}
 

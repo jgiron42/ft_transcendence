@@ -140,6 +140,12 @@ export class ChannelsController {
 		return this.chanConnectionService.create({ user, channel });
 	}
 
+	@Post(":id/leave")
+	@UseGuards(DevelopmentGuard)
+	async leaveChannel(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
+		return await this.chanConnectionService.getQuery().channel(id).user(user.id).notBan().remove();
+	}
+
 	/**
 	 * return all messages from a channel if the user is on this channel
 	 */

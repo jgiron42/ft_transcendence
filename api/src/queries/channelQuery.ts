@@ -44,7 +44,7 @@ export class ChannelQuery extends QueryCooker<Channel> {
 		this.query = this.query
 			.leftJoin(ChanConnection, alias, `${alias}.channelId = channel.id`)
 			.andWhere(`${alias}.userId = :${this.newId}`, { [this.currentId]: userId })
-			.andWhere(`${alias} = :ownerType`, { ownerType: ChannelRole.OWNER });
+			.andWhere(`${alias}.role = :ownerType`, { ownerType: ChannelRole.OWNER });
 		return this;
 	}
 
