@@ -10,7 +10,7 @@
 						</div>
 					</div>
 				</button>
-				<button v-if="chanType === 'own'" class="w-4 h-3" @click.prevent="test(chan.id)">
+				<button v-if="chanType === 'own'" class="w-4 h-3" @click.prevent="leaveChannel(chan.id)">
 					<svg version="1.1" viewBox="0 0 1000 1000" height="10px">
 						<g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">
 							<path
@@ -28,6 +28,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Channel } from "@/models/Channel";
+import { chatStore } from "@/store/";
 
 export default Vue.extend({
 	name: "ListChannels",
@@ -50,8 +51,11 @@ export default Vue.extend({
 		},
 	},
 	methods: {
-		test(chanId: number) {
-			console.log(chanId);
+		leaveChannel(chanId: number) {
+			this.api.post("/channels/" + chanId + "/leave", null, null, () => {
+				chatStore.resetCurrentChannel();
+				this.$nuxt.$emit("updateChannels");
+			});
 		},
 	},
 });
