@@ -19,6 +19,20 @@ class Vector2D {
 	}
 }
 
+// Vector quadratic
+class Vector4D {
+	x: number;
+	y: number;
+	z: number;
+	w: number;
+	constructor(x: number, y: number, z: number, w: number) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+	}
+}
+
 // check if q is on Segment pr
 function onSegment(p: Vector2D, q: Vector2D, r: Vector2D) {
 	if (
@@ -59,18 +73,34 @@ class Player {
 	pos: Vector2D;
 	speed: number;
 	size: Vector2D;
+	minmaxVel: Vector4D;
+	vel: Vector2D;
+	acc: number;
 
 	constructor(res: Vector2D, x: number) {
 		this.size = new Vector2D(0.025 * res.y, 0.1 * res.y);
 		this.pos = new Vector2D(x, res.y / 2 - 100 / 2);
+		this.minmaxVel = new Vector4D(1.0, 1.0, 3.0, 3.0);
 		this.speed = 7;
+		this.vel = new Vector2D(0, 0);
+		this.acc = 0.2;
 	}
 
 	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D) {
 		if (vkUp && this.pos.y - this.speed > 40) {
 			this.pos.y -= this.speed;
+			if (this.vel.y + this.acc <= this.minmaxVel.w) this.vel.y += this.acc;
+			if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
 		} else if (vkDown && this.pos.y + this.speed < res.y - this.size.y - 40) {
 			this.pos.y += this.speed;
+			if (this.vel.y + this.acc <= this.minmaxVel.w) this.vel.y += this.acc;
+			if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
+		}
+		if (!vkUp && !vkDown) {
+			this.vel.y = this.minmaxVel.y;
+			this.vel.x = this.minmaxVel.x;
+		} else {
+			this.speed = 7;
 		}
 	}
 
@@ -149,7 +179,7 @@ class Ball {
 
 	leftVerticalCol(pad: Player) {
 		this.speed += this.acc;
-		this.dir.x = -this.dir.x * 1 + this.acc;
+		this.dir.x = -this.dir.x * 1 + this.acc * pad.vel.x;
 		let part = 0;
 		if (
 			this.pos.y + this.dir.y + this.size.x > pad.pos.y + pad.size.y / 3 &&
@@ -159,7 +189,7 @@ class Ball {
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
 		if (part === 0) this.dir.y = -1 * this.speed;
 		else if (part === 1) this.dir.y = 0;
-		else this.dir.y = 1 * this.speed;
+		else this.dir.y = 1 * this.speed * pad.vel.y;
 	}
 
 	topHorizontalCol(pad: Player) {
@@ -304,6 +334,10 @@ export default Vue.extend({
 				// Update ball
 				this.ball.update(this.res, this.players);
 			}
+			if (this.score_p1 == 11 || this.score_p2 == 11) {
+				this.score_p1 = 0;
+				this.score_p2 = 0;
+			}
 		},
 		// display background, playground and scores
 		clear() {
@@ -317,9 +351,9 @@ export default Vue.extend({
 				this.ctx.font = "100px roboto";
 				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - this.res.x / 4 - 25, 200);
 				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + this.res.x / 4 - 25, 200);
-				for (let i = 0; i < (this.res.y / 2) * 24; i++) {
+				for (let i = 0; i < (this.res.y / 2); i++) {
 					if (i % 2) {
-						this.ctx.fillRect(this.res.x / 2 - 7, i * 20 + 10, 10, 20);
+						this.ctx.fillRect(this.res.x / 2 , i * 20, 10, 20);
 					}
 				}
 			}
