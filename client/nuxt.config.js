@@ -40,8 +40,22 @@ export default {
 	css: ["~/layouts/global.css"],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
-	modules: [],
+	modules: ["@nuxtjs/axios"],
 
+	axios: {
+		baseURL: process.env.baseURL || "http://localhost:4000", // Used as fallback if no runtime config is provided
+	},
+	publicRuntimeConfig: {
+		axios: {
+			browserBaseURL: process.env.BROWSER_BASE_URL + "/api" || "http://localhost:4000",
+		},
+	},
+
+	privateRuntimeConfig: {
+		axios: {
+			baseURL: process.env.BASE_URL,
+		},
+	},
 	io: {},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
