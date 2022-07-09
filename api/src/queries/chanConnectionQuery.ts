@@ -12,6 +12,7 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 				.leftJoinAndSelect("chan_connection.user", "user")
 				.leftJoinAndSelect("chan_connection.channel", "channel"),
 		);
+		this.sort("chan_connection.created_at", "DESC");
 	}
 
 	/**

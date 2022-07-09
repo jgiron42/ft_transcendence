@@ -12,6 +12,7 @@ export class InviteQuery extends QueryCooker<ChanInvitation> {
 				.leftJoinAndSelect("invitation.user", "invited")
 				.leftJoinAndSelect("invitation.channel", "channel"),
 		);
+		this.sort("invitation.created_at", "DESC");
 	}
 
 	/**

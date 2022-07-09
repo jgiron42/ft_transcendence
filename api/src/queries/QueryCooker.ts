@@ -30,6 +30,10 @@ export class QueryCooker<Entity extends EntityInterface> {
 		this.getid = idGen("generatedId");
 	}
 
+	sort(sort: string, order?: "ASC" | "DESC", nulls?: "NULLS FIRST" | "NULLS LAST") {
+		this.query = this.query.orderBy(sort, order, nulls);
+	}
+
 	paginate(page = 1, itemByPage = 10) {
 		this.per_page = itemByPage;
 		this.query = this.query.skip((page - 1) * itemByPage).take(itemByPage);

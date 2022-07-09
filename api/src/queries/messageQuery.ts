@@ -13,6 +13,7 @@ export class MessageQuery extends QueryCooker<Message> {
 				.leftJoinAndSelect("message.user", "user")
 				.leftJoinAndSelect("message.channel", "channel"),
 		);
+		this.sort("message.created_at", "ASC");
 	}
 
 	/**

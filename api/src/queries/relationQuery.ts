@@ -11,6 +11,7 @@ export class RelationQuery extends QueryCooker<Relation> {
 				.leftJoinAndSelect("relation.owner", "owner")
 				.leftJoinAndSelect("relation.target", "target"),
 		);
+		this.sort("relation.created_at", "DESC");
 	}
 
 	/**

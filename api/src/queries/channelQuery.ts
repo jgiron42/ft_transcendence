@@ -11,6 +11,7 @@ export class ChannelQuery extends QueryCooker<Channel> {
 				.createQueryBuilder("channel")
 				.leftJoin(ChanConnection, "chan_connection", "chan_connection.channelId = channel.id"),
 		);
+		this.sort("channel.created_at", "DESC");
 	}
 
 	/**
