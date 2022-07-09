@@ -1,12 +1,16 @@
 <template>
 	<div id="admin-panel" class="h-full">
 		<ArrowDropdown name="admins list" :click="onShowAdmin" />
-		<ListUsers v-if="showAdmin && adminConnections.length !== 0" :connections="adminConnections" />
+		<ListUsers v-if="showAdmin && adminConnections.length !== 0" :connections="adminConnections" :margin="true" />
 		<ArrowDropdown name="banned users" :click="onShowBanned" />
-		<ListUsers v-if="showBanned && bannedConnections.length !== 0" :connections="bannedConnections" />
+		<ListUsers
+			v-if="showBanned && bannedConnections.length !== 0"
+			:connections="bannedConnections"
+			:margin="true"
+		/>
 		<div v-else-if="showBanned" class="empty-text">No banned users.</div>
 		<ArrowDropdown name="muted users" :click="onShowMuted" />
-		<ListUsers v-if="showMuted && mutedConnections.length !== 0" :connections="mutedConnections" />
+		<ListUsers v-if="showMuted && mutedConnections.length !== 0" :connections="mutedConnections" :margin="true" />
 		<div v-else-if="showMuted" class="empty-text">No muted users.</div>
 	</div>
 </template>

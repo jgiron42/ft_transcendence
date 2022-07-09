@@ -27,7 +27,14 @@
 			</div>
 			<UsersInChannel v-if="selection === 0" :socket="socket" />
 			<AdminPanel v-if="selection === 1" />
-			<div v-if="selection === 2">test</div>
+			<ArrowDropdown v-if="selection === 2" name="invitations" :click="onShowInvitations" />
+			<ListUsers
+				v-if="selection === 2 && showInvitations && invitations.length !== 0"
+				:connections="invitations"
+				:margin="true"
+			/>
+			<div v-else-if="selection === 2 && showInvitations" class="empty-text">No invitations.</div>
+			<div v-if="selection === 2">Friends..</div>
 		</div>
 	</div>
 </template>
@@ -52,6 +59,7 @@ export default Vue.extend({
 	data() {
 		return {
 			selection: 0,
+			showInvitations: false,
 			get currentChannel() {
 				return chatStore.currentChannel;
 			},
@@ -60,6 +68,10 @@ export default Vue.extend({
 			},
 			get myRole() {
 				return chatStore.roleOnCurrentChannel;
+			},
+			get invitations() {
+				// TODO: get friends invitations on chatStore
+				return [];
 			},
 		};
 	},
@@ -71,6 +83,9 @@ export default Vue.extend({
 	methods: {
 		checkOwner(): boolean {
 			return this.myRole === ChannelRole.OWNER;
+		},
+		onShowInvitations() {
+			this.showInvitations = !this.showInvitations;
 		},
 	},
 });

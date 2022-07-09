@@ -31,6 +31,12 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
+	resetCurrentChannel() {
+		this.currentChannel = new Channel();
+		this.roleOnCurrentChannel = ChannelRole.USER;
+	}
+
+	@Mutation
 	updateMe(user: User) {
 		this.me = user;
 	}
