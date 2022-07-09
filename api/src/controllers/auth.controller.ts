@@ -19,6 +19,7 @@ import { LoggedGuard } from "@guards/logged.guard";
 import { antiAuthFilter } from "@filters/antiAuth.filter";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
 import { DevelopmentGuard } from "@guards/development.guard";
+import config from "@config/api.config"
 
 @Controller("auth")
 @UseGuards(LoggedGuard)
@@ -30,11 +31,11 @@ export class AuthController {
 	@Get()
 	login(): string {
 		return (
-			'<form action="/auth/42" method="POST">' +
+			'<form action="auth/42" method="POST">' +
 			'<label for="submit1">42 auth</label>' +
 			'<input type="submit" id="submit1" value="submit">' +
 			" </form>" +
-			'<form action="/auth/totp" method="POST">' +
+			'<form action="auth/totp" method="POST">' +
 			'<label for="totp">totp auth</label>' +
 			'<input type="text" name="code" id="totp">' +
 			'<input type="submit" id="submit2" value="submit">' +
@@ -47,17 +48,18 @@ export class AuthController {
 	 */
 	@Post("logout")
 	@UseGuards(...SessionGuard)
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	logout(@Session() ses: SessionT) {
 		this.authService.logout(ses);
 	}
+
 
 	/**
 	 * Route to login with the 42 OAuth
 	 */
 	@Post("42")
 	@UseGuards(AuthGuard("42"))
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	ftAuth() {
 		return "not reached";
 	}
@@ -67,10 +69,12 @@ export class AuthController {
 	 */
 	@Get("42")
 	@UseGuards(AuthGuard("42"))
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	callback(@Session() ses: Record<string, any>, @Req() req: Request) {
 		ses.user = req.user;
 		ses.ftIdentified = Date.now();
+		console.log("ses:", ses);
+		return req.session;
 	}
 
 	/**
@@ -78,7 +82,7 @@ export class AuthController {
 	 * @apiParam {String} code the totp token
 	 */
 	@Post("totp")
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	@UseGuards(SessionGuardFt, AuthGuard("totp"))
 	totpAuth(@Session() ses: Record<string, any>) {
 		ses.totpIdentified = true;

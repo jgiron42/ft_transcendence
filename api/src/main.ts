@@ -15,6 +15,7 @@ import { useContainer } from "class-validator";
 	// Enable session
 	app.use(
 		session({
+			name: "NESTJS_SESSION_ID",
 			secret: "my-secret", // TODO: voir la doc
 			resave: false,
 			saveUninitialized: false,
