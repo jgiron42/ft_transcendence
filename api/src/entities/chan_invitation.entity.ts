@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn } from "typeorm";
 import { Channel } from "@entities/channel.entity";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -13,9 +13,6 @@ import { User } from "./user.entity";
 @Entity()
 @Unique("unique_invitation", ["channel", "user", "invited_by"])
 export class ChanInvitation {
-	constructor() {
-		this.created_at = new Date();
-	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -40,7 +37,7 @@ export class ChanInvitation {
 	channel: Channel;
 
 	// date of invitation
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }

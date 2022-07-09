@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
 
@@ -15,7 +15,6 @@ export class User {
 		this.totp_enabled = false;
 		this.totp_key = "";
 		this.status = 0;
-		this.created_at = new Date();
 	}
 	@PrimaryColumn()
 	@SetMode("cr")
@@ -57,7 +56,7 @@ export class User {
 	totp_key: string;
 
 	// date of registration of the user
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }

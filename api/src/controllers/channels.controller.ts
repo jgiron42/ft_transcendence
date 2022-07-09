@@ -174,7 +174,7 @@ export class ChannelsController {
 		@Param("id", ParseIntPipe) id: number,
 		@GetUser() user: User,
 	): Promise<object> {
-		message.channel = await this.channelService.getQuery().on_channel(user.id).getOneOrFail(id);
+		message.channel = await this.channelService.getQuery().can_talk(user.id).getOneOrFail(id);
 		message.user = user;
 		return this.messageService.create(message);
 	}
@@ -227,10 +227,9 @@ export class ChannelsController {
 	}
 
 	/**
-	 * ban a user from a channel if the user is admin on this channel
+	 * ban a user from a channel if the current user is admin on this channel
 	 */
 	@Post(":chan_id/ban/:user_id")
-	@UsePipes(getValidationPipe(ChanInvitation))
 	async ban(
 		@Param("chan_id", ParseIntPipe) chanId: number,
 		@Param("user_id") userId: string,
@@ -242,5 +241,41 @@ export class ChannelsController {
 			.channel(chanId)
 			.user(userId)
 			.update({ role: ChannelRole.BANNED });
+	}
+
+	/**
+	 * mute a user on a channel if the current user is admin on this channel
+	 */
+	@Post(":chan_id/mute/:user_id")
+	async mute(
+		@Param("chan_id", ParseIntPipe) chanId: number,
+		@Param("user_id") userId: string,
+		@Query("duration") duration = new Date(8640000000000000), // default to max timestamp ("infinite" mute)
+		@GetUser() user: User,
+	): Promise<void> {
+		await this.chanConnectionService
+			.getQuery()
+			.connection_chan_admin(user.id)
+			.channel(chanId)
+			.user(userId)
+			.update({ mute_end: duration });
+	}
+
+	/**
+	 * unmute a user on a channel if the current user is admin on this channel
+	 */
+	@Post(":chan_id/unmute/:user_id")
+	async unmute(
+		@Param("chan_id", ParseIntPipe) chanId: number,
+		@Param("user_id") userId: string,
+		@GetUser() user: User,
+	): Promise<void> {
+		await this.chanConnectionService
+			.getQuery()
+			.connection_chan_admin(user.id)
+			.channel(chanId)
+			.user(userId)
+			.mute()
+			.update({ mute_end: null });
 	}
 }

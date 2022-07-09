@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Channel } from "@entities/channel.entity";
 import { Expose } from "class-transformer";
@@ -18,8 +18,6 @@ export enum ChannelRole {
 export class ChanConnection {
 	constructor() {
 		this.role = ChannelRole.USER;
-		this.muted = false;
-		this.created_at = new Date();
 	}
 
 	@PrimaryGeneratedColumn()
@@ -45,17 +43,13 @@ export class ChanConnection {
 	@SetMode("cru")
 	role: ChannelRole;
 
-	// use to know if the user is mute in the channel
-	@Column()
-	@SetMode("cru")
-	muted: boolean;
-
 	// date to know the end of the mute
 	@Column({ nullable: true })
 	@SetMode("cru")
 	mute_end: Date;
 
 	// date of the message
-	@Column()
+	@CreateDateColumn()
+	@SetMode("r")
 	created_at: Date;
 }

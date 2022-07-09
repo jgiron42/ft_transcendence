@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Validate } from "class-validator";
 import { UserExistsRule } from "@src/validators/userExist.validator";
@@ -17,7 +17,6 @@ export class Game {
 		this.user_two = new User();
 		this.finished = false;
 		this.type = 0;
-		this.created_at = new Date();
 	}
 
 	@PrimaryGeneratedColumn()
@@ -59,7 +58,7 @@ export class Game {
 	finished: boolean;
 
 	// date begin of game
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }

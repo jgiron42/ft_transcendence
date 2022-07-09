@@ -39,6 +39,11 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 		return this;
 	}
 
+	mute() {
+		this.query = this.query.andWhere("chan_connection.mute_end > :date", { date: new Date() });
+		return this;
+	}
+
 	/**
 	 * select only the connections visible by userId
 	 */

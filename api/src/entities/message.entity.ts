@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from "typeorm";
 import { Channel } from "@entities/channel.entity";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -9,9 +9,6 @@ import { User } from "./user.entity";
 
 @Entity()
 export class Message {
-	constructor() {
-		this.created_at = new Date();
-	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -33,7 +30,7 @@ export class Message {
 	content: string;
 
 	// date of the message
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 import { SetMode } from "@utils/set-mode";
 
 // entity use to describe the channel
@@ -15,7 +15,6 @@ export class Channel {
 	constructor() {
 		this.type = ChannelType.PUBLIC;
 		this.password = "";
-		this.created_at = new Date();
 	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
@@ -39,14 +38,8 @@ export class Channel {
 	@SetMode("cu")
 	password: string;
 
-	// // owner  (and creator) of the channel
-	// @ManyToOne(() => User, (owner) => owner.id, { eager: true, onDelete: "CASCADE", nullable: true })
-	// @Validate(UserExistsRule) // class-validator
-	// @setService(UserService)
-	// @SetMode("ru")
-	// owner: User | string;
-
 	// date of the message
-	@Column()
+	@CreateDateColumn()
+	@SetMode("r")
 	created_at: Date;
 }

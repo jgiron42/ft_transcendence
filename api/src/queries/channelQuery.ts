@@ -64,6 +64,27 @@ export class ChannelQuery extends QueryCooker<Channel> {
 	}
 
 	/**
+	 * select only the channels in which userId is
+	 */
+	can_talk(userId: string) {
+		const chan_connection = `chan_connection${this.newId}`;
+		this.query = this.query
+			.leftJoin(ChanConnection, chan_connection, `${chan_connection}.channelId = channel.id`)
+			.andWhere(`${chan_connection}.userId = :${this.newId}`, {
+				[this.currentId]: userId,
+			})
+			.andWhere(`${chan_connection}.role <> :bannedType`, { bannedType: ChannelRole.BANNED })
+			.andWhere(
+				new Brackets((qb) => {
+					qb.where(`${chan_connection}.mute_end IS NULL`).orWhere(`${chan_connection}.mute_end < :now`, {
+						now: new Date(),
+					});
+				}),
+			);
+		return this;
+	}
+
+	/**
 	 * select only the channels of type type
 	 */
 	type(type: ChannelType) {

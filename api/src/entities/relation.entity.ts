@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn } from "typeorm";
 import { User } from "@entities/user.entity";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -15,9 +15,6 @@ export enum RelationType {
 @Entity()
 @Unique("unique_relation", ["owner", "target", "type"])
 export class Relation {
-	constructor() {
-		this.created_at = new Date();
-	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -43,6 +40,7 @@ export class Relation {
 	type: RelationType;
 
 	// date of creation
-	@Column()
+	@CreateDateColumn()
+	@SetMode("r")
 	created_at: Date;
 }
