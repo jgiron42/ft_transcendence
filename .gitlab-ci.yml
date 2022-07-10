@@ -1,129 +1,127 @@
 stages:
   - build
-  - lint
-  - build_prod
-  - test
+  - lint_and_test
   - deploy
 
 image: node:17.4.0
 
-cache: &global_cache
-  key: "${CI_PIPELINE_IID}-${stage}"
-  paths:
-    - $stage/node_modules/
-    - $stage/dist/
-    - $stage/docker_images/
-
 before_script:
-  - cd $stage
+  - cp .env.sample .env
+  - cp api.env.sample api.env
+  - cp db.env.sample db.env
+  - cd $APP_NAME
 
-build_api:
+build_api_dev:
   stage: build
   variables:
-    stage: api
+    APP_NAME: api
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
+    paths:
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: push
   script:
     - NODE_ENV=development npm install
-    #- cp config-sample.json config.json
     - npm run build
 
-build_client:
+build_client_dev:
   stage: build
   variables:
-    stage: client
+    APP_NAME: client
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
+    paths:
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: push
   script:
-    - mv .env-prod .env
     - NODE_ENV=development npm install
-    - npm run generate
+    - npm run build
 
 eslint_api:
-  stage: lint
+  stage: lint_and_test
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
+    paths:
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: pull
   variables:
-    stage: api
+    APP_NAME: api
   script:
-    #- cp config-sample.json config.json
     - npm run lint
   needs:
-    - build_api
+    - build_api_dev
 
 eslint_client:
-  stage: lint
+  stage: lint_and_test
   cache:
-    <<: *global_cache
+    key: "${CI_PIPELINE_IID}-${APP_NAME}"
+    paths:
+      - $APP_NAME/node_modules/
+      - $APP_NAME/dist/
     policy: pull
   variables:
-    stage: client
+    APP_NAME: client
   script:
     - npm run lint
   needs:
-    - build_client
+    - build_client_dev
 
-build_prod_api:
-  stage: build_prod
+build_api_prod:
+  stage: build
   image: docker:18.03
   services:
     - name: docker:18.03-dind
       command: ["--tls=false"]
       alias: docker
-  cache:
-    <<: *global_cache
-    policy: push
   variables:
-    stage: api
+    APP_NAME: api
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
-    - current_time="$(date +%s)"
-    - echo "Version $current_time"
-    - docker build --tag "api:$current_time" --build-arg "buildtarget=production" .
-    #  Save image to cached path
-    - mkdir -p docker_images
-    - docker image save "api:$current_time" -o "docker_images/api.docker"
+    # Build and push the image in the built-in gitlab docker registry
+    - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push "$IMAGE_TAG"
 
-build_prod_client:
-  stage: build_prod
+build_client_prod:
+  stage: build
   image: docker:18.03
   services:
     - name: docker:18.03-dind
       command: ["--tls=false"]
       alias: docker
-  cache:
-    <<: *global_cache
-    policy: push
   variables:
-    stage: client
+    APP_NAME: client
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
   script:
-    - current_time="$(date +%s)"
-    - echo "Version $current_time"
-    - docker build --tag "client:$current_time" --build-arg "buildtarget=production" .
-    #  Save image to cached path
-    - mkdir -p docker_images
-    - docker image save "client:$current_time" -o "docker_images/client.docker"
-
+    # Build and push the image in the built-in gitlab docker registry
+    - docker build --tag "$IMAGE_TAG" --build-arg "NODE_ENV=production" .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push "$IMAGE_TAG"
 
 test_e2e_api:
-  stage: test
-  image: docker:20.10.6
-  cache:
-    <<: *global_cache
-    policy: pull
+  stage: lint_and_test
+  image: docker/compose
   services:
     - name: docker:18.03-dind
       command: ["--tls=false"]
       alias: docker
   variables:
-    stage: api
+    APP_NAME: api
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
+    # Volume is broken when the image didn't build in the same job,
+    # so we get rid of it
+    DUMMY_MOUNT: /disabled
   script:
+    # Pull the image from the built-in gitlab docker registry
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull "$IMAGE_TAG"
+    - docker tag "$IMAGE_TAG" "ft_transcendance_api:latest"
     - cd ..
-    - apk add docker-compose
-    - cp .env.prod .env; cp api.env.sample api.env; cp db.env.sample db.env; true
-    - docker-compose up -d api db  # db
+    # Launch the required services
+    - docker-compose up -d api db
     # Waiting for service to be up
     - |
       for i in $(seq 0 120)
@@ -133,26 +131,28 @@ test_e2e_api:
       done
     # Check if waiting loop ended because success or timeout
     - docker-compose exec -T api curl --fail 127.0.0.1:3000 || (docker-compose logs && exit 1)
-  # needs:
-  # - build_prod_api
+  needs:
+   - build_api_prod
 
 test_e2e_client:
-  stage: test
-  image: docker:20.10.6
-  cache:
-    <<: *global_cache
-    policy: pull
+  stage: lint_and_test
+  image: docker/compose
   services:
     - name: docker:18.03-dind
       command: ["--tls=false"]
       alias: docker
   variables:
-    stage: client
+    APP_NAME: client
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$APP_NAME-$CI_PIPELINE_IID
+    DUMMY_MOUNT: /disabled
   script:
+    # Pull the image from the built-in gitlab docker registry
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull "$IMAGE_TAG"
+    - docker tag "$IMAGE_TAG" "ft_transcendance_client:latest"
     - cd ..
-    - apk add docker-compose
-    - cp .env.prod .env; cp api.env.sample api.env; cp db.env.sample db.env; true
-    - docker-compose up -d client # db
+    # Launch the required services
+    - docker-compose up -d client
     # Waiting for service to be up
     - |
       for i in $(seq 0 120)
@@ -162,13 +162,13 @@ test_e2e_client:
       done
     # Check if waiting loop ended because success or timeout
     - docker-compose exec -T client curl --fail 127.0.0.1:4000 || (docker-compose logs && exit 1)
-  # needs:
-  # - build_prod_api
+  needs:
+    - build_client_prod
 
 deploy_api:
   stage: deploy
   variables:
-    stage: api
+    APP_NAME: api
   script:
     - chmod 600 "$ID_RSA"
     - echo '' >> "$ID_RSA"
@@ -182,7 +182,7 @@ deploy_api:
 deploy_client:
   stage: deploy
   variables:
-    stage: client
+    APP_NAME: client
   script:
     - chmod 600 "$ID_RSA"
     - echo '' >> "$ID_RSA"
@@ -196,7 +196,7 @@ deploy_client:
 deploy_db:
   stage: deploy
   variables:
-    stage: db
+    APP_NAME: db
   script:
     - chmod 600 "$ID_RSA"
     - echo '' >> "$ID_RSA"
@@ -210,7 +210,7 @@ deploy_db:
 deploy_proxy:
   stage: deploy
   variables:
-    stage: proxy
+    APP_NAME: proxy
   script:
     - chmod 600 "$ID_RSA"
     - echo '' >> "$ID_RSA"
