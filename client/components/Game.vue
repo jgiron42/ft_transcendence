@@ -334,7 +334,7 @@ export default Vue.extend({
 				// Update ball
 				this.ball.update(this.res, this.players);
 			}
-			if (this.score_p1 == 11 || this.score_p2 == 11) {
+			if (this.score_p1 === 11 || this.score_p2 === 11) {
 				this.score_p1 = 0;
 				this.score_p2 = 0;
 			}
@@ -351,9 +351,9 @@ export default Vue.extend({
 				this.ctx.font = "100px roboto";
 				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - this.res.x / 4 - 25, 200);
 				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + this.res.x / 4 - 25, 200);
-				for (let i = 0; i < (this.res.y / 2); i++) {
+				for (let i = 0; i < this.res.y / 2; i++) {
 					if (i % 2) {
-						this.ctx.fillRect(this.res.x / 2 , i * 20, 10, 20);
+						this.ctx.fillRect(this.res.x / 2, i * 20, 10, 20);
 					}
 				}
 			}
