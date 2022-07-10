@@ -34,9 +34,14 @@ export class RelationQuery extends QueryCooker<Relation> {
 	see_relation(userId: string) {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
-				qb
-					.where(`owner.id = :${this.newId}`, { [this.currentId]: userId })
-					.orWhere("relation.type <> :type2", { type2: RelationType.BLOCK }),
+				qb.where(`owner.id = :${this.newId}`, { [this.currentId]: userId }).orWhere(
+					new Brackets((qb1) => {
+						qb1.where(`target.id = :${this.newId}`, { [this.currentId]: userId }).andWhere(
+							"relation.type <> :type2",
+							{ type2: RelationType.BLOCK },
+						);
+					}),
+				),
 			),
 		);
 		return this;
