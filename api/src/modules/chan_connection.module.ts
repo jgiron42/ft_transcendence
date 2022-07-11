@@ -6,7 +6,6 @@ import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { UserModule } from "@modules/user.module";
 import { ChanConnectionsController } from "@controllers/chan-connections.controller";
-import { SocketService } from "@services/socket.service";
 import { AuthModule } from "./auth.module";
 
 @Module({
@@ -15,7 +14,7 @@ import { AuthModule } from "./auth.module";
 		forwardRef(() => AuthModule),
 		forwardRef(() => UserModule),
 	],
-	providers: [ChanConnectionService, SocketService],
+	providers: [ChanConnectionService],
 	controllers: [ChanConnectionsController],
 	exports: [ChanConnectionService],
 })

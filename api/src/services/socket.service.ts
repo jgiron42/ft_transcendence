@@ -7,37 +7,41 @@ import { WsException } from "@nestjs/websockets";
 @Injectable()
 export class SocketService {
 	constructor() {
-		this.clientMap = new Map<string, User>();
+		this.clientMap = new Map<Socket, User>();
 	}
 
-	static server: Server;
-	private clientMap: Map<string, User>;
+	server: Server;
+	private clientMap: Map<Socket, User>;
 
 	getClientSize(): number {
 		return this.clientMap.size;
 	}
 
 	getClient(socket: Socket): User {
-		return this.clientMap.get(socket.id);
-	}
-
-	getClientBySocketId(socketId: string): User {
-		return this.clientMap.get(socketId);
+		return this.clientMap.get(socket);
 	}
 
 	addClient(socket: Socket, user: User) {
-		if (!this.clientMap.has(socket.id)) {
-			this.clientMap.set(socket.id, user);
+		if (!this.clientMap.has(socket)) {
+			this.clientMap.set(socket, user);
 		}
 	}
 
 	removeClient(socket: Socket) {
-		this.clientMap.delete(socket.id);
+		this.clientMap.delete(socket);
 	}
 
 	sendMessage(msg: string, content: any = null, room = "") {
-		if (room !== "") SocketService.server.to(room).emit(msg, content);
-		else SocketService.server.emit(msg, content);
+		if (room !== "") this.server.to(room).emit(msg, content);
+		else this.server.emit(msg, content);
+	}
+
+	sendMessageToClient(msg: string, content: any = null, user: User | string) {
+		for (const [_socket, _user] of this.clientMap) {
+			if (_user.id === (typeof user === "string" ? user : user.id)) {
+				_socket.emit(msg, content);
+			}
+		}
 	}
 
 	sendError(error: string) {

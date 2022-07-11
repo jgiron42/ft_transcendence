@@ -5,14 +5,12 @@ import { ChanConnection } from "@entities/chan_connection.entity";
 import { Container } from "typedi";
 import { ChanConnectionQuery } from "@src/queries/chanConnectionQuery";
 import { DeepPartial } from "typeorm/common/DeepPartial";
-import { SocketService } from "@services/socket.service";
 
 @Injectable()
 export class ChanConnectionService {
 	constructor(
 		@InjectRepository(ChanConnection)
 		private ChanConnectionRepository: Repository<ChanConnection>,
-		private socketService: SocketService,
 	) {
 		Container.set(this.constructor, this);
 	}
@@ -30,9 +28,7 @@ export class ChanConnectionService {
 	}
 
 	create(chanConnection: DeepPartial<ChanConnection>): Promise<ChanConnection> {
-		const connection = this.ChanConnectionRepository.create(chanConnection);
-		this.socketService.sendMessage("updateUsers", null, connection.channel.name);
-		return this.save(connection);
+		return this.save(this.ChanConnectionRepository.create(chanConnection));
 	}
 
 	async save(chanConnection: ChanConnection): Promise<ChanConnection> {

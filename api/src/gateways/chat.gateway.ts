@@ -44,7 +44,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private channelMap: Map<string, Channel>;
 
 	afterInit(server: Server) {
-		SocketService.server = server;
+		this.socketService.server = server;
 		this.logger.log("Chat gateway initialized.");
 	}
 

@@ -6,7 +6,6 @@ import { Container } from "typedi";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChannelQuery } from "@src/queries/channelQuery";
 import { compare, hash, genSalt } from "bcrypt";
-import { SocketService } from "@services/socket.service";
 
 @Injectable()
 export class ChannelService {
@@ -15,7 +14,6 @@ export class ChannelService {
 		private ChannelRepository: Repository<Channel>,
 		@InjectEntityManager("default")
 		private entityManager: EntityManager,
-		private socketService: SocketService,
 	) {
 		Container.set(this.constructor, this);
 	}
@@ -51,9 +49,8 @@ export class ChannelService {
 	}
 
 	create(channel: Channel): Promise<Channel> {
-		const chan = this.ChannelRepository.create(channel);
-		this.socketService.sendMessage("updateChannels", null, "realm");
-		return this.save(chan);
+		// this.socketService.sendMessage("updateChannels", null, "realm");
+		return this.save(this.ChannelRepository.create(channel));
 	}
 
 	async save(channel: Channel): Promise<Channel> {
