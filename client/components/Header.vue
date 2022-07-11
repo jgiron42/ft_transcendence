@@ -4,11 +4,11 @@
 			<button @click.prevent="isActive = !isActive">
 				<Logo />
 			</button>
-			<div v-if="isActive === true" class="scroll_menu flex flex-row">
+			<div v-if="isActive === true && connected === true" class="scroll_menu flex flex-row">
 				<NuxtLink class="selection_menu" to="/homepage">Homepage</NuxtLink>
 				<NuxtLink class="selection_menu" to="/homepage">Pong</NuxtLink>
 				<NuxtLink class="selection_menu" to="/homepage">Social Network</NuxtLink>
-				<NuxtLink class="selection_menu" to="/homepage">Profile</NuxtLink>
+				<NuxtLink class="selection_menu" to="/profile">Profile</NuxtLink>
 			</div>
 		</div>
 		<div class="border-design_white border-b border-2"></div>
@@ -21,6 +21,7 @@ export default Vue.extend({
 	data() {
 		return {
 			isActive: false,
+      connected: true,
 		};
 	},
 });
