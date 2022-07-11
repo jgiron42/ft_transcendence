@@ -2,6 +2,7 @@ import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Channel } from "@/models/Channel";
+import { Relation } from "@/models/Relation";
 
 export interface ChatInterface {
 	me: User;
@@ -10,6 +11,7 @@ export interface ChatInterface {
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
 	chanConnections: Array<ChanConnection>;
+	relations: Array<Relation>;
 }
 
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
@@ -20,6 +22,7 @@ export default class Chat extends VuexModule implements ChatInterface {
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
+	relations: Array<Relation> = [] as Relation[];
 
 	@Mutation
 	resetAll() {
@@ -78,5 +81,15 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	pushMyChannels(chan: Channel) {
 		this.myChannels.push(chan);
+	}
+
+	@Mutation
+	updateRelations(relations: Relation[]) {
+		this.relations = relations;
+	}
+
+	@Mutation
+	pushRelations(relation: Relation) {
+		this.relations.push(relation);
 	}
 }

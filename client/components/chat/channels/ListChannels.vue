@@ -4,13 +4,25 @@
 			<div class="flex gap-3 items-center chan-name" :class="chan.id == currentChannel.id ? 'selected' : ''">
 				<button class="cut-text btn text-left" @click="joinChannel(chan)">
 					<div class="flex">
-						<div class="w-5">#</div>
+						<div v-if="chan.type === ChannelType.PUBLIC" class="w-5">#</div>
+						<div v-if="chan.type === ChannelType.PASSWORD" class="w-5 h-5">
+							<svg version="1.1" viewBox="0 0 1000 1000" height="30px">
+								<g transform="translate(0.000000,600.000000) scale(0.100000,-0.100000)" fill="#a2a2a2">
+									<path
+										d="M2370 5105 c-606 -84 -1085 -553 -1185 -1161 -10 -60 -15 -166 -15 -325 0 -207 2 -238 16 -243 9 -3 89 -6 179 -6 147 0 165 2 174 18 5 9 11 127 13 262 4 210 8 256 26 322 52 191 128 323 262 459 166 167 339 258 563 294 199 32 374 9 572 -77 221 -96 430 -312 521 -537 59 -145 67 -198 72 -461 2 -135 8 -253 13 -262 9 -16 27 -18 174 -18 90 0 170 3 179 6 14 5 16 36 16 243 0 159 -5 265 -15 325 -64 392 -282 727 -615 947 -275 182 -619 260 -950 214z"
+									/>
+									<path
+										d="M1023 3160 c-12 -5 -27 -18 -33 -29 -8 -15 -10 -271 -7 -894 3 -864 3 -873 26 -972 127 -562 514 -1000 1041 -1178 334 -113 686 -113 1020 0 527 178 914 616 1041 1178 23 99 23 108 26 976 4 856 3 876 -16 900 l-19 24 -1529 2 c-868 1 -1537 -2 -1550 -7z m1672 -1307 c51 -27 107 -85 137 -143 18 -36 23 -60 23 -125 0 -96 -21 -144 -96 -215 l-49 -47 0 -263 c0 -251 -1 -264 -22 -301 -23 -41 -84 -79 -128 -79 -44 0 -105 38 -128 79 -21 37 -22 50 -22 301 l0 263 -49 47 c-75 71 -96 119 -96 215 0 65 5 89 23 125 41 78 107 137 182 161 46 15 182 4 225 -18z"
+									/>
+								</g>
+							</svg>
+						</div>
 						<div class="w-full">
 							<b>{{ chan.name }}</b>
 						</div>
 					</div>
 				</button>
-				<button v-if="chanType === 'own'" class="w-4 h-3" @click.prevent="leaveChannel(chan.id)">
+				<button v-if="listType === 'own'" class="w-4 h-3" @click.prevent="leaveChannel(chan.id)">
 					<svg version="1.1" viewBox="0 0 1000 1000" height="10px">
 						<g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">
 							<path
@@ -27,7 +39,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Channel } from "@/models/Channel";
+import { Channel, ChannelType } from "@/models/Channel";
 import { chatStore } from "@/store/";
 
 export default Vue.extend({
@@ -45,10 +57,17 @@ export default Vue.extend({
 			type: Function,
 			default: () => {},
 		},
-		chanType: {
+		listType: {
 			type: String,
 			default: "own",
 		},
+	},
+	data() {
+		return {
+			get ChannelType() {
+				return ChannelType;
+			},
+		};
 	},
 	methods: {
 		leaveChannel(chanId: number) {

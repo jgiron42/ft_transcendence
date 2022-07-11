@@ -53,9 +53,6 @@ export default Vue.extend({
 		onShowMuted() {
 			this.showMuted = !this.showMuted;
 		},
-		test() {
-			console.log("coucou");
-		},
 	},
 });
 </script>

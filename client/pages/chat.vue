@@ -89,6 +89,7 @@ export default Vue.extend({
 		this.socket.on("updateChannels", () => {
 			this.$nuxt.$emit("updateChannels");
 			this.chat.getChanConnections();
+			this.chat.getRelations();
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			this.$nuxt.$emit("JC", messages);
@@ -98,8 +99,12 @@ export default Vue.extend({
 			const c = await this.chat.joinChannel(chan);
 			if (c) this.socket.emit("JC", c.id);
 		});
-		this.socket.on("updateUsers", () => {
+		this.socket.on("updateRelations", () => {
+			this.chat.getRelations();
+		});
+		this.socket.on("updateChanConnections", () => {
 			this.chat.getChanConnections();
+			this.chat.getRelations();
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.$nuxt.$emit("MSG", message);

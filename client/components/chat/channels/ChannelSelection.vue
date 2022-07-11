@@ -37,7 +37,7 @@
 		<ListChannels
 			v-if="selection === 0 && showInvitations && invitations.length !== 0"
 			:channels="invitations"
-			chan-type="invitation"
+			list-type="invitation"
 		/>
 		<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
 		<ListChannels
@@ -45,14 +45,14 @@
 			:channels="myChannels"
 			:current-channel="currentChannel"
 			:join-channel="joinChannel"
-			chan-type="own"
+			list-type="own"
 		/>
 		<ListChannels
 			v-if="selection === 1"
 			:channels="visibleChannels"
 			:current-channel="currentChannel"
 			:join-channel="joinChannel"
-			chan-type=""
+			list-type=""
 		/>
 	</div>
 </template>

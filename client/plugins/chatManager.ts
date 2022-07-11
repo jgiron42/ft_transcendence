@@ -3,9 +3,7 @@ import { User } from "@/models/User";
 import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store/";
 import { ChanConnection } from "@/models/ChanConnection";
-
-// import { User } from "@/models/User";
-// import { Message } from "@/models/Message";
+import { Relation } from "@/models/Relation";
 
 interface chatInterface {
 	whoAmI(): Promise<User | undefined>;
@@ -14,6 +12,7 @@ interface chatInterface {
 	getVisibleChannels(): void;
 	getMyChannels(): void;
 	getChanConnections(): Promise<Array<ChanConnection> | undefined>;
+	getRelations(): Promise<Array<Relation> | undefined>;
 }
 
 declare module "vue/types/vue" {
@@ -93,4 +92,16 @@ Vue.prototype.chat = <chatInterface>{
 		);
 		return ret;
 	},
+	async getRelations(): Promise<Array<Relation> | undefined> {
+		let ret: Array<Relation> | undefined;
+		await Vue.prototype.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
+			const relations = [] as Relation[];
+			r.data.forEach((relation: Relation) => {
+				relations.push(relation);
+			});
+			ret = relations;
+			chatStore.updateRelations(relations);
+		});
+		return ret;
+	}
 };
