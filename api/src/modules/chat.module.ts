@@ -14,6 +14,13 @@ import { MessageSubscriber } from "@subscribers/message.subscriber";
 @Module({
 	imports: [MessageModule, UserModule, AuthModule, ChannelModule, ChanConnectionModule],
 	controllers: [],
-	providers: [ChatGateway, SocketService, RelationSubscriber, ChannelSubscriber, ChanConnectionSubscriber, MessageSubscriber],
+	providers: [
+		ChatGateway,
+		SocketService,
+		RelationSubscriber,
+		ChannelSubscriber,
+		ChanConnectionSubscriber,
+		MessageSubscriber,
+	],
 })
 export class ChatModule {}
