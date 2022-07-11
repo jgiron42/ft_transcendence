@@ -71,7 +71,7 @@ export default Vue.extend({
 	},
 	methods: {
 		leaveChannel(chanId: number) {
-			this.api.post("/channels/" + chanId + "/leave", null, null, () => {
+			this.api.post("/channels/" + chanId + "/leave", undefined, undefined, () => {
 				if (chanId === chatStore.currentChannel.id) {
 					chatStore.resetCurrentChannel();
 				}

@@ -85,7 +85,7 @@ export default Vue.extend({
 	},
 	methods: {
 		acceptFriendRequest(id: number) {
-			this.api.post("/relations/" + id + "/accept_friend", null, null, null, (err: any) => {
+			this.api.post("/relations/" + id + "/accept_friend", undefined, undefined, undefined, (err: any) => {
 				console.log(err);
 			});
 		},

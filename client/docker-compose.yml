@@ -24,9 +24,11 @@ services:
             - ./entrypoint.sh:/app/entrypoint.sh
             - ./jsconfig.json:/app/jsconfig.json
             - ./logs:/app/logs
+            - ./middleware:/app/middleware
             - ./nuxt.config.js:/app/nuxt.config.js
             - ./package.json:/app/package.json
             - ./pages:/app/pages
+            - ./plugins:/app/plugins
             - ./static:/app/static
             - ./store:/app/store
             - ./stylelint.config.js:/app/stylelint.config.js

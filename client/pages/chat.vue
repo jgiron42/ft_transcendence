@@ -48,18 +48,7 @@ export default Vue.extend({
 	middleware: ["getUser", "auth"],
 	data() {
 		return {
-			socket: this.$nuxtSocket({
-				name: "chat",
-				channel: "/chat",
-				reconnection: true,
-				reconnectionAttempts: Infinity,
-				reconnectionDelay: 1000,
-				reconnectionDelayMax: 5000,
-				timeout: 10000,
-				autoConnect: true,
-				transports: ["websocket"],
-				teardown: false,
-			}),
+			socket: this.$socketManager.getSocket(),
 			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
 			get currentChannel() {
@@ -72,6 +61,9 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
+		if (this.currentChannel.id !== undefined) {
+			this.socket.emit("JC", this.currentChannel.id);
+		}
 		this.socket.on("HC", () => {
 			this.socket.emit("HC", {
 				token: this.$cookies.get("connect.sid"),
@@ -111,7 +103,7 @@ export default Vue.extend({
 		});
 	},
 	destroyed() {
-		this.socket.disconnect();
+		this.socket.removeAllListeners();
 	},
 	methods: {
 		onShowChannels() {

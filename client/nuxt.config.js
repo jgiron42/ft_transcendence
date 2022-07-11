@@ -26,6 +26,7 @@ export default {
 		{ src: "@/plugins/vue-js-modal", mode: "client" },
 		{ src: "@/plugins/apiManager", mode: "client" },
 		{ src: "@/plugins/chatManager", mode: "client" },
+		{ src: "@/plugins/socketManager", mode: "client" },
 	],
 
 	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
