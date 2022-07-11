@@ -48,8 +48,7 @@
 import Vue from "vue";
 import { ChannelRole } from "@/models/ChanConnection";
 import { chatStore } from "@/store";
-import { Relation } from "@/models/Relation";
-import { RelationType } from "@/models/Relation";
+import { Relation, RelationType } from "@/models/Relation";
 
 export default Vue.extend({
 	name: "SelectionUserPannel",

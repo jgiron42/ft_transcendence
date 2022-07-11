@@ -9,5 +9,4 @@ const config = {
 	itemPerPage: process.env.API_ITEM_PER_PAGE || 10,
 	maxItemPerPage: Number(process.env.API_MAX_ITEM_PER_PAGE) || 100,
 };
-console.log("sessionSecret:", config.sessionSecret);
 export default config;

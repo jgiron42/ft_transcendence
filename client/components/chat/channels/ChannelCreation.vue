@@ -58,7 +58,7 @@ export default Vue.extend({
 			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
 		createChannel() {
-			this.api.post("/channels", this.channel, null, (r: { data: Channel }) => {
+			this.api.post("/channels", this.channel, undefined, (r: { data: Channel }) => {
 				this.$nuxt.$emit("createChannel", r.data);
 				this.$modal.hide("create_channel");
 			});

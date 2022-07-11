@@ -39,6 +39,6 @@ const SocketManager: Plugin = (context, inject) => {
 	});
 	const hub = new SocketHub(socket);
 	inject("socketManager", hub);
-}
+};
 
 export default SocketManager;
