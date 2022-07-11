@@ -74,7 +74,7 @@ export class RelationsController {
 			.getQuery()
 			.target(user.id)
 			.type(RelationType.FRIEND_REQUEST)
-			.update({ type: RelationType.FRIEND }, id);
+			.updateWithSave({ type: RelationType.FRIEND }, id);
 	}
 
 	/**

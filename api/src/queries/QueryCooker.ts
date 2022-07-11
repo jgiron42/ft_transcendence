@@ -3,6 +3,7 @@ import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity
 import { EntityInterface } from "@src/types/entityInterface";
 import { PaginatedResponse } from "@src/types/paginated-response";
 import { DeepPartial } from "typeorm/common/DeepPartial";
+import { UpdateResult } from "typeorm/query-builder/result/UpdateResult";
 
 function* idGen(prefix = "id"): Generator<string, string, boolean> {
 	let i = 0;
@@ -60,8 +61,14 @@ export class QueryCooker<Entity extends EntityInterface> {
 		return this.query.getOneOrFail();
 	}
 
-	async update(value: QueryDeepPartialEntity<Entity>, id?: Entity["id"]) {
+	async update(value: QueryDeepPartialEntity<Entity>, id?: Entity["id"]): Promise<UpdateResult> {
 		return this.entityRepository.update({ id: (await this.getOneOrFail(id)).id as Entity["id"] }, value);
+	}
+
+	async updateWithSave(value: QueryDeepPartialEntity<Entity>, id?: Entity["id"]): Promise<Entity> {
+		const val: Entity = await this.getOneOrFail(id);
+		Object.assign(val, value);
+		return this.entityRepository.save(val);
 	}
 
 	async create(value: DeepPartial<Entity>) {
