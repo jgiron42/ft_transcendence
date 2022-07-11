@@ -64,7 +64,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 		if (usr) {
 			this.socketService.addClient(socket, usr);
 			await socket.join("realm");
-			socket.emit("updateChannels");
 		} else {
 			this.socketService.sendError("User not found.");
 		}

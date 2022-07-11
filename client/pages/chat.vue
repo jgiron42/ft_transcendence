@@ -61,6 +61,11 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
+		if (this.socket.connected) {
+			this.$nuxt.$emit("updateChannels");
+			this.chat.getChanConnections();
+			this.chat.getRelations();
+		}
 		if (this.currentChannel.id !== undefined) {
 			this.socket.emit("JC", this.currentChannel.id);
 		}

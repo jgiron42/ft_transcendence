@@ -7,7 +7,6 @@ interface socketHubInterface {
 }
 
 declare module "vue/types/vue" {
-	// this.$myInjectedFunction inside Vue components
 	interface Vue {
 		$socketManager: socketHubInterface;
 	}
@@ -19,7 +18,6 @@ class SocketHub extends Vue implements socketHubInterface {
 	}
 
 	getSocket(): NuxtSocket {
-		this.$nuxt.$emit("getSocket");
 		return this.socket;
 	}
 }
