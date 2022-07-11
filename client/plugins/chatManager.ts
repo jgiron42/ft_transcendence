@@ -103,5 +103,5 @@ Vue.prototype.chat = <chatInterface>{
 			chatStore.updateRelations(relations);
 		});
 		return ret;
-	}
+	},
 };

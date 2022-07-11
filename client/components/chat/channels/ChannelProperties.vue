@@ -47,7 +47,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { ChannelRole } from "@/models/ChanConnection";
-import { User } from "@/models/User";
 import { chatStore } from "@/store";
 import { Relation } from "@/models/Relation";
 import { RelationType } from "@/models/Relation";

@@ -39,7 +39,9 @@
 			<div v-else>
 				<button class="user-button cut-text btn text-left" :class="margin ? 'pad-left' : ''" @click="click">
 					<b v-if="relation.owner.id !== me.id">{{ relation.owner.username }}</b>
-					<b v-if="relation.target.id !== me.id || relation.owner.id == relation.target.id">{{ relation.target.username }}</b>
+					<b v-if="relation.target.id !== me.id || relation.owner.id == relation.target.id">{{
+						relation.target.username
+					}}</b>
 				</button>
 			</div>
 		</div>
@@ -48,17 +50,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore }  from "@/store";
+import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "ListUsers",
-	data() {
-		return {
-			get me() {
-				return chatStore.me;
-			},
-		};
-	},
 	props: {
 		connections: {
 			type: Array,
@@ -81,20 +76,20 @@ export default Vue.extend({
 			default: "",
 		},
 	},
+	data() {
+		return {
+			get me() {
+				return chatStore.me;
+			},
+		};
+	},
 	methods: {
 		acceptFriendRequest(id: number) {
-			this.api.post(
-				"/relations/" + id + "/accept_friend",
-				null,
-				null,
-				null,
-				(err: any) => {
-					console.log(err);
-				}
-			);
+			this.api.post("/relations/" + id + "/accept_friend", null, null, null, (err: any) => {
+				console.log(err);
+			});
 		},
-		declineFriendRequest() {
-		},
+		declineFriendRequest() {},
 	},
 });
 </script>
