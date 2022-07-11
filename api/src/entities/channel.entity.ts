@@ -12,10 +12,6 @@ export enum ChannelType {
 
 @Entity()
 export class Channel {
-	constructor() {
-		this.type = ChannelType.PUBLIC;
-		this.password = "";
-	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -29,12 +25,13 @@ export class Channel {
 	@Column({
 		type: "enum",
 		enum: ChannelType,
+		default: ChannelType.PUBLIC,
 	})
 	@SetMode("cru")
 	type: ChannelType;
 
 	// password to access to the channnel
-	@Column()
+	@Column({ default: "" })
 	@SetMode("cu")
 	password: string;
 

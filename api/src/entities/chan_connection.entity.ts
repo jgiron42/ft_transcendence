@@ -16,10 +16,6 @@ export enum ChannelRole {
 @Expose() // class-transformer
 @Unique("unique_connection", ["channel", "user"])
 export class ChanConnection {
-	constructor() {
-		this.role = ChannelRole.USER;
-	}
-
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -38,13 +34,13 @@ export class ChanConnection {
 	@Column({
 		type: "enum",
 		enum: ChannelRole,
+		default: ChannelRole.USER,
 	})
-	@Column()
 	@SetMode("cru")
 	role: ChannelRole;
 
 	// date to know the end of the mute
-	@Column({ nullable: true })
+	@Column({ nullable: true, default: null })
 	@SetMode("cru")
 	mute_end: Date;
 

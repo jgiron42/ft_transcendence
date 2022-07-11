@@ -10,15 +10,6 @@ import { SetMode } from "@utils/set-mode";
 
 @Entity()
 export class Game {
-	constructor() {
-		this.score_second_player = 0;
-		this.score_first_player = 0;
-		this.user_one = new User();
-		this.user_two = new User();
-		this.finished = false;
-		this.type = 0;
-	}
-
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -38,22 +29,22 @@ export class Game {
 	user_two: User | string;
 
 	// score of the first player
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("r")
 	score_first_player: number;
 
 	// score of the second player
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("r")
 	score_second_player: number;
 
 	// type of game
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("cr")
 	type: number;
 
 	// status of the game
-	@Column()
+	@Column({ default: false })
 	@SetMode("r")
 	finished: boolean;
 
