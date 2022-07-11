@@ -64,16 +64,8 @@ export default Vue.extend({
 		if (this.currentChannel.id !== undefined) {
 			this.socket.emit("JC", this.currentChannel.id);
 		}
-		this.socket.on("HC", () => {
-			this.socket.emit("HC", {
-				token: this.$cookies.get("connect.sid"),
-			});
-		});
-		this.socket.on("Hello", async () => {
-			if (this.currentChannel !== undefined && this.currentChannel.id !== undefined) {
-				const tmp = await this.chat.joinChannel(this.currentChannel);
-				if (tmp) this.socket.emit("JC", tmp.id);
-			}
+		this.socket.emit("HC", {
+			token: this.$cookies.get("connect.sid"),
 		});
 		this.socket.on("connect", () => {
 			this.$nuxt.$emit("initSocket");
