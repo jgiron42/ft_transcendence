@@ -4,6 +4,7 @@ import { SessionGuard } from "@guards/session.guard";
 import { MessageService } from "@services/message.service";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Page } from "@utils/Page";
+import { Date as myDate } from "@utils/Date";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
 import { PaginatedResponse } from "@src/types/paginated-response";
@@ -23,11 +24,16 @@ export class MessagesController {
 	 */
 	@Get()
 	async getAll(
+		@myDate() date: Date,
 		@Page() page: number,
 		@PerPage() per_page: number,
 		@GetUser() user: User,
 	): Promise<PaginatedResponse<Message>> {
-		return this.messageService.getQuery().see_message(user.id).paginate(page, per_page).getManyAndCount();
+		return this.messageService
+			.getQuery()
+			.see_message(user.id)
+			.paginate(date ?? page, per_page, "message.created_at")
+			.getManyAndCount();
 	}
 
 	/**
