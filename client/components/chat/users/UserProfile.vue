@@ -41,7 +41,7 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style scoped>
 .button_profile {
 	overflow: hidden;
 	color: black;

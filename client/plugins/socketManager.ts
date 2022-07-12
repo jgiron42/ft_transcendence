@@ -8,7 +8,7 @@ interface socketHubInterface {
 
 declare module "vue/types/vue" {
 	interface Vue {
-		$socketManager: socketHubInterface;
+		$socket: socketHubInterface;
 	}
 }
 
@@ -36,7 +36,7 @@ const SocketManager: Plugin = (context) => {
 		teardown: false,
 	});
 	const hub = new SocketHub(socket);
-	Vue.prototype.$socketManager = hub;
+	Vue.prototype.$socket = hub;
 };
 
 export default SocketManager;

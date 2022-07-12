@@ -93,7 +93,6 @@ export default Vue.extend({
 				if (this.checkPrivateChannel(chan.id)) this.chat.joinChannel(chan);
 				else {
 					chatStore.updateJoiningChannel(chan);
-					console.log(JSON.stringify(chatStore.joiningChannel));
 					this.$modal.show("join_protected_chan");
 				}
 			} else {
