@@ -15,8 +15,8 @@
 			</div>
 			<select id="type-select" class="text-black p-2" name="pets" @change="selectCategory($event)">
 				<option value="PUBLIC">public</option>
-				<!-- option value="DM">direct message</option -->
 				<option value="PRIVATE">private</option>
+				<option value="PASSWORD">protected</option>
 			</select>
 			<div v-if="selectedType === 1">
 				<div class="flex flex-col">
@@ -54,10 +54,11 @@ export default Vue.extend({
 		selectCategory(event: Event) {
 			this.selectedType = (ChannelType as any)[(event.target as HTMLInputElement).value];
 			this.channel.type = this.selectedType;
-			if (this.selectedType !== ChannelType.PRIVATE) this.channel.password = "";
+			console.log("type: " + this.selectedType);
+			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
 		createChannel() {
-			this.api.post("/channels", this.channel, null, (r: { data: Channel }) => {
+			this.api.post("/channels", this.channel, undefined, (r: { data: Channel }) => {
 				this.$nuxt.$emit("createChannel", r.data);
 				this.$modal.hide("create_channel");
 			});

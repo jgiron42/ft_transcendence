@@ -6,7 +6,6 @@ import { Channel } from "@entities/channel.entity";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanConnection } from "@entities/chan_connection.entity";
-import { SocketService } from "@services/socket.service";
 import { ChannelsController } from "@controllers/channels.controller";
 import { MessageModule } from "@modules/message.module";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
@@ -22,7 +21,7 @@ import { AuthModule } from "./auth.module";
 		forwardRef(() => ChanInvitationModule),
 		MessageModule,
 	],
-	providers: [ChannelService, UserService, SocketService],
+	providers: [ChannelService, UserService],
 	controllers: [ChannelsController],
 	exports: [ChannelService, UserService],
 })

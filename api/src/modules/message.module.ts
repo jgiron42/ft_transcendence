@@ -5,7 +5,6 @@ import { Channel } from "@entities/channel.entity";
 import { Message } from "@entities/message.entity";
 import { MessageService } from "@services/message.service";
 import { UserModule } from "@modules/user.module";
-import { SocketService } from "@services/socket.service";
 import { MessagesController } from "@controllers/messages.controller";
 import { AuthModule } from "./auth.module";
 
@@ -15,7 +14,7 @@ import { AuthModule } from "./auth.module";
 		forwardRef(() => AuthModule),
 		forwardRef(() => UserModule),
 	],
-	providers: [MessageService, SocketService],
+	providers: [MessageService],
 	controllers: [MessagesController],
 	exports: [MessageService],
 })

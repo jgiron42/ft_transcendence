@@ -1,43 +1,35 @@
 import Vue from "vue";
 import axios from "axios";
 
-interface apiInterface {
-	get(route: string, params?: Object | null, onSuccess?: Function | null, onError?: Function | null): Promise<void>;
-	post(
-		route: string,
-		data?: Object | null,
-		params?: Object | null,
-		onSuccess?: Function | null,
-		onError?: Function | null,
-	): Promise<void>;
+class ApiClass extends Vue {
+	async post(route: string, data?: any, params?: Object, onSuccess?: Function, onError?: Function) {
+		await axios
+			.post(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
+			.then((response) => {
+				onSuccess?.(response);
+			})
+			.catch((err) => {
+				// error.response.data.message
+				onError?.(err);
+			});
+	}
+
+	async get(route: string, params?: Object, onSuccess?: Function, onError?: Function) {
+		await axios
+			.get(process.env.apiBaseUrl + route, { withCredentials: true, params })
+			.then((response) => {
+				onSuccess?.(response);
+			})
+			.catch((err) => {
+				onError?.(err);
+			});
+	}
 }
 
 declare module "vue/types/vue" {
 	interface Vue {
-		api: apiInterface;
+		api: ApiClass;
 	}
 }
 
-Vue.prototype.api = <apiInterface>{
-	async post(route: string, data = null, params = null, onSuccess = null, onError = null) {
-		await axios
-			.post(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
-			.then((response) => {
-				if (onSuccess !== null) onSuccess(response);
-			})
-			.catch((err) => {
-				// error.response.data.message
-				if (onError !== null) onError(err);
-			});
-	},
-	async get(route: string, params = null, onSuccess = null, onError = null) {
-		await axios
-			.get(process.env.apiBaseUrl + route, { withCredentials: true, params })
-			.then((response) => {
-				if (onSuccess !== null) onSuccess(response);
-			})
-			.catch((err) => {
-				if (onError !== null) onError(err);
-			});
-	},
-};
+Vue.prototype.api = new ApiClass();

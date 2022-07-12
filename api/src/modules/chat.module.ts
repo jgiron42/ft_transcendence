@@ -6,10 +6,21 @@ import { AuthModule } from "@modules/auth.module";
 import { ChannelModule } from "@modules/channel.module";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { SocketService } from "@services/socket.service";
+import { RelationSubscriber } from "@subscribers/relation.subscriber";
+import { ChannelSubscriber } from "@subscribers/channel.subscriber";
+import { ChanConnectionSubscriber } from "@subscribers/chan_connection.subscriber";
+import { MessageSubscriber } from "@subscribers/message.subscriber";
 
 @Module({
 	imports: [MessageModule, UserModule, AuthModule, ChannelModule, ChanConnectionModule],
 	controllers: [],
-	providers: [ChatGateway, SocketService],
+	providers: [
+		ChatGateway,
+		SocketService,
+		RelationSubscriber,
+		ChannelSubscriber,
+		ChanConnectionSubscriber,
+		MessageSubscriber,
+	],
 })
 export class ChatModule {}

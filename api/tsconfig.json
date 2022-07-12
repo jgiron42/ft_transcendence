@@ -109,6 +109,7 @@
 			"@enums/*": ["src/types/enums/*"],
 			"@utils/*": ["src/utils/*"],
 			"@test/*": ["test/*"],
+			"@subscribers/*": ["src/subscribers/*"],
 		}
 	},
 }

@@ -20,7 +20,10 @@
 				<button
 					class="btn-group btn-right"
 					:class="selection === 2 ? 'btn-selected' : ''"
-					@click.prevent="selection = 2"
+					@click.prevent="
+						selection = 2;
+						showInvitations = false;
+					"
 				>
 					Friends
 				</button>
@@ -30,11 +33,13 @@
 			<ArrowDropdown v-if="selection === 2" name="invitations" :click="onShowInvitations" />
 			<ListUsers
 				v-if="selection === 2 && showInvitations && invitations.length !== 0"
-				:connections="invitations"
+				:relations="invitations"
 				:margin="true"
+				type="invitations"
 			/>
 			<div v-else-if="selection === 2 && showInvitations" class="empty-text">No invitations.</div>
-			<div v-if="selection === 2">Friends..</div>
+			<ListUsers v-if="selection === 2 && friends.length !== 0" :relations="friends" type="friends" />
+			<div v-else-if="selection === 2" class="!pl-0 empty-friends">No friends yet.</div>
 		</div>
 	</div>
 </template>
@@ -43,6 +48,7 @@
 import Vue from "vue";
 import { ChannelRole } from "@/models/ChanConnection";
 import { chatStore } from "@/store";
+import { Relation, RelationType } from "@/models/Relation";
 
 export default Vue.extend({
 	name: "SelectionUserPannel",
@@ -70,8 +76,22 @@ export default Vue.extend({
 				return chatStore.roleOnCurrentChannel;
 			},
 			get invitations() {
-				// TODO: get friends invitations on chatStore
-				return [];
+				const ret = [] as Relation[];
+				for (const relation of chatStore.relations) {
+					if (relation.target.id === chatStore.me.id && relation.type === RelationType.FRIEND_REQUEST) {
+						ret.push(relation);
+					}
+				}
+				return ret;
+			},
+			get friends() {
+				const ret = [] as Relation[];
+				for (const relation of chatStore.relations) {
+					if (relation.type === RelationType.FRIEND) {
+						ret.push(relation);
+					}
+				}
+				return ret;
 			},
 		};
 	},
@@ -120,5 +140,9 @@ export default Vue.extend({
 .btn-selected {
 	background-color: #97add9;
 	color: #2c3548;
+}
+
+.empty-friends {
+	color: #d5d5d5;
 }
 </style>
