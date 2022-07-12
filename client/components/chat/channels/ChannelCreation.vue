@@ -15,7 +15,7 @@
 			</div>
 			<select id="type-select" class="text-black p-2" name="pets" @change="selectCategory($event)">
 				<option value="PUBLIC">public</option>
-				<!-- option value="DM">direct message</option -->
+				<option value="PRIVATE">private</option>
 				<option value="PASSWORD">protected</option>
 			</select>
 			<div v-if="selectedType === 1">
