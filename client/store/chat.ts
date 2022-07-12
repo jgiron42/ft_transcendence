@@ -3,6 +3,7 @@ import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Channel } from "@/models/Channel";
 import { Relation } from "@/models/Relation";
+import { ChanInvitation } from "@/models/ChanInvitation";
 
 export interface ChatInterface {
 	me: User;
@@ -11,7 +12,9 @@ export interface ChatInterface {
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
 	chanConnections: Array<ChanConnection>;
+	chanInvitations: Array<ChanInvitation>;
 	relations: Array<Relation>;
+	joiningChannel: Channel | undefined;
 }
 
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
@@ -22,7 +25,9 @@ export default class Chat extends VuexModule implements ChatInterface {
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
+	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
 	relations: Array<Relation> = [] as Relation[];
+	joiningChannel: Channel | undefined = new Channel();
 
 	@Mutation
 	resetAll() {
@@ -55,6 +60,11 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
+	updateChanInvitations(invitations: ChanInvitation[]) {
+		this.chanInvitations = invitations;
+	}
+
+	@Mutation
 	pushUser(connection: ChanConnection) {
 		this.chanConnections.push(connection);
 	}
@@ -62,6 +72,16 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	updateCurrentChannel(chan: Channel) {
 		this.currentChannel = chan;
+	}
+
+	@Mutation
+	updateJoiningChannel(chan: Channel) {
+		this.joiningChannel = chan;
+	}
+
+	@Mutation
+	removeJoiningChannel() {
+		this.joiningChannel = undefined;
 	}
 
 	@Mutation

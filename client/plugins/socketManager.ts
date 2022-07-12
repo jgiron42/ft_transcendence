@@ -22,7 +22,7 @@ class SocketHub extends Vue implements socketHubInterface {
 	}
 }
 
-const SocketManager: Plugin = (context, inject) => {
+const SocketManager: Plugin = (context) => {
 	const socket = context.app.$nuxtSocket({
 		name: "chat",
 		channel: "/chat",
@@ -36,7 +36,7 @@ const SocketManager: Plugin = (context, inject) => {
 		teardown: false,
 	});
 	const hub = new SocketHub(socket);
-	inject("socketManager", hub);
+	Vue.prototype.$socketManager = hub;
 };
 
 export default SocketManager;

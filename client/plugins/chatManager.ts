@@ -3,6 +3,7 @@ import { User } from "@/models/User";
 import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store/";
 import { ChanConnection } from "@/models/ChanConnection";
+import { ChanInvitation } from "@/models/ChanInvitation";
 import { Relation } from "@/models/Relation";
 
 class ChatClass extends Vue {
@@ -21,12 +22,12 @@ class ChatClass extends Vue {
 		});
 	}
 
-	async joinChannel(chan: Channel): Promise<Channel | undefined> {
+	async joinChannel(chan: Channel, password?: string, onSuccess?: Function): Promise<Channel | undefined> {
 		let ret: Channel | undefined;
 		await this.api.post(
 			"/channels/" + chan.id + "/join",
 			undefined,
-			undefined,
+			{ password },
 			(d = { data: { channel: new Channel() } }) => {
 				ret = d.data.channel;
 			},
@@ -37,6 +38,9 @@ class ChatClass extends Vue {
 				chatStore.updateCurrentChannel(d.data);
 				this.getChanConnections();
 			});
+			Vue.prototype.$socketManager.getSocket()?.emit("JC", ret.id);
+			this.$nuxt.$emit("updateChannels");
+			onSuccess?.();
 		}
 		return ret;
 	}
@@ -79,6 +83,19 @@ class ChatClass extends Vue {
 				chatStore.updateChanConnections(connections);
 			},
 		);
+		return ret;
+	}
+
+	async getChanInvitations(): Promise<Array<ChanInvitation> | undefined> {
+		let ret: Array<ChanInvitation> | undefined;
+		await this.api.get("/invitations", { page: 1, per_page: 100 }, (r: { data: ChanInvitation[] }) => {
+			const invitations = [] as ChanInvitation[];
+			r.data.forEach((invitation: ChanInvitation) => {
+				invitations.push(invitation);
+			});
+			ret = invitations;
+			chatStore.updateChanInvitations(invitations);
+		});
 		return ret;
 	}
 

@@ -33,6 +33,7 @@
 			<Chatbox v-if="isOnChannel" :socket="socket" />
 			<ChannelProperties v-if="showUsers && isOnChannel" />
 			<Popup name="create_channel" component="chat/channels/ChannelCreation" />
+			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
 		</div>
 	</div>
 </template>
@@ -61,28 +62,29 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		if (this.socket.connected) {
-			this.$nuxt.$emit("updateChannels");
-			this.chat.getChanConnections();
-			this.chat.getRelations();
-		}
 		if (this.currentChannel.id !== undefined) {
+			console.log("A");
 			this.socket.emit("JC", this.currentChannel.id);
 		}
+		if (this.socket.connected) {
+			this.updateChannels();
+			console.log("B");
+		}
+		this.socket.on("connect", () => {
+			this.updateChannels();
+			console.log("C");
+		});
 		this.socket.emit("HC", {
 			token: this.$cookies.get("connect.sid"),
 		});
-		this.socket.on("connect", () => {
-			this.$nuxt.$emit("initSocket");
+		this.$nuxt.$on("updateChannels", () => {
+			this.updateChannels();
 		});
 		this.socket.on("updateChannels", () => {
-			this.$nuxt.$emit("updateChannels");
-			this.chat.getChanConnections();
-			this.chat.getRelations();
+			this.updateChannels();
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			this.$nuxt.$emit("JC", messages);
-			this.$nuxt.$emit("updateChannels");
 		});
 		this.$nuxt.$on("createChannel", async (chan: Channel) => {
 			const c = await this.chat.joinChannel(chan);
@@ -92,8 +94,10 @@ export default Vue.extend({
 			this.chat.getRelations();
 		});
 		this.socket.on("updateChanConnections", () => {
-			this.chat.getChanConnections();
-			this.chat.getRelations();
+			this.updateChannels();
+		});
+		this.socket.on("updateChanInvitations", () => {
+			this.chat.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.$nuxt.$emit("MSG", message);
@@ -103,6 +107,13 @@ export default Vue.extend({
 		this.socket.removeAllListeners();
 	},
 	methods: {
+		async updateChannels() {
+			await this.chat.getMyChannels();
+			await this.chat.getVisibleChannels();
+			await this.chat.getChanConnections();
+			await this.chat.getRelations();
+			await this.chat.getChanInvitations();
+		},
 		onShowChannels() {
 			if (this.$device.isMobile) {
 				this.showUsers = false;

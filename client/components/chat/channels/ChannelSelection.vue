@@ -40,18 +40,11 @@
 			list-type="invitation"
 		/>
 		<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
-		<ListChannels
-			v-if="selection === 0"
-			:channels="myChannels"
-			:current-channel="currentChannel"
-			:join-channel="joinChannel"
-			list-type="own"
-		/>
+		<ListChannels v-if="selection === 0" :channels="myChannels" :current-channel="currentChannel" list-type="own" />
 		<ListChannels
 			v-if="selection === 1"
 			:channels="visibleChannels"
 			:current-channel="currentChannel"
-			:join-channel="joinChannel"
 			list-type=""
 		/>
 	</div>
@@ -59,7 +52,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
@@ -90,8 +82,7 @@ export default Vue.extend({
 				return chatStore.currentChannel;
 			},
 			get invitations() {
-				// TODO: get invitations on chatStore
-				return [];
+				return chatStore.chanInvitations || [];
 			},
 			selection: 0,
 			showInvitations: false,
@@ -106,30 +97,9 @@ export default Vue.extend({
 				containerTest.scrollLeft = containerTest.scrollWidth;
 			}
 		}
-		this.$nuxt.$on("updateChannels", () => {
-			this.onUpdateChannels();
-		});
-	},
-	destroyed() {
-		this.$nuxt.$off("updateChannels");
+		this.chat.getChanInvitations();
 	},
 	methods: {
-		async onUpdateChannels() {
-			await this.chat.getMyChannels();
-			if (this.myChannels.length === 0 && this.visibleChannels.length === 0) {
-				this.selection = 1;
-			}
-			this.chat.getVisibleChannels();
-		},
-		async joinChannel(chan: Channel) {
-			const tmp = await this.chat.joinChannel(chan);
-			if (tmp) {
-				await Vue.prototype.api.get("/channels/" + chan.id, null, (d = { data: new Channel() }) => {
-					chatStore.updateCurrentChannel(d.data);
-					this.socket.emit("JC", tmp.id);
-				});
-			}
-		},
 		onShowInvitations() {
 			this.showInvitations = !this.showInvitations;
 		},

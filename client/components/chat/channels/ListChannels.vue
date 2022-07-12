@@ -1,8 +1,12 @@
 <template>
 	<div>
 		<div v-for="(chan, index) of channels" :key="index">
-			<div class="flex gap-3 items-center chan-name" :class="chan.id == currentChannel.id ? 'selected' : ''">
-				<button class="cut-text btn text-left" @click="joinChannel(chan)">
+			<div
+				v-if="listType !== 'invitation'"
+				class="flex gap-3 items-center chan-name"
+				:class="chan.id == currentChannel.id ? 'selected' : ''"
+			>
+				<button class="cut-text btn text-left" @click="join(chan)">
 					<div class="flex">
 						<div v-if="chan.type === ChannelType.PUBLIC" class="w-5">#</div>
 						<div v-if="chan.type === ChannelType.PASSWORD" class="w-5 h-5">
@@ -62,10 +66,6 @@ export default Vue.extend({
 			type: Object,
 			default: new Channel(),
 		},
-		joinChannel: {
-			type: Function,
-			default: () => {},
-		},
 		listType: {
 			type: String,
 			default: "own",
@@ -76,9 +76,30 @@ export default Vue.extend({
 			get ChannelType() {
 				return ChannelType;
 			},
+			get chanConnections() {
+				return chatStore.chanConnections;
+			},
+			get myChannels() {
+				return chatStore.myChannels;
+			},
 		};
 	},
 	methods: {
+		checkPrivateChannel(chanId: number) {
+			return this.myChannels.filter((chan) => chan.id === chanId).length > 0;
+		},
+		join(chan: Channel) {
+			if (chan.type === ChannelType.PASSWORD) {
+				if (this.checkPrivateChannel(chan.id)) this.chat.joinChannel(chan);
+				else {
+					chatStore.updateJoiningChannel(chan);
+					console.log(JSON.stringify(chatStore.joiningChannel));
+					this.$modal.show("join_protected_chan");
+				}
+			} else {
+				this.chat.joinChannel(chan);
+			}
+		},
 		leaveChannel(chanId: number) {
 			this.api.post("/channels/" + chanId + "/leave", undefined, undefined, () => {
 				if (chanId === chatStore.currentChannel.id) {

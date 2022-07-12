@@ -25,6 +25,7 @@ services:
             - ./jsconfig.json:/app/jsconfig.json
             - ./logs:/app/logs
             - ./middleware:/app/middleware
+            - ./models:/app/models
             - ./nuxt.config.js:/app/nuxt.config.js
             - ./package.json:/app/package.json
             - ./pages:/app/pages
