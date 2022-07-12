@@ -35,9 +35,14 @@ export class QueryCooker<Entity extends EntityInterface> {
 		this.query = this.query.orderBy(sort, order, nulls);
 	}
 
-	paginate(page = 1, itemByPage = 10) {
-		this.per_page = itemByPage;
-		this.query = this.query.skip((page - 1) * itemByPage).take(itemByPage);
+	paginate(page: number | Date = 1, itemByPage = 10, s = "created_at") {
+		if (page instanceof Date) {
+			this.per_page = itemByPage;
+			this.query = this.query.andWhere(`${s} < :cursor_date`, { cursor_date: page }).take(itemByPage);
+		} else {
+			this.per_page = itemByPage;
+			this.query = this.query.skip((page - 1) * itemByPage).take(itemByPage);
+		}
 		return this;
 	}
 

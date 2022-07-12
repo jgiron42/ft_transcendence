@@ -27,6 +27,7 @@ import { getPutPipeline } from "@utils/getPutPipeline";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { SessionGuard } from "@guards/session.guard";
 import { DevelopmentGuard } from "@src/guards/development.guard";
+import { Date as myDate } from "@utils/Date";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
@@ -152,6 +153,7 @@ export class ChannelsController {
 	@Get(":id/messages")
 	async getMessage(
 		@Param("id", ParseIntPipe) id: number,
+		@myDate() date: number,
 		@Page() page: number,
 		@PerPage() per_page: number,
 		@GetUser() user: User,
@@ -160,7 +162,7 @@ export class ChannelsController {
 			.getQuery()
 			.see_message(user.id)
 			.channel(id)
-			.paginate(page, per_page)
+			.paginate(date ?? page, per_page, "message.created_at")
 			.getManyAndCount();
 	}
 

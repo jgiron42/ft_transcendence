@@ -10,10 +10,11 @@ export class MessageQuery extends QueryCooker<Message> {
 			entityRepository,
 			entityRepository
 				.createQueryBuilder("message")
+				.addSelect(["message.created_at AS created_at"])
 				.leftJoinAndSelect("message.user", "user")
 				.leftJoinAndSelect("message.channel", "channel"),
 		);
-		this.sort("message.created_at", "ASC");
+		this.sort("message.created_at", "DESC");
 	}
 
 	/**
