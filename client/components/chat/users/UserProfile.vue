@@ -1,10 +1,9 @@
 <template>
 	<div class="text-white flex flex-col pl-8 pr-8 gap-4">
-		<div class="flex flex-col">pseudo: {{ pseudo }}</div>
-		<div class="flex flex-col">nb games : {{ nb_game }}</div>
-		<div class="flex flex-col">nb wins : {{ nb_win }}</div>
-		<div class="flex flex-col">nb loses : {{ nb_lose }}</div>
-		<div class="flex flex-col">ratio : {{ ratio }}</div>
+		<div class="flex flex-col">pseudo: {{ user.username }}</div>
+		<div class="flex flex-col">nb games : {{ user.nb_game }}</div>
+		<div class="flex flex-col">nb wins : {{ user.nb_win }}</div>
+		<div class="flex flex-col">ratio : {{ nb_wins / nb_game }}</div>
 		<div class="flex flex-row">
 			<button v-if="friend" class="button_profile" @click.prevent="addFriend">friend request</button>
 			<button v-else class="button_profile" @click.prevent="removeFriend">remove friend</button>
@@ -15,10 +14,15 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { userProfile } from "@/store";
+
 export default Vue.extend({
 	name: "UserProfile",
 	data() {
 		return {
+			get user() {
+				return userProfile.user;
+			},
 			pseudo: "pseudo test",
 			nb_game: 3,
 			nb_win: 0,

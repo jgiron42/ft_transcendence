@@ -32,6 +32,7 @@
 			<ChannelSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
 			<Chatbox v-if="isOnChannel" :socket="socket" />
 			<ChannelProperties v-if="showUsers && isOnChannel" />
+			<Popup name="user_profile" component="chat/users/UserProfile" />
 			<Popup name="create_channel" component="chat/channels/ChannelCreation" />
 			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
 		</div>

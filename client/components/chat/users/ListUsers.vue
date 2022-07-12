@@ -1,13 +1,21 @@
 <template>
 	<div>
 		<div v-for="(connection, index) of connections" :key="index">
-			<button class="user-button cut-text btn text-left" :class="margin ? 'pad-left' : ''" @click="click">
-				<b>{{ connection.user.username }} {{ connection.role }}</b>
+			<button
+				class="user-button cut-text btn text-left"
+				:class="margin ? 'pad-left' : ''"
+				@click="showUserConnection(connection)"
+			>
+				<b>{{ connection.user.username }}</b>
 			</button>
 		</div>
 		<div v-for="(relation, index) of relations" :key="index">
 			<div v-if="type === 'invitations'" class="flex gap-3 items-center chan-name">
-				<button class="user-button cut-text btn text-left" :class="margin ? 'pad-left' : ''" @click="click">
+				<button
+					class="user-button cut-text btn text-left"
+					:class="margin ? 'pad-left' : ''"
+					@click="showUserRelation(relation)"
+				>
 					<b>{{ relation.owner.username }}</b>
 				</button>
 				<div class="flex gap-1">
@@ -37,7 +45,11 @@
 				</div>
 			</div>
 			<div v-else>
-				<button class="user-button cut-text btn text-left" :class="margin ? 'pad-left' : ''" @click="click">
+				<button
+					class="user-button cut-text btn text-left"
+					:class="margin ? 'pad-left' : ''"
+					@click="showUserRelation(relation)"
+				>
 					<b v-if="relation.owner.id !== me.id">{{ relation.owner.username }}</b>
 					<b v-if="relation.target.id !== me.id || relation.owner.id == relation.target.id">{{
 						relation.target.username
@@ -50,7 +62,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { chatStore, userProfile } from "@/store";
+import { ChanConnection } from "@/models/ChanConnection";
+import { Relation } from "@/models/Relation";
 
 export default Vue.extend({
 	name: "ListUsers",
@@ -62,10 +76,6 @@ export default Vue.extend({
 		relations: {
 			type: Array,
 			default: () => [],
-		},
-		click: {
-			type: Function,
-			default: () => {},
 		},
 		margin: {
 			type: Boolean,
@@ -90,6 +100,17 @@ export default Vue.extend({
 			});
 		},
 		declineFriendRequest() {},
+		showUserRelation(relation: Relation) {
+			let user;
+			if (relation.owner.id === this.me.id || relation.owner.id === relation.target.id) user = relation.target;
+			else if (relation.target.id === this.me.id) user = relation.owner;
+			if (user) userProfile.updateUser(user);
+			this.$modal.show("user_profile");
+		},
+		showUserConnection(connection: ChanConnection) {
+			userProfile.updateUser(connection.user);
+			this.$modal.show("user_profile");
+		},
 	},
 });
 </script>
