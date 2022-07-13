@@ -162,7 +162,7 @@ export class ChannelsController {
 			.getQuery()
 			.see_message(user.id)
 			.channel(id)
-			.paginate(date ?? page, per_page, "message.created_at")
+			.paginate(date ?? page, per_page)
 			.getManyAndCount();
 	}
 

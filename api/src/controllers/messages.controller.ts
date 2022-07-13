@@ -32,7 +32,7 @@ export class MessagesController {
 		return this.messageService
 			.getQuery()
 			.see_message(user.id)
-			.paginate(date ?? page, per_page, "message.created_at")
+			.paginate(date ?? page, per_page)
 			.getManyAndCount();
 	}
 

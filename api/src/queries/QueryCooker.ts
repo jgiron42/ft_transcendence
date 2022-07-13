@@ -27,7 +27,11 @@ export class QueryCooker<Entity extends EntityInterface> {
 		return this.getid.next(true).value;
 	}
 
-	constructor(private entityRepository: Repository<Entity>, public query: SelectQueryBuilder<Entity>) {
+	constructor(
+		private entityRepository: Repository<Entity>,
+		public query: SelectQueryBuilder<Entity>,
+		private alias = "entity",
+	) {
 		this.getid = idGen("generatedId");
 	}
 
@@ -35,10 +39,12 @@ export class QueryCooker<Entity extends EntityInterface> {
 		this.query = this.query.orderBy(sort, order, nulls);
 	}
 
-	paginate(page: number | Date = 1, itemByPage = 10, s = "created_at") {
+	paginate(page: number | Date = 1, itemByPage = 10) {
 		if (page instanceof Date) {
 			this.per_page = itemByPage;
-			this.query = this.query.andWhere(`${s} < :cursor_date`, { cursor_date: page }).take(itemByPage);
+			this.query = this.query
+				.andWhere(`${this.alias}.created_at < :cursor_date`, { cursor_date: page })
+				.take(itemByPage);
 		} else {
 			this.per_page = itemByPage;
 			this.query = this.query.skip((page - 1) * itemByPage).take(itemByPage);
