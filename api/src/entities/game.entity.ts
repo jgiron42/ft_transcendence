@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Check } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Validate } from "class-validator";
 import { UserExistsRule } from "@src/validators/userExist.validator";
@@ -9,6 +9,7 @@ import { SetMode } from "@utils/set-mode";
 // this entity is use to stock all the game
 
 @Entity()
+@Check('"userOneId" <> "userTwoId"')
 export class Game {
 	@PrimaryGeneratedColumn()
 	@SetMode("r")

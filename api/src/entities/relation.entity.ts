@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn, Check } from "typeorm";
 import { User } from "@entities/user.entity";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -14,6 +14,7 @@ export enum RelationType {
 
 @Entity()
 @Unique("unique_relation", ["owner", "target", "type"])
+@Check('"ownerId" <> "targetId"')
 export class Relation {
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
