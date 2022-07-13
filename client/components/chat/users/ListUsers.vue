@@ -97,7 +97,7 @@ export default Vue.extend({
 		acceptFriendRequest(id: number) {
 			this.chat.acceptFriend(id);
 		},
-		declineFriendRequest(relation) {
+		declineFriendRequest(relation: Relation) {
 			this.chat.removeFriend(relation);
 		},
 		showUserRelation(relation: Relation) {
