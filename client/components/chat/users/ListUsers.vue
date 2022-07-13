@@ -32,7 +32,7 @@
 							</g>
 						</svg>
 					</button>
-					<button v-if="true" class="w-4 h-3" @click.prevent="declineFriendRequest(relation.id)">
+					<button v-if="true" class="w-4 h-3" @click.prevent="declineFriendRequest(relation)">
 						<svg version="1.1" viewBox="0 0 1000 1000" height="10px">
 							<g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">
 								<path
@@ -97,7 +97,9 @@ export default Vue.extend({
 		acceptFriendRequest(id: number) {
 			this.chat.acceptFriend(id);
 		},
-		declineFriendRequest() {},
+		declineFriendRequest(relation) {
+			this.chat.removeFriend(relation);
+		},
 		showUserRelation(relation: Relation) {
 			let user;
 			if (relation.owner.id === this.me.id || relation.owner.id === relation.target.id) user = relation.target;

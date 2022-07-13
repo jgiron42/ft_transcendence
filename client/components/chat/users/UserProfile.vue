@@ -8,7 +8,7 @@
 			<button v-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
 				Remove friend!
 			</button>
-			<button v-else-if="isPending(relation)" class="button_profile" @click.prevent="cancel_request">
+			<button v-else-if="isPending(relation)" class="button_profile" @click.prevent="removeFriend">
 				Cancel request!
 			</button>
 			<button v-else-if="isWaitingAnswer(relation)" class="button_profile" @click.prevent="acceptFriend">
