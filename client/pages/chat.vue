@@ -32,6 +32,7 @@
 			<ChannelSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
 			<Chatbox v-if="isOnChannel" :socket="socket" />
 			<ChannelProperties v-if="showUsers && isOnChannel" />
+			<Popup name="user_profile" component="chat/users/UserProfile" />
 			<Popup name="create_channel" component="chat/channels/ChannelCreation" />
 			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
 		</div>
@@ -49,7 +50,7 @@ export default Vue.extend({
 	middleware: ["getUser", "auth"],
 	data() {
 		return {
-			socket: this.$socketManager.getSocket(),
+			socket: this.$socket.getSocket(),
 			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
 			get currentChannel() {
@@ -63,32 +64,19 @@ export default Vue.extend({
 	},
 	mounted() {
 		if (this.currentChannel.id !== undefined) {
-			console.log("A");
 			this.socket.emit("JC", this.currentChannel.id);
 		}
 		if (this.socket.connected) {
 			this.updateChannels();
-			console.log("B");
 		}
 		this.socket.on("connect", () => {
 			this.updateChannels();
-			console.log("C");
 		});
 		this.socket.emit("HC", {
 			token: this.$cookies.get("connect.sid"),
 		});
-		this.$nuxt.$on("updateChannels", () => {
-			this.updateChannels();
-		});
 		this.socket.on("updateChannels", () => {
 			this.updateChannels();
-		});
-		this.socket.on("JC", (messages: Message[]) => {
-			this.$nuxt.$emit("JC", messages);
-		});
-		this.$nuxt.$on("createChannel", async (chan: Channel) => {
-			const c = await this.chat.joinChannel(chan);
-			if (c) this.socket.emit("JC", c.id);
 		});
 		this.socket.on("updateRelations", () => {
 			this.chat.getRelations();
@@ -101,6 +89,18 @@ export default Vue.extend({
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.$nuxt.$emit("MSG", message);
+		});
+		this.socket.on("JC", (messages: Message[]) => {
+			this.$nuxt.$emit("JC", messages);
+		});
+
+		// Nuxt events
+		this.$nuxt.$on("updateChannels", () => {
+			this.updateChannels();
+		});
+		this.$nuxt.$on("createChannel", async (chan: Channel) => {
+			const c = await this.chat.joinChannel(chan);
+			if (c) this.socket.emit("JC", c.id);
 		});
 	},
 	destroyed() {

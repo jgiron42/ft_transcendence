@@ -38,7 +38,7 @@ class ChatClass extends Vue {
 				chatStore.updateCurrentChannel(d.data);
 				this.getChanConnections();
 			});
-			Vue.prototype.$socketManager.getSocket()?.emit("JC", ret.id);
+			Vue.prototype.$socket.getSocket()?.emit("JC", ret.id);
 			this.$nuxt.$emit("updateChannels");
 			onSuccess?.();
 		}
