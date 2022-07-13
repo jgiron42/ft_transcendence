@@ -58,8 +58,7 @@ export default Vue.extend({
 			this.chat.addFriend(this.user);
 		},
 		acceptFriend() {
-			if (this.relation)
-				this.chat.acceptFriend(this.relation.id);
+			if (this.relation) this.chat.acceptFriend(this.relation.id);
 		},
 		removeFriend() {
 			if (this.relation) {
