@@ -6,7 +6,7 @@ import { ChanConnection } from "@/models/ChanConnection";
 import { ChanInvitation } from "@/models/ChanInvitation";
 import { Relation } from "@/models/Relation";
 
-class ChatClass extends Vue {
+class Chat extends Vue {
 	async whoAmI(): Promise<User | undefined> {
 		let ret;
 		await this.api.get("/me", undefined, (r: { data: User }) => {
@@ -130,8 +130,8 @@ class ChatClass extends Vue {
 
 declare module "vue/types/vue" {
 	interface Vue {
-		chat: ChatClass;
+		chat: Chat;
 	}
 }
 
-Vue.prototype.chat = new ChatClass();
+Vue.prototype.chat = new Chat();

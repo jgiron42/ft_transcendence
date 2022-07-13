@@ -1,7 +1,7 @@
 import Vue from "vue";
 import axios from "axios";
 
-class ApiClass extends Vue {
+class Api extends Vue {
 	async post(route: string, data?: any, params?: Object, onSuccess?: Function, onError?: Function) {
 		await axios
 			.post(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
@@ -39,8 +39,8 @@ class ApiClass extends Vue {
 
 declare module "vue/types/vue" {
 	interface Vue {
-		api: ApiClass;
+		api: Api;
 	}
 }
 
-Vue.prototype.api = new ApiClass();
+Vue.prototype.api = new Api();
