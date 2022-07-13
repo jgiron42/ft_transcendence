@@ -54,7 +54,6 @@ export default Vue.extend({
 		selectCategory(event: Event) {
 			this.selectedType = (ChannelType as any)[(event.target as HTMLInputElement).value];
 			this.channel.type = this.selectedType;
-			console.log("type: " + this.selectedType);
 			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
 		createChannel() {

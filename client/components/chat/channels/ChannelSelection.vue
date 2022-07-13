@@ -15,10 +15,7 @@
 				<button
 					class="btn-group btn-left"
 					:class="selection === 0 ? 'btn-selected' : ''"
-					@click.prevent="
-						selection = 0;
-						showInvitations = false;
-					"
+					@click.prevent="selection = 0"
 				>
 					mine
 				</button>
@@ -30,10 +27,8 @@
 					list
 				</button>
 			</div>
-			<!--UsersInChannel v-if="selection === 0" :socket="socket" />
-			<AdminPanel v-if="selection === 1" /-->
 		</div>
-		<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" />
+		<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" :state="showInvitations" />
 		<ListChannels
 			v-if="selection === 0 && showInvitations && invitations.length !== 0"
 			:channels="invitations"
@@ -85,7 +80,7 @@ export default Vue.extend({
 				return chatStore.chanInvitations || [];
 			},
 			selection: 0,
-			showInvitations: false,
+			showInvitations: true,
 		};
 	},
 	mounted() {

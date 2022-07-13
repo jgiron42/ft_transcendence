@@ -62,7 +62,6 @@ export default Vue.extend({
 		},
 		removeFriend() {
 			if (this.relation) {
-				console.log(JSON.stringify(this.relation, null, 4));
 				this.chat.removeFriend(this.relation);
 			}
 		},

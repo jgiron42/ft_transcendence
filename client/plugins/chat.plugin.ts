@@ -107,7 +107,6 @@ class Chat extends Vue {
 				relations.push(relation);
 			});
 			ret = relations;
-			console.log("relations: " + JSON.stringify(relations, null, 4));
 			chatStore.updateRelations(relations);
 		});
 		return ret;

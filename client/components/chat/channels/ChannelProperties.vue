@@ -20,17 +20,19 @@
 				<button
 					class="btn-group btn-right"
 					:class="selection === 2 ? 'btn-selected' : ''"
-					@click.prevent="
-						selection = 2;
-						showInvitations = false;
-					"
+					@click.prevent="selection = 2"
 				>
 					Friends
 				</button>
 			</div>
 			<UsersInChannel v-if="selection === 0" :socket="socket" />
-			<AdminPanel v-if="selection === 1" />
-			<ArrowDropdown v-if="selection === 2" name="invitations" :click="onShowInvitations" />
+			<AdminPanel :selection="selection" />
+			<ArrowDropdown
+				v-if="selection === 2"
+				name="invitations"
+				:click="onShowInvitations"
+				:state="showInvitations"
+			/>
 			<ListUsers
 				v-if="selection === 2 && showInvitations && invitations.length !== 0"
 				:relations="invitations"
@@ -65,7 +67,7 @@ export default Vue.extend({
 	data() {
 		return {
 			selection: 0,
-			showInvitations: false,
+			showInvitations: true,
 			get currentChannel() {
 				return chatStore.currentChannel;
 			},
