@@ -19,24 +19,33 @@
 import Vue from "vue";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
+import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "Messages",
 	data() {
 		return {
-			messages: [] as Message[],
+			get messages() {
+				const messages1 = [] as Message[];
+				chatStore.messages.forEach((message) => {
+					const isBlocked = chatStore.blockedUsers.some((relation) => {
+						return relation.target.id === (message.user as User).id;
+					});
+					if (!isBlocked) {
+						messages1.push(message);
+					} else {
+						const msg = {...message};
+						msg.content = "You can't see this message because you blocked this user";
+						msg.blocked = true;
+						messages1.push(msg);
+					}
+				});
+				return messages1;
+			},
 			get me() {
 				return chatStore.me;
 			},
 		};
-	},
-	mounted() {
-		this.$nuxt.$on("JC", (messages: Message[]) => {
-			this.messages = messages;
-		});
-		this.$nuxt.$on("MSG", (message: Message) => {
-			this.messages.push(message);
-		});
 	},
 	destroyed() {
 		this.$nuxt.$off("JC");

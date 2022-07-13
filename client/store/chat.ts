@@ -2,6 +2,7 @@ import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Channel } from "@/models/Channel";
+import { Message } from "@/models/Message";
 import { Relation } from "@/models/Relation";
 import { ChanInvitation } from "@/models/ChanInvitation";
 
@@ -11,6 +12,7 @@ export interface ChatInterface {
 	myChannels: Array<Channel>;
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
+	messages: Array<Message>;
 	chanConnections: Array<ChanConnection>;
 	chanInvitations: Array<ChanInvitation>;
 	relations: Array<Relation>;
@@ -25,6 +27,7 @@ export default class Chat extends VuexModule implements ChatInterface {
 	visibleChannels: Channel[] = [];
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
+	messages: Message[] = [];
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
 	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
 	relations: Array<Relation> = [] as Relation[];
@@ -74,6 +77,16 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	updateCurrentChannel(chan: Channel) {
 		this.currentChannel = chan;
+	}
+
+	@Mutation
+	updateMessages(messages: Message[]) {
+		this.messages = messages;
+	}
+
+	@Mutation
+	pushMessage(message: Message) {
+		this.messages.push(message);
 	}
 
 	@Mutation

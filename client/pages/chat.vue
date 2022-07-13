@@ -92,10 +92,10 @@ export default Vue.extend({
 			this.chat.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			this.$nuxt.$emit("MSG", message);
+			chatStore.pushMessage(message);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
-			this.$nuxt.$emit("JC", messages);
+			chatStore.updateMessages(messages);
 		});
 
 		// Nuxt events

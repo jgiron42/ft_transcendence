@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { User } from "@/models/User";
 import { Channel } from "@/models/Channel";
+import { Message } from "@/models/Message";
 import { chatStore } from "@/store/";
 import { ChanConnection } from "@/models/ChanConnection";
 import { ChanInvitation } from "@/models/ChanInvitation";
@@ -144,6 +145,16 @@ class Chat extends Vue {
 			});
 		}
 	}
+
+//	async getMessage(message: Message) {
+//		// check if message.user is a blocked user
+//		const index = chatStore.blockedUsers.findIndex((r: Relation) => r.target.id === (message.user as User).id);
+//		if (index !== -1)
+//			return;
+//		await this.api.get("/messages/" + message.id, undefined, (r: { data: Message }) => {
+//			this.$nuxt.$emit("MSG", r.data);
+//		});
+//	}
 }
 
 declare module "vue/types/vue" {
