@@ -3,10 +3,18 @@
 		<div class="flex flex-col">pseudo: {{ user.username }}</div>
 		<div class="flex flex-col">nb games : {{ user.nb_game }}</div>
 		<div class="flex flex-col">nb wins : {{ user.nb_win }}</div>
-		<div class="flex flex-col">ratio : {{ nb_wins / nb_game }}</div>
-		<div class="flex flex-row">
-			<button v-if="friend" class="button_profile" @click.prevent="addFriend">friend request</button>
-			<button v-else class="button_profile" @click.prevent="removeFriend">remove friend</button>
+		<div class="flex flex-col">ratio : {{ user.nb_wins / user.nb_game }}</div>
+		<div v-if="user.id !== me.id" class="flex flex-row">
+			<button v-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
+				Remove friend!
+			</button>
+			<button v-else-if="isPending(relation)" class="button_profile" @click.prevent="cancel_request">
+				Cancel request!
+			</button>
+			<button v-else-if="isWaitingAnswer(relation)" class="button_profile" @click.prevent="acceptFriend">
+				Accept friend request!
+			</button>
+			<button v-else class="button_profile" @click.prevent="addFriend">Add friend!</button>
 			<button class="button_profile" @click.prevent="blockUser">block {{ pseudo }}</button>
 		</div>
 	</div>
@@ -14,7 +22,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { userProfile } from "@/store";
+import { Relation, RelationType } from "@/models/Relation";
+import { userProfile, chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "UserProfile",
@@ -23,23 +32,51 @@ export default Vue.extend({
 			get user() {
 				return userProfile.user;
 			},
+			get me() {
+				return chatStore.me;
+			},
 			pseudo: "pseudo test",
 			nb_game: 3,
 			nb_win: 0,
 			nb_lose: 3,
 			ratio: 0,
-			friend: false,
+			get relation() {
+				for (const relation of chatStore.relations) {
+					if (
+						(relation.owner.id !== this.user.id && relation.target.id === this.user.id) ||
+						(relation.owner.id === this.user.id && relation.target.id !== this.user.id)
+					) {
+						return relation;
+					}
+				}
+				return undefined;
+			},
 		};
 	},
 	methods: {
 		addFriend() {
-			console.log("ADD friend");
+			this.chat.addFriend(this.user);
+		},
+		acceptFriend() {
+			this.chat.acceptFriend(this.relation?.id);
 		},
 		removeFriend() {
-			console.log("REMOVE friend");
+			if (this.relation) {
+				console.log(JSON.stringify(this.relation, null, 4));
+				this.chat.removeFriend(this.relation);
+			}
 		},
 		blockUser() {
 			console.log("Block User");
+		},
+		isFriend(relation: Relation) {
+			return relation?.type === RelationType.FRIEND;
+		},
+		isPending(relation: Relation) {
+			return relation?.type === RelationType.FRIEND_REQUEST && relation?.owner.id === this.me.id;
+		},
+		isWaitingAnswer(relation: Relation) {
+			return relation?.type === RelationType.FRIEND_REQUEST && relation?.target.id === this.me.id;
 		},
 	},
 });

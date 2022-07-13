@@ -95,6 +95,6 @@ export class QueryCooker<Entity extends EntityInterface> {
 	}
 
 	async remove(id?: Entity["id"]) {
-		return this.entityRepository.remove(await this.getOneOrFail(id));
+		return await this.entityRepository.remove(await this.getOneOrFail(id));
 	}
 }

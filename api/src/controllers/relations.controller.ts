@@ -81,7 +81,7 @@ export class RelationsController {
 	 * delete the relation designated by id
 	 */
 	@Delete(":id")
-	remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return this.relationService.getQuery().see_relation(user.id).remove(id);
+	async remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
+		return await this.relationService.getQuery().see_relation(user.id).remove(id);
 	}
 }

@@ -81,6 +81,10 @@ export default Vue.extend({
 		this.socket.on("updateRelations", () => {
 			this.chat.getRelations();
 		});
+		this.socket.on("removeRelation", (id: number) => {
+			const relations = chatStore.relations.filter((r) => r.id !== id);
+			chatStore.updateRelations(relations);
+		});
 		this.socket.on("updateChanConnections", () => {
 			this.updateChannels();
 		});

@@ -24,6 +24,17 @@ class ApiClass extends Vue {
 				onError?.(err);
 			});
 	}
+
+	async delete(route: string, params?: Object, onSuccess?: Function, onError?: Function) {
+		await axios
+			.delete(process.env.apiBaseUrl + route, { withCredentials: true, params })
+			.then((response) => {
+				onSuccess?.(response);
+			})
+			.catch((err) => {
+				onError?.(err);
+			});
+	}
 }
 
 declare module "vue/types/vue" {

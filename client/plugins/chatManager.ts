@@ -107,9 +107,24 @@ class ChatClass extends Vue {
 				relations.push(relation);
 			});
 			ret = relations;
+			console.log("relations: " + JSON.stringify(relations, null, 4));
 			chatStore.updateRelations(relations);
 		});
 		return ret;
+	}
+
+	async addFriend(user: User): Promise<void> {
+		await this.api.post("/users/" + user.id + "/invite_friend", undefined, undefined, () => {
+			this.getRelations();
+		});
+	}
+
+	async acceptFriend(id: number): Promise<void> {
+		await this.api.post("/relations/" + id + "/accept_friend");
+	}
+
+	async removeFriend(relation: Relation): Promise<void> {
+		await this.api.delete("/relations/" + relation.id);
 	}
 }
 

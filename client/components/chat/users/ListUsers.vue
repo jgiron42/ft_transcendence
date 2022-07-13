@@ -95,9 +95,7 @@ export default Vue.extend({
 	},
 	methods: {
 		acceptFriendRequest(id: number) {
-			this.api.post("/relations/" + id + "/accept_friend", undefined, undefined, undefined, (err: any) => {
-				console.log(err);
-			});
+			this.chat.acceptRequest(id);
 		},
 		declineFriendRequest() {},
 		showUserRelation(relation: Relation) {
