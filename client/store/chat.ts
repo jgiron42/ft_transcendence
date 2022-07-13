@@ -111,8 +111,13 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
-	pushRelations(relation: Relation) {
-		this.relations.push(relation);
+	pushRelations(rel: Relation) {
+		const id = this.relations.findIndex((r: Relation) => r.id === rel.id);
+		if (id === -1) {
+			this.relations.push(rel);
+		} else {
+			this.relations[id] = rel;
+		}
 	}
 
 	@Mutation
@@ -122,8 +127,11 @@ export default class Chat extends VuexModule implements ChatInterface {
 
 	@Mutation
 	pushBlockedUsers(rel: Relation) {
-		if (!this.blockedUsers.find((r: Relation) => r.id === rel.id)) {
+		const id = this.blockedUsers.findIndex((r: Relation) => r.id === rel.id);
+		if (id === -1) {
 			this.blockedUsers.push(rel);
+		} else {
+			this.blockedUsers[id] = rel;
 		}
 	}
 

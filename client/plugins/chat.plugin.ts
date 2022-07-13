@@ -104,8 +104,8 @@ class Chat extends Vue {
 		await this.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
 			const relations = [] as Relation[];
 			r.data.forEach((relation: Relation) => {
-				relations.push(relation);
 				if (relation.type === RelationType.BLOCK) chatStore.pushBlockedUsers(relation);
+				else relations.push(relation);
 			});
 			ret = relations;
 			chatStore.updateRelations(relations);
@@ -129,7 +129,9 @@ class Chat extends Vue {
 
 	async blockUser(user: User): Promise<void> {
 		await this.api.post("/users/" + user.id + "/block", undefined, undefined, (r: { data: Relation }) => {
-			chatStore.pushBlockedUsers(r.data as Relation);
+			this.api.get("/relations/" + r.data.id, undefined, (_r: { data: Relation }) => {
+				chatStore.pushBlockedUsers(_r.data as Relation);
+			});
 			console.log("blocked users: " + JSON.stringify(chatStore.blockedUsers));
 		});
 	}

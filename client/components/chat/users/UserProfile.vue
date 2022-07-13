@@ -5,13 +5,13 @@
 		<div class="flex flex-col">nb wins : {{ user.nb_win }}</div>
 		<div class="flex flex-col">ratio : {{ user.nb_wins / user.nb_game }}</div>
 		<div v-if="user.id !== me.id" class="flex flex-row">
-			<button v-if="isBlocked" class="button_profile">You Can't add {{ user.username }}</button>
-			<button v-else-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
+			<button v-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
 				Remove friend!
 			</button>
 			<button v-else-if="isPending(relation)" class="button_profile" @click.prevent="removeFriend">
 				Cancel request!
 			</button>
+			<button v-else-if="isBlocked" class="button_profile">You Can't add {{ user.username }}</button>
 			<button v-else-if="isWaitingAnswer(relation)" class="button_profile" @click.prevent="acceptFriend">
 				Accept friend request!
 			</button>
@@ -51,7 +51,6 @@ export default Vue.extend({
 				return undefined;
 			},
 			get isBlocked() {
-				console.log("isBlocked: " + chatStore.blockedUsers.find((r) => r.target.id === this.user.id));
 				return chatStore.blockedUsers.find((r) => r.target.id === this.user.id);
 			},
 		};

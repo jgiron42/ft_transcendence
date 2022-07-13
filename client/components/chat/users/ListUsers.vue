@@ -91,6 +91,7 @@ export default Vue.extend({
 			get me() {
 				return chatStore.me;
 			},
+			rel: this.relations,
 		};
 	},
 	methods: {

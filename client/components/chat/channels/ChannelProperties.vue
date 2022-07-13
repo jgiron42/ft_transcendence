@@ -27,21 +27,7 @@
 			</div>
 			<UsersInChannel v-if="selection === 0" :socket="socket" />
 			<AdminPanel :selection="selection" />
-			<ArrowDropdown
-				v-if="selection === 2"
-				name="invitations"
-				:click="onShowInvitations"
-				:state="showInvitations"
-			/>
-			<ListUsers
-				v-if="selection === 2 && showInvitations && invitations.length !== 0"
-				:relations="invitations"
-				:margin="true"
-				type="invitations"
-			/>
-			<div v-else-if="selection === 2 && showInvitations" class="empty-text">No invitations.</div>
-			<ListUsers v-if="selection === 2 && friends.length !== 0" :relations="friends" type="friends" />
-			<div v-else-if="selection === 2" class="!pl-0 empty-friends">No friends yet.</div>
+			<SocialPanel :selection="selection" />
 		</div>
 	</div>
 </template>
@@ -50,7 +36,6 @@
 import Vue from "vue";
 import { ChannelRole } from "@/models/ChanConnection";
 import { chatStore } from "@/store";
-import { Relation, RelationType } from "@/models/Relation";
 
 export default Vue.extend({
 	name: "SelectionUserPannel",
@@ -77,28 +62,6 @@ export default Vue.extend({
 			get myRole() {
 				return chatStore.roleOnCurrentChannel;
 			},
-			get invitations() {
-				const ret = [] as Relation[];
-				for (const relation of chatStore.relations) {
-					if (
-						relation.target.id === chatStore.me.id &&
-						relation.type === RelationType.FRIEND_REQUEST &&
-						!chatStore.blockedUsers.find((r) => r.target.id === relation.owner.id)
-					) {
-						ret.push(relation);
-					}
-				}
-				return ret;
-			},
-			get friends() {
-				const ret = [] as Relation[];
-				for (const relation of chatStore.relations) {
-					if (relation.type === RelationType.FRIEND) {
-						ret.push(relation);
-					}
-				}
-				return ret;
-			},
 		};
 	},
 	mounted() {
@@ -109,9 +72,6 @@ export default Vue.extend({
 	methods: {
 		checkOwner(): boolean {
 			return this.myRole === ChannelRole.OWNER;
-		},
-		onShowInvitations() {
-			this.showInvitations = !this.showInvitations;
 		},
 	},
 });
