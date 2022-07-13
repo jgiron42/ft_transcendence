@@ -5,7 +5,8 @@
 		<div class="flex flex-col">nb wins : {{ user.nb_win }}</div>
 		<div class="flex flex-col">ratio : {{ user.nb_wins / user.nb_game }}</div>
 		<div v-if="user.id !== me.id" class="flex flex-row">
-			<button v-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
+			<button v-if="isBlocked" class="button_profile">You Can't add {{ user.username }}</button>
+			<button v-else-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
 				Remove friend!
 			</button>
 			<button v-else-if="isPending(relation)" class="button_profile" @click.prevent="removeFriend">
@@ -15,7 +16,10 @@
 				Accept friend request!
 			</button>
 			<button v-else class="button_profile" @click.prevent="addFriend">Add friend!</button>
-			<button class="button_profile" @click.prevent="blockUser">block {{ pseudo }}</button>
+			<button v-if="!isBlocked" class="button_profile" @click.prevent="blockUser">
+				Block {{ user.username }}!
+			</button>
+			<button v-else class="button_profile" @click.prevent="unblockUser">Unblock {{ user.username }}!</button>
 		</div>
 	</div>
 </template>
@@ -35,11 +39,6 @@ export default Vue.extend({
 			get me() {
 				return chatStore.me;
 			},
-			pseudo: "pseudo test",
-			nb_game: 3,
-			nb_win: 0,
-			nb_lose: 3,
-			ratio: 0,
 			get relation() {
 				for (const relation of chatStore.relations) {
 					if (
@@ -50,6 +49,10 @@ export default Vue.extend({
 					}
 				}
 				return undefined;
+			},
+			get isBlocked() {
+				console.log("isBlocked: " + chatStore.blockedUsers.find((r) => r.target.id === this.user.id));
+				return chatStore.blockedUsers.find((r) => r.target.id === this.user.id);
 			},
 		};
 	},
@@ -66,7 +69,10 @@ export default Vue.extend({
 			}
 		},
 		blockUser() {
-			console.log("Block User");
+			this.chat.blockUser(this.user);
+		},
+		unblockUser() {
+			this.chat.unblockUser(this.user);
 		},
 		isFriend(relation: Relation) {
 			return relation?.type === RelationType.FRIEND;

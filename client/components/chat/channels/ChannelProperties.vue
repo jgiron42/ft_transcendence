@@ -22,7 +22,7 @@
 					:class="selection === 2 ? 'btn-selected' : ''"
 					@click.prevent="selection = 2"
 				>
-					Friends
+					Social
 				</button>
 			</div>
 			<UsersInChannel v-if="selection === 0" :socket="socket" />
@@ -80,7 +80,11 @@ export default Vue.extend({
 			get invitations() {
 				const ret = [] as Relation[];
 				for (const relation of chatStore.relations) {
-					if (relation.target.id === chatStore.me.id && relation.type === RelationType.FRIEND_REQUEST) {
+					if (
+						relation.target.id === chatStore.me.id &&
+						relation.type === RelationType.FRIEND_REQUEST &&
+						!chatStore.blockedUsers.find((r) => r.target.id === relation.owner.id)
+					) {
 						ret.push(relation);
 					}
 				}

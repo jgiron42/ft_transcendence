@@ -4,7 +4,7 @@ import { Channel } from "@/models/Channel";
 import { chatStore } from "@/store/";
 import { ChanConnection } from "@/models/ChanConnection";
 import { ChanInvitation } from "@/models/ChanInvitation";
-import { Relation } from "@/models/Relation";
+import { Relation, RelationType } from "@/models/Relation";
 
 class Chat extends Vue {
 	async whoAmI(): Promise<User | undefined> {
@@ -105,6 +105,7 @@ class Chat extends Vue {
 			const relations = [] as Relation[];
 			r.data.forEach((relation: Relation) => {
 				relations.push(relation);
+				if (relation.type === RelationType.BLOCK) chatStore.pushBlockedUsers(relation);
 			});
 			ret = relations;
 			chatStore.updateRelations(relations);
@@ -124,6 +125,22 @@ class Chat extends Vue {
 
 	async removeFriend(relation: Relation): Promise<void> {
 		await this.api.delete("/relations/" + relation.id);
+	}
+
+	async blockUser(user: User): Promise<void> {
+		await this.api.post("/users/" + user.id + "/block", undefined, undefined, (r: { data: Relation }) => {
+			chatStore.pushBlockedUsers(r.data as Relation);
+			console.log("blocked users: " + JSON.stringify(chatStore.blockedUsers));
+		});
+	}
+
+	async unblockUser(user: User): Promise<void> {
+		const index = chatStore.blockedUsers.findIndex((r: Relation) => r.target.id === user.id);
+		if (index !== -1) {
+			await this.api.delete("/relations/" + chatStore.blockedUsers[index].id, undefined, () => {
+				chatStore.spliceBlockedUsers(index);
+			});
+		}
 	}
 }
 

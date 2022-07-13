@@ -15,6 +15,7 @@ export interface ChatInterface {
 	chanInvitations: Array<ChanInvitation>;
 	relations: Array<Relation>;
 	joiningChannel: Channel | undefined;
+	blockedUsers: Array<Relation>;
 }
 
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
@@ -28,6 +29,7 @@ export default class Chat extends VuexModule implements ChatInterface {
 	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
 	relations: Array<Relation> = [] as Relation[];
 	joiningChannel: Channel | undefined = new Channel();
+	blockedUsers: Relation[] = [];
 
 	@Mutation
 	resetAll() {
@@ -111,5 +113,22 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	pushRelations(relation: Relation) {
 		this.relations.push(relation);
+	}
+
+	@Mutation
+	updateBlockedUsers(rel: Relation[]) {
+		this.blockedUsers = rel;
+	}
+
+	@Mutation
+	pushBlockedUsers(rel: Relation) {
+		if (!this.blockedUsers.find((r: Relation) => r.id === rel.id)) {
+			this.blockedUsers.push(rel);
+		}
+	}
+
+	@Mutation
+	spliceBlockedUsers(id: number) {
+		this.blockedUsers.splice(id, 1);
 	}
 }
