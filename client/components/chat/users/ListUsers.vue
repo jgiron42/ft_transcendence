@@ -126,7 +126,7 @@ export default Vue.extend({
 		},
 		unblock(rel: Relation) {
 			this.chat.unblockUser(rel.target);
-		}
+		},
 	},
 });
 </script>

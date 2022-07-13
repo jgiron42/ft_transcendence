@@ -34,7 +34,7 @@ export default Vue.extend({
 					if (!isBlocked) {
 						messages1.push(message);
 					} else {
-						const msg = {...message};
+						const msg = { ...message };
 						msg.content = "You can't see this message because you blocked this user";
 						msg.blocked = true;
 						messages1.push(msg);
