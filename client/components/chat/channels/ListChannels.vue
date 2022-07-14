@@ -90,13 +90,13 @@ export default Vue.extend({
 		},
 		join(chan: Channel) {
 			if (chan.type === ChannelType.PASSWORD) {
-				if (this.checkPrivateChannel(chan.id)) this.chat.joinChannel(chan);
+				if (this.checkPrivateChannel(chan.id)) this.chat.channel.joinChannel(chan);
 				else {
 					chatStore.updateJoiningChannel(chan);
 					this.$modal.show("join_protected_chan");
 				}
 			} else {
-				this.chat.joinChannel(chan);
+				this.chat.channel.joinChannel(chan);
 			}
 		},
 		leaveChannel(chanId: number) {

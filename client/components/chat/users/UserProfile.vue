@@ -53,28 +53,28 @@ export default Vue.extend({
 			get isBlocked() {
 				return chatStore.blockedUsers.find((r) => r.target.id === this.user.id);
 			},
-			get ratio(): float {
+			get ratio(): number {
 				return this.user.nb_win / this.user.nb_game;
 			},
 		};
 	},
 	methods: {
 		addFriend() {
-			this.chat.addFriend(this.user);
+			this.chat.relation.addFriend(this.user);
 		},
 		acceptFriend() {
-			if (this.relation) this.chat.acceptFriend(this.relation.id);
+			if (this.relation) this.chat.relation.acceptFriend(this.relation.id);
 		},
 		removeFriend() {
 			if (this.relation) {
-				this.chat.removeFriend(this.relation);
+				this.chat.relation.removeFriend(this.relation);
 			}
 		},
 		blockUser() {
-			this.chat.blockUser(this.user);
+			this.chat.relation.blockUser(this.user);
 		},
 		unblockUser() {
-			this.chat.unblockUser(this.user);
+			this.chat.relation.unblockUser(this.user);
 		},
 		isFriend(relation: Relation) {
 			return relation?.type === RelationType.FRIEND;

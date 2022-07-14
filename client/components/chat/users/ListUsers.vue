@@ -108,10 +108,10 @@ export default Vue.extend({
 	},
 	methods: {
 		acceptFriendRequest(id: number) {
-			this.chat.acceptFriend(id);
+			this.chat.relation.acceptFriend(id);
 		},
 		declineFriendRequest(relation: Relation) {
-			this.chat.removeFriend(relation);
+			this.chat.relation.removeFriend(relation);
 		},
 		showUserRelation(relation: Relation) {
 			let user;
@@ -125,7 +125,7 @@ export default Vue.extend({
 			this.$modal.show("user_profile");
 		},
 		unblock(rel: Relation) {
-			this.chat.unblockUser(rel.target);
+			this.chat.relation.unblockUser(rel.target);
 		},
 	},
 });

@@ -85,7 +85,7 @@ export default Vue.extend({
 			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
 		async updateChannel() {
-			if (await this.chat.updateChannel(this.channel)) {
+			if (await this.chat.channel.updateChannel(this.channel)) {
 				this.$modal.hide("edit_channel");
 			}
 		},

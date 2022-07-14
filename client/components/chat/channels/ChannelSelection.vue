@@ -92,7 +92,7 @@ export default Vue.extend({
 				containerTest.scrollLeft = containerTest.scrollWidth;
 			}
 		}
-		this.chat.getChanInvitations();
+		this.chat.chanInvitation.getChanInvitations();
 	},
 	methods: {
 		onShowInvitations() {

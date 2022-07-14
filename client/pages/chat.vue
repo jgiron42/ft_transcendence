@@ -84,7 +84,7 @@ export default Vue.extend({
 			this.updateChannels();
 		});
 		this.socket.on("updateRelations", () => {
-			this.chat.getRelations();
+			this.chat.relation.getRelations();
 		});
 		this.socket.on("removeRelation", (id: number) => {
 			const relations = chatStore.relations.filter((r) => r.id !== id);
@@ -97,10 +97,10 @@ export default Vue.extend({
 			chatStore.removeChanConnection(connection);
 		});
 		this.socket.on("updateChanInvitations", () => {
-			this.chat.getChanInvitations();
+			this.chat.chanInvitation.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			this.chat.getMessage(message);
+			this.chat.message.getMessage(message);
 			// chatStore.pushMessage(message);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
@@ -112,7 +112,7 @@ export default Vue.extend({
 			this.updateChannels();
 		});
 		this.$nuxt.$on("createChannel", async (chan: Channel) => {
-			const c = await this.chat.joinChannel(chan);
+			const c = await this.chat.channel.joinChannel(chan);
 			if (c) this.socket.emit("JC", c.id);
 		});
 	},
@@ -121,11 +121,11 @@ export default Vue.extend({
 	},
 	methods: {
 		async updateChannels() {
-			await this.chat.getMyChannels();
-			await this.chat.getVisibleChannels();
-			await this.chat.getChanConnections();
-			await this.chat.getRelations();
-			await this.chat.getChanInvitations();
+			await this.chat.chanConnection.getUserChanConnections();
+			await this.chat.channel.getChannels();
+			await this.chat.chanConnection.getChanConnections();
+			await this.chat.relation.getRelations();
+			await this.chat.chanInvitation.getChanInvitations();
 		},
 		onShowChannels() {
 			if (this.$device.isMobile) {
