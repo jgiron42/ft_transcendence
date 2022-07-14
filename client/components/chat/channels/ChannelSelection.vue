@@ -40,7 +40,7 @@
 			v-if="selection === 1"
 			:channels="visibleChannels"
 			:current-channel="currentChannel"
-			list-type=""
+			list-type="all"
 		/>
 	</div>
 </template>

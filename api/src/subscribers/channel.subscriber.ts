@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent, Connection } from "typeorm";
+import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent, Connection } from "typeorm";
 import { Channel } from "@entities/channel.entity";
 import { SocketService } from "@services/socket.service";
 
@@ -16,7 +16,10 @@ export class ChannelSubscriber implements EntitySubscriberInterface<Channel> {
 	}
 
 	afterInsert(event: InsertEvent<Channel>) {
-		void event;
-		this.socketService.sendMessage("updateChannels", null, "realm");
+		this.socketService.sendMessage("updateChannel", event.entity, "realm");
+	}
+
+	afterUpdate(event: UpdateEvent<Channel>) {
+		this.socketService.sendMessage("updateChannel", event.entity, "realm");
 	}
 }

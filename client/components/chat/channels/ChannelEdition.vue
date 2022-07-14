@@ -13,7 +13,13 @@
 					/>
 				</div>
 			</div>
-			<select id="type-select" class="text-black p-2" name="pets" @change="selectCategory($event)">
+			<select
+				id="type-select"
+				v-model="selectedTypeName"
+				class="text-black p-2"
+				name="pets"
+				@change="selectCategory($event)"
+			>
 				<option value="PUBLIC">public</option>
 				<option value="PRIVATE">private</option>
 				<option value="PASSWORD">protected</option>
@@ -21,6 +27,7 @@
 			<div v-if="selectedType === 1">
 				<div class="flex flex-col">
 					<p class="ml-2">Enter the password:</p>
+					<p class="info ml-2">(Leaving this field empty will not update the password)</p>
 					<div class="area-chan-name p-2">
 						<input
 							id="textarea-password"
@@ -33,21 +40,37 @@
 					</div>
 				</div>
 			</div>
-			<button class="validate" @click.prevent="createChannel">Create the channel {{ channel.name }}</button>
+			<button class="validate" @click.prevent="updateChannel">Update the channel {{ channel.name }}</button>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Channel, ChannelType } from "@/models/Channel";
+import { ChannelType } from "@/models/Channel";
+import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "ChannelCreation",
 	data() {
 		return {
-			channel: { name: "", type: ChannelType.PUBLIC } as Channel,
-			selectedType: ChannelType.PUBLIC,
+			channel: {
+				id: chatStore.currentChannel.id,
+				name: chatStore.currentChannel.name,
+				type: chatStore.currentChannel.type,
+				password: "",
+			},
+			selectedType: chatStore.currentChannel.type,
+			get selectedTypeName() {
+				switch (this.selectedType) {
+					case ChannelType.PUBLIC:
+						return "PUBLIC";
+					case ChannelType.PRIVATE:
+						return "PRIVATE";
+					case ChannelType.PASSWORD:
+						return "PASSWORD";
+				}
+			},
 		};
 	},
 	methods: {
@@ -56,11 +79,8 @@ export default Vue.extend({
 			this.channel.type = this.selectedType;
 			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
-		createChannel() {
-			this.api.post("/channels", this.channel, undefined, (r: { data: Channel }) => {
-				this.$nuxt.$emit("createChannel", r.data);
-				this.$modal.hide("create_channel");
-			});
+		updateChannel() {
+			this.chat.updateChannel(this.channel);
 		},
 	},
 });
@@ -96,5 +116,11 @@ export default Vue.extend({
 	display: inline;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.info {
+	font: 0.75em "Open Sans", sans-serif;
+	color: #d0d0d0;
+	padding-bottom: 5px;
 }
 </style>

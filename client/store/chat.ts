@@ -1,7 +1,7 @@
 import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
-import { Channel } from "@/models/Channel";
+import { Channel, ChannelType } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { Relation } from "@/models/Relation";
 import { ChanInvitation } from "@/models/ChanInvitation";
@@ -47,6 +47,15 @@ export default class Chat extends VuexModule implements ChatInterface {
 	resetCurrentChannel() {
 		this.currentChannel = new Channel();
 		this.roleOnCurrentChannel = ChannelRole.USER;
+	}
+
+	@Mutation
+	leaveChannel(chanId: number) {
+		this.chanConnections = this.chanConnections.filter((c: ChanConnection) => c.channel.id !== chanId);
+		this.visibleChannels = this.visibleChannels.filter(
+			(c: Channel) => c.id !== chanId && c.type === ChannelType.PRIVATE,
+		);
+		this.myChannels = this.myChannels.filter((c: Channel) => c.id !== chanId);
 	}
 
 	@Mutation
@@ -104,8 +113,29 @@ export default class Chat extends VuexModule implements ChatInterface {
 		this.visibleChannels = chans;
 	}
 
-	@Mutation pushVisibleChannels(chan: Channel) {
+	@Mutation
+	pushVisibleChannels(chan: Channel) {
 		this.visibleChannels.push(chan);
+	}
+
+	@Mutation
+	updateChannel(chan: Channel) {
+		const id = this.chanConnections.findIndex((c: ChanConnection) => c.channel.id === chan.id);
+		const vid = this.visibleChannels.findIndex((c: Channel) => c.id === chan.id);
+		if (id !== -1) {
+			const _id = this.myChannels.findIndex((c: Channel) => c.id === chan.id);
+			this.myChannels.splice(_id, 1);
+			this.myChannels.push(chan);
+			this.visibleChannels.splice(vid, 1);
+			this.visibleChannels.push(chan);
+		} else {
+			if (vid !== -1) {
+				this.visibleChannels.splice(vid, 1);
+			}
+			if (chan.type !== ChannelType.PRIVATE) {
+				this.visibleChannels.push(chan);
+			}
+		}
 	}
 
 	@Mutation

@@ -6,6 +6,12 @@
 			<hr />
 		</div>
 		<br />
+		<div id="channel-prop">
+			<ArrowDropdown name="channel properties" :click="onShowChanProps" :state="showChanProps" />
+			<div v-if="showChanProps" class="">
+				<EditChannel />
+			</div>
+		</div>
 		<div id="admin-list">
 			<ArrowDropdown name="admins users" :click="onShowAdmin" :state="showAdmin" />
 			<ListUsers
@@ -66,6 +72,7 @@ export default Vue.extend({
 			get mutedConnections() {
 				return chatStore.chanConnections.filter((connection) => connection.muted);
 			},
+			showChanProps: true,
 			showAdmin: true,
 			showBanned: true,
 			showMuted: true,
@@ -81,6 +88,9 @@ export default Vue.extend({
 		onShowMuted() {
 			this.showMuted = !this.showMuted;
 		},
+		onShowChanProps() {
+			this.showChanProps = !this.showChanProps;
+		},
 	},
 });
 </script>
@@ -88,6 +98,10 @@ export default Vue.extend({
 <style scoped>
 .empty-text {
 	color: #d5d5d5;
+	padding-left: 28px;
+}
+
+.sub-content {
 	padding-left: 28px;
 }
 

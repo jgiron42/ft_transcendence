@@ -30,7 +30,7 @@
 								</g>
 							</svg>
 						</div>
-						<div class="w-full cut-text">
+						<div class="w-full">
 							<b>{{ chan.name }}</b>
 						</div>
 					</div>
@@ -104,7 +104,7 @@ export default Vue.extend({
 				if (chanId === chatStore.currentChannel.id) {
 					chatStore.resetCurrentChannel();
 				}
-				this.$nuxt.$emit("updateChannels");
+				chatStore.leaveChannel(chanId);
 			});
 		},
 	},

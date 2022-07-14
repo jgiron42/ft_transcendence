@@ -35,6 +35,17 @@ class Api extends Vue {
 				onError?.(err);
 			});
 	}
+
+	async put(route: string, data?: any, params?: Object, onSuccess?: Function, onError?: Function) {
+		await axios
+			.put(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
+			.then((response) => {
+				onSuccess?.(response);
+			})
+			.catch((err) => {
+				onError?.(err);
+			});
+	}
 }
 
 declare module "vue/types/vue" {

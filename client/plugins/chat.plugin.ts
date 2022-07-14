@@ -156,6 +156,10 @@ class Chat extends Vue {
 			});
 		}
 	}
+
+	async updateChannel(chan: Channel) {
+		await this.api.put("/channels/" + chan.id, chan);
+	}
 }
 
 declare module "vue/types/vue" {
