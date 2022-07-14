@@ -40,7 +40,9 @@
 					</div>
 				</div>
 			</div>
-			<button class="validate" @click.prevent="updateChannel">Update the channel {{ channel.name }}</button>
+			<button class="validate" @click.prevent="updateChannel">
+				Update the channel {{ currentChannel.name }}
+			</button>
 		</div>
 	</div>
 </template>
@@ -71,6 +73,9 @@ export default Vue.extend({
 						return "PASSWORD";
 				}
 			},
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 		};
 	},
 	methods: {
@@ -79,8 +84,10 @@ export default Vue.extend({
 			this.channel.type = this.selectedType;
 			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
-		updateChannel() {
-			this.chat.updateChannel(this.channel);
+		async updateChannel() {
+			if (await this.chat.updateChannel(this.channel)) {
+				this.$modal.hide("edit_channel");
+			}
 		},
 	},
 });

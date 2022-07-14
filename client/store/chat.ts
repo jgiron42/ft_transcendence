@@ -84,7 +84,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
 		if (id !== -1) this.chanConnections.splice(id, 1);
 		this.chanConnections.push(connection);
-		console.log("chanConnections", JSON.stringify(this.chanConnections));
 	}
 
 	@Mutation
@@ -149,6 +148,9 @@ export default class Chat extends VuexModule implements ChatInterface {
 			if (chan.type !== ChannelType.PRIVATE) {
 				this.visibleChannels.push(chan);
 			}
+		}
+		if (chan.id === this.currentChannel.id) {
+			this.currentChannel = chan;
 		}
 	}
 

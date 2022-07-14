@@ -25,7 +25,9 @@ export default Vue.extend({
 	name: "EditChannel",
 	data() {
 		return {
-			currentChannel: chatStore.currentChannel,
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 			get ChannelType() {
 				return ChannelType;
 			},

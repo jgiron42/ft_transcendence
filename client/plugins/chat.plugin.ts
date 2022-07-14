@@ -165,8 +165,12 @@ class Chat extends Vue {
 		}
 	}
 
-	async updateChannel(chan: Channel) {
-		await this.api.put("/channels/" + chan.id, chan);
+	async updateChannel(chan: Channel): Promise<boolean> {
+		let ret = false;
+		await this.api.put("/channels/" + chan.id, chan, undefined, () => {
+			ret = true;
+		});
+		return ret;
 	}
 }
 
