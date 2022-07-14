@@ -45,6 +45,7 @@ import Vue from "vue";
 import { Channel } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
+import { ChanConnection } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "Chat",
@@ -89,8 +90,11 @@ export default Vue.extend({
 			const relations = chatStore.relations.filter((r) => r.id !== id);
 			chatStore.updateRelations(relations);
 		});
-		this.socket.on("updateChanConnections", () => {
-			this.updateChannels();
+		this.socket.on("newConnection", (connection: ChanConnection) => {
+			chatStore.pushChanConnection(connection);
+		});
+		this.socket.on("removeConnection", (connection: ChanConnection) => {
+			chatStore.removeChanConnection(connection);
 		});
 		this.socket.on("updateChanInvitations", () => {
 			this.chat.getChanInvitations();

@@ -46,6 +46,15 @@ class Chat extends Vue {
 		return ret;
 	}
 
+	async leaveChannel(chan: Channel) {
+		await this.api.post("/channels/" + chan.id + "/leave", undefined, undefined, () => {
+			if (chan.id === chatStore.currentChannel.id) {
+				chatStore.resetCurrentChannel();
+			}
+			chatStore.leaveChannel(chan.id);
+		});
+	}
+
 	async getVisibleChannels() {
 		await this.api.get("/channels", { page: 1, per_page: 100 }, (r: { data: Channel[] }) => {
 			if (r.data instanceof Array) chatStore.updateVisibleChannels(r.data);
@@ -133,7 +142,6 @@ class Chat extends Vue {
 			this.api.get("/relations/" + r.data.id, undefined, (_r: { data: Relation }) => {
 				chatStore.pushBlockedUsers(_r.data as Relation);
 			});
-			console.log("blocked users: " + JSON.stringify(chatStore.blockedUsers));
 			Vue.prototype.$socket.getSocket()?.emit("JC", chatStore.currentChannel.id);
 		});
 	}

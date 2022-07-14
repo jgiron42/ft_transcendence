@@ -53,7 +53,7 @@ export default class Chat extends VuexModule implements ChatInterface {
 	leaveChannel(chanId: number) {
 		this.chanConnections = this.chanConnections.filter((c: ChanConnection) => c.channel.id !== chanId);
 		this.visibleChannels = this.visibleChannels.filter(
-			(c: Channel) => c.id !== chanId && c.type === ChannelType.PRIVATE,
+			(c: Channel) => !(c.id === chanId && c.type === ChannelType.PRIVATE),
 		);
 		this.myChannels = this.myChannels.filter((c: Channel) => c.id !== chanId);
 	}
@@ -71,6 +71,20 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	updateChanConnections(connections: ChanConnection[]) {
 		this.chanConnections = connections;
+	}
+
+	@Mutation
+	removeChanConnection(connection: ChanConnection) {
+		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
+		if (id !== -1) this.chanConnections.splice(id, 1);
+	}
+
+	@Mutation
+	pushChanConnection(connection: ChanConnection) {
+		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
+		if (id !== -1) this.chanConnections.splice(id, 1);
+		this.chanConnections.push(connection);
+		console.log("chanConnections", JSON.stringify(this.chanConnections));
 	}
 
 	@Mutation

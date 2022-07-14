@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent, Connection } from "typeorm";
+import { EventSubscriber, EntitySubscriberInterface, InsertEvent, RemoveEvent, Connection } from "typeorm";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { SocketService } from "@services/socket.service";
 
@@ -16,6 +16,11 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 	}
 
 	afterInsert(event: InsertEvent<ChanConnection>) {
-		this.socketService.sendMessage("updateChanConnections", null, event.entity.channel.name);
+		this.socketService.sendMessage("newConnection", event.entity, event.entity.channel.name);
+	}
+
+	async beforeRemove(event: RemoveEvent<ChanConnection>) {
+		this.socketService.sendMessage("removeConnection", event.entity, event.entity.channel.name);
+		await this.socketService.leaveRoom(event.entity.user.id, event.entity.channel.name);
 	}
 }

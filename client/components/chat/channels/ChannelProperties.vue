@@ -39,16 +39,6 @@ import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "SelectionUserPannel",
-	props: {
-		socket: {
-			type: Object,
-			default: () => {},
-		},
-		align: {
-			type: String,
-			default: "right",
-		},
-	},
 	data() {
 		return {
 			selection: 0,
@@ -65,8 +55,8 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.$nuxt.$on("JC", () => {
-			this.selection = 0;
+		this.$nuxt.$on("updateChannels", () => {
+			if (this.selection === 1) this.selection = 0;
 		});
 	},
 	methods: {
