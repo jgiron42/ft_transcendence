@@ -1,7 +1,8 @@
 import Vue from "vue";
+import { chatStore } from "@/store/";
 import { User } from "@/models/User";
 import { Channel } from "@/models/Channel";
-import { chatStore } from "@/store/";
+import { Message } from "@/models/Message";
 import { ChanConnection } from "@/models/ChanConnection";
 import { ChanInvitation } from "@/models/ChanInvitation";
 import { Relation, RelationType } from "@/models/Relation";
@@ -133,6 +134,7 @@ class Chat extends Vue {
 				chatStore.pushBlockedUsers(_r.data as Relation);
 			});
 			console.log("blocked users: " + JSON.stringify(chatStore.blockedUsers));
+			Vue.prototype.$socket.getSocket()?.emit("JC", chatStore.currentChannel.id);
 		});
 	}
 
@@ -141,6 +143,16 @@ class Chat extends Vue {
 		if (index !== -1) {
 			await this.api.delete("/relations/" + chatStore.blockedUsers[index].id, undefined, () => {
 				chatStore.spliceBlockedUsers(index);
+				Vue.prototype.$socket.getSocket()?.emit("JC", chatStore.currentChannel.id);
+			});
+		}
+	}
+
+	async getMessage(message: Message): Promise<void> {
+		// check if message.user isn't blocked
+		if (!chatStore.blockedUsers.find((r: Relation) => r.target.id === message.user)) {
+			await this.api.get("/messages/" + message.id, undefined, (r: { data: Message }) => {
+				chatStore.pushMessage(r.data);
 			});
 		}
 	}

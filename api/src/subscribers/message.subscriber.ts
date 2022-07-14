@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { EventSubscriber, EntitySubscriberInterface, InsertEvent, Connection } from "typeorm";
 import { Message } from "@entities/message.entity";
 import { Channel } from "@entities/channel.entity";
+import { User } from "@entities/user.entity";
 import { SocketService } from "@services/socket.service";
 
 @EventSubscriber()
@@ -17,6 +18,10 @@ export class MessageSubscriber implements EntitySubscriberInterface<Message> {
 	}
 
 	afterInsert(event: InsertEvent<Message>) {
-		this.socketService.sendMessage("MSG", event.entity, (event.entity.channel as Channel).name);
+		this.socketService.sendMessage(
+			"MSG",
+			{ id: event.entity.id, user: (event.entity.user as User).id },
+			(event.entity.channel as Channel).name,
+		);
 	}
 }

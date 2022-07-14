@@ -92,7 +92,8 @@ export default Vue.extend({
 			this.chat.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			chatStore.pushMessage(message);
+			this.chat.getMessage(message);
+			// chatStore.pushMessage(message);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			chatStore.updateMessages(messages);

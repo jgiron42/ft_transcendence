@@ -17,30 +17,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
-import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "Messages",
 	data() {
 		return {
 			get messages() {
-				const messages1 = [] as Message[];
-				chatStore.messages.forEach((message) => {
-					const isBlocked = chatStore.blockedUsers.some((relation) => {
-						return relation.target.id === (message.user as User).id;
-					});
-					if (!isBlocked) {
-						messages1.push(message);
-					} else {
-						const msg = { ...message };
-						msg.content = "You can't see this message because you blocked this user";
-						msg.blocked = true;
-						messages1.push(msg);
-					}
-				});
-				return messages1;
+				return chatStore.messages;
 			},
 			get me() {
 				return chatStore.me;
