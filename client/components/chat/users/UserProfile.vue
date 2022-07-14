@@ -1,9 +1,9 @@
 <template>
 	<div class="text-white flex flex-col pl-8 pr-8 gap-4">
-		<div class="flex flex-col">pseudo: {{ user.username }}</div>
-		<div class="flex flex-col">nb games : {{ user.nb_game }}</div>
-		<div class="flex flex-col">nb wins : {{ user.nb_win }}</div>
-		<div class="flex flex-col">ratio : {{ user.nb_wins / user.nb_game }}</div>
+		<div>pseudo: {{ user.username }}</div>
+		<div>nb games : {{ user.nb_game }}</div>
+		<div>nb wins : {{ user.nb_win }}</div>
+		<div>ratio : {{ ratio }}</div>
 		<div v-if="user.id !== me.id" class="flex flex-row">
 			<button v-if="isFriend(relation)" class="button_profile" @click.prevent="removeFriend">
 				Remove friend!
@@ -52,6 +52,9 @@ export default Vue.extend({
 			},
 			get isBlocked() {
 				return chatStore.blockedUsers.find((r) => r.target.id === this.user.id);
+			},
+			get ratio(): float {
+				return this.user.nb_win / this.user.nb_game;
 			},
 		};
 	},
