@@ -1,7 +1,7 @@
 <template>
 	<div id="chat-selection" class="h-full" :class="isOnChannel ? 'on-channel' : ''">
 		<div class="flex flex-row">
-			<div id="channel-title" class="pl-11 w-full text-center mt-auto mb-auto">Channels</div>
+			<div class="pl-11 chat-title">Channels</div>
 			<button
 				id="channel-creation"
 				class="items-center cut-text w-95 btn pr-3 pl-3"

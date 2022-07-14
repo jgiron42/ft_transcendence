@@ -7,7 +7,7 @@
 					:class="selection === 0 ? 'btn-selected' : ''"
 					@click.prevent="selection = 0"
 				>
-					User
+					Channel
 				</button>
 				<button
 					v-if="checkOwner()"
@@ -25,7 +25,7 @@
 					Social
 				</button>
 			</div>
-			<UsersInChannel v-if="selection === 0" :socket="socket" />
+			<UsersInChannel :selection="selection" />
 			<AdminPanel :selection="selection" />
 			<SocialPanel :selection="selection" />
 		</div>

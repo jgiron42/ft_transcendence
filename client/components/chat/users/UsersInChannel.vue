@@ -1,6 +1,15 @@
 <template>
-	<div id="user-selection" class="h-full">
-		<ListUsers :connections="chanConnections" />
+	<div v-if="selection == 0" id="user-selection" class="h-full flex flex-col gap-2">
+		<div id="title">
+			<hr />
+			<div id="chan-name" class="panel-title">Channel: {{ currentChannel.name }}</div>
+			<hr />
+		</div>
+		<br />
+		<div id="users-list">
+			<ArrowDropdown name="users" :click="onShowUsers" :state="showUsers" />
+			<ListUsers v-if="showUsers" :margin="true" :connections="chanConnections" />
+		</div>
 	</div>
 </template>
 
@@ -10,41 +19,33 @@ import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "UsersInChannel",
+	props: {
+		selection: {
+			type: Number,
+			default: 0,
+		},
+	},
 	data() {
 		return {
+			showUsers: true,
 			get chanConnections() {
 				return chatStore.chanConnections;
 			},
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 		};
+	},
+	methods: {
+		onShowUsers() {
+			this.showUsers = !this.showUsers;
+		},
 	},
 });
 </script>
 
-<style>
-#user-selection {
-	width: 100%;
-	background-color: #252525;
-}
-
-.user-name {
-	overflow: hidden;
-	color: #bdbdbd;
-	font: 1em "Open Sans", sans-serif;
-	width: 100%;
-	padding: 3px;
-	border-radius: 5px;
-	margin-bottom: 5px;
-}
-
-.user-name:hover {
-	background-color: #393939;
-	color: #999;
-}
-
-.cut-text {
-	text-overflow: ellipsis;
-	overflow: hidden;
-	width: 100%;
-	white-space: nowrap;
+<style scoped>
+hr {
+	border-color: #555;
 }
 </style>

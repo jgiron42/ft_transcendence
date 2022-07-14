@@ -1,18 +1,33 @@
 <template>
-	<div v-if="selection == 2">
-		<ArrowDropdown name="invitations" :click="onShowInvitations" :state="showInvitations" />
-		<ListUsers
-			v-if="showInvitations && invitations.length !== 0"
-			:relations="invitations"
-			:margin="true"
-			type="invitations"
-		/>
-		<div v-else-if="showInvitations" class="empty-text">No invitations.</div>
-		<ArrowDropdown name="blocked users" :click="onShowBlocked" :state="showBlocked" />
-		<ListUsers v-if="showBlocked && blocked.length !== 0" :relations="blocked" type="blocked" :margin="true" />
-		<div v-else-if="showBlocked" class="empty-text">No blocked users.</div>
-		<ListUsers v-if="friends.length !== 0" :relations="friends" type="friends" />
-		<div v-else class="!pl-0 empty-friends">No friends yet.</div>
+	<div v-if="selection == 2" id="social-panel" class="h-full flex flex-col gap-2">
+		<div id="title">
+			<hr />
+			<div class="panel-title">Social Panel</div>
+			<hr />
+		</div>
+		<br />
+		<div id="invite-panel">
+			<ArrowDropdown name="invitations" :click="onShowInvitations" :state="showInvitations" />
+			<ListUsers
+				v-if="showInvitations && invitations.length !== 0"
+				:relations="invitations"
+				:margin="true"
+				type="invitations"
+			/>
+			<div v-else-if="showInvitations" class="empty-text">No invitations.</div>
+		</div>
+		<hr />
+		<div id="friends">
+			<ArrowDropdown name="friends" :click="onShowFriends" :state="showFriends" />
+			<ListUsers v-if="showFriends && friends.length !== 0" :relations="friends" type="friends" :margin="true" />
+			<div v-else-if="showFriends" class="empty-text">No friends yet.</div>
+		</div>
+		<hr />
+		<div id="block-panel">
+			<ArrowDropdown name="blocked users" :click="onShowBlocked" :state="showBlocked" />
+			<ListUsers v-if="showBlocked && blocked.length !== 0" :relations="blocked" type="blocked" :margin="true" />
+			<div v-else-if="showBlocked" class="empty-text">No blocked users.</div>
+		</div>
 	</div>
 </template>
 
@@ -58,6 +73,7 @@ export default Vue.extend({
 			},
 			showInvitations: true,
 			showBlocked: true,
+			showFriends: true,
 		};
 	},
 	methods: {
@@ -67,6 +83,15 @@ export default Vue.extend({
 		onShowBlocked() {
 			this.showBlocked = !this.showBlocked;
 		},
+		onShowFriends() {
+			this.showFriends = !this.showFriends;
+		},
 	},
 });
 </script>
+
+<style scoped>
+hr {
+	border-color: #555;
+}
+</style>

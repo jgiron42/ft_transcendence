@@ -47,3 +47,23 @@ html {
 	background-color: #97add9;
 	color: #2c3548;
 }
+
+.chat-title {
+	width: 100%;
+	margin-top: auto;
+	margin-bottom: auto;
+	text-align: center;
+	vertical-align: middle;
+	color: #d5d5d5;
+}
+
+.panel-title {
+	width: 100%;
+	margin-top: auto;
+	margin-bottom: auto;
+	text-align: center;
+	vertical-align: middle;
+	color: #d5d5d5;
+	background-color: #3e3e3e;
+	padding: 0 0.25em;
+}

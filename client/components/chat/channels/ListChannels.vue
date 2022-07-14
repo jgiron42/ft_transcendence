@@ -30,7 +30,7 @@
 								</g>
 							</svg>
 						</div>
-						<div class="w-full">
+						<div class="w-full cut-text">
 							<b>{{ chan.name }}</b>
 						</div>
 					</div>
