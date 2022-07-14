@@ -1,11 +1,11 @@
 import Vue from "vue";
 import { chatStore } from "@/store";
 import { User } from "@/models/User";
-import ChannelPlugin from "@/plugins/channel.plugin";
-import ChanConnectionPlugin from "@/plugins/chan_connection.plugin";
-import ChanInvitationPlugin from "@/plugins/chan_invitation.plugin";
-import MessagePlugin from "@/plugins/message.plugin";
-import RelationPlugin from "@/plugins/relation.plugin";
+import { ChannelPlugin } from "@/plugins/channel.plugin";
+import { ChanConnectionPlugin } from "@/plugins/chan_connection.plugin";
+import { ChanInvitationPlugin } from "@/plugins/chan_invitation.plugin";
+import { MessagePlugin } from "@/plugins/message.plugin";
+import { RelationPlugin } from "@/plugins/relation.plugin";
 
 interface IChatPlugin {
 	channel: ChannelPlugin;

@@ -29,12 +29,12 @@
 			</button>
 		</div>
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-			<ChannelSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
+			<LeftPanel v-if="showChannels" :socket="socket" />
 			<Chatbox v-if="isOnChannel" :socket="socket" />
-			<ChannelProperties v-if="showUsers && isOnChannel" />
+			<RightPanel v-if="showUsers && isOnChannel" />
 			<Popup name="user_profile" component="chat/users/UserProfile" />
-			<Popup name="create_channel" component="chat/channels/ChannelCreation" />
-			<Popup name="edit_channel" component="chat/channels/ChannelEdition" />
+			<Popup name="create_channel" component="chat/channels/popup/ChannelCreation" />
+			<Popup name="edit_channel" component="chat/channels/popup/ChannelEdition" />
 			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
 		</div>
 	</div>
@@ -59,8 +59,7 @@ export default Vue.extend({
 				return chatStore.currentChannel;
 			},
 			get isOnChannel() {
-				const name = this.currentChannel.name;
-				return name !== undefined && name.length !== 0;
+				return this.currentChannel.name;
 			},
 		};
 	},

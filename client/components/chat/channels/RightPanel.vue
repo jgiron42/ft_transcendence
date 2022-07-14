@@ -38,7 +38,7 @@ import { ChannelRole } from "@/models/ChanConnection";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
-	name: "SelectionUserPannel",
+	name: "RightPanel",
 	data() {
 		return {
 			selection: 0,

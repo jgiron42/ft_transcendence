@@ -67,6 +67,12 @@ export default {
 		apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
 	},
 	components: {
-		dirs: ["~/components", "~/components/chat", "~/components/chat/channels", "~/components/chat/users"],
+		dirs: [
+			"~/components",
+			"~/components/chat",
+			"~/components/chat/channels",
+			"~/components/chat/users",
+			"~/components/chat/channels/popup",
+		],
 	},
 };

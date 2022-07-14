@@ -50,19 +50,11 @@ import Vue from "vue";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
-	name: "ChannelSelection",
+	name: "LeftPanel",
 	props: {
-		socket: {
-			type: Object,
-			default: () => {},
-		},
 		align: {
 			type: String,
 			default: "left",
-		},
-		isOnChannel: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	data() {
@@ -78,6 +70,9 @@ export default Vue.extend({
 			},
 			get invitations() {
 				return chatStore.chanInvitations || [];
+			},
+			get isOnChannel() {
+				return this.currentChannel.name;
 			},
 			selection: 0,
 			showInvitations: true,

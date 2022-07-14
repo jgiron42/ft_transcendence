@@ -3,7 +3,7 @@ import { chatStore } from "@/store";
 import { Channel } from "@/models/Channel";
 import { ChanConnection } from "@/models/ChanConnection";
 
-export default class ChanConnectionPlugin extends Vue {
+export class ChanConnectionPlugin extends Vue {
 	async getUserChanConnections() {
 		await this.api.get(
 			"/users/" + (await chatStore.me.id) + "/chan_connections",

@@ -2,7 +2,7 @@ import Vue from "vue";
 import { chatStore } from "@/store";
 import { Channel } from "@/models/Channel";
 
-export default class ChannelPlugin extends Vue {
+export class ChannelPlugin extends Vue {
 	async joinChannel(chan: Channel, password?: string, onSuccess?: Function): Promise<Channel | undefined> {
 		let ret: Channel | undefined;
 		await this.api.post(

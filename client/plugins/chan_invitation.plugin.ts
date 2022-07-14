@@ -2,7 +2,7 @@ import Vue from "vue";
 import { chatStore } from "@/store";
 import { ChanInvitation } from "@/models/ChanInvitation";
 
-export default class ChanInvitationPlugin extends Vue {
+export class ChanInvitationPlugin extends Vue {
 	async getChanInvitations(): Promise<Array<ChanInvitation> | undefined> {
 		let ret: Array<ChanInvitation> | undefined;
 		await this.api.get("/invitations", { page: 1, per_page: 100 }, (r: { data: ChanInvitation[] }) => {

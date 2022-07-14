@@ -3,7 +3,7 @@ import { chatStore } from "@/store";
 import { Relation, RelationType } from "@/models/Relation";
 import { User } from "@/models/User";
 
-export default class RelationPlugin extends Vue {
+export class RelationPlugin extends Vue {
 	async getRelations(): Promise<Array<Relation> | undefined> {
 		let ret: Array<Relation> | undefined;
 		await this.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
