@@ -1,7 +1,7 @@
 <template>
 	<div class="flex w-full h-full">
-		<div class="top-1/3">
-			<canvas id="game" width="896" height="504"> </canvas>
+		<div class="game_bis top-1/3">
+			<canvas id="game" width="800" height="600"> </canvas>
 		</div>
 	</div>
 </template>
@@ -275,6 +275,7 @@ export default Vue.extend({
 		// Adding event hooks
 		document.addEventListener("keydown", this.handleKeyPress, false);
 		document.addEventListener("keyup", this.handleKeyRelease, false);
+		document.addEventListener("resize", this.sizeCanvas, false);
 
 		// Create Entities
 		setInterval(this.draw, 10);
@@ -339,6 +340,10 @@ export default Vue.extend({
 				this.score_p2 = 0;
 			}
 		},
+		sizeCanvas() {
+			this.canvas.width = innerWidth;
+			this.canvas.height = innerHeight * 0.5;
+		},
 		// display background, playground and scores
 		clear() {
 			if (this.ctx && this.res) {
@@ -376,6 +381,14 @@ canvas {
 	padding: 0;
 	margin: auto;
 	display: block;
-	width: 800px;
 }
+
+.game_bis{
+	margin-left: auto;
+	margin-right: auto;
+	display:grid;
+	align-content: center;
+	justify-content: center;
+}
+
 </style>
