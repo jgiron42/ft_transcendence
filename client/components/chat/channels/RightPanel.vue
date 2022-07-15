@@ -108,6 +108,5 @@ export default Vue.extend({
 <style scoped>
 .btn-group {
 	font-size: small;
-	width: 33.33%;
 }
 </style>
