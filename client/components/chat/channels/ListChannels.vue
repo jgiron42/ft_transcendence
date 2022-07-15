@@ -50,6 +50,13 @@
 					</svg>
 				</button>
 			</div>
+			<div v-for="(_chan, _index) of channels" v-else :key="_index">
+				<div class="cut-text btn text-left">
+					<div class="w-full">
+						<b>{{ chan.name }}</b>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -66,10 +73,6 @@ export default Vue.extend({
 			type: Array,
 			default: () => [],
 		},
-		currentChannel: {
-			type: Object,
-			default: new Channel(),
-		},
 		listType: {
 			type: String,
 			default: "own",
@@ -85,6 +88,9 @@ export default Vue.extend({
 			},
 			get myChannels() {
 				return chatStore.myChannels;
+			},
+			get currentChannel() {
+				return chatStore.currentChannel;
 			},
 		};
 	},

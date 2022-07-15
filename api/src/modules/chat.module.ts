@@ -10,6 +10,7 @@ import { RelationSubscriber } from "@subscribers/relation.subscriber";
 import { ChannelSubscriber } from "@subscribers/channel.subscriber";
 import { ChanConnectionSubscriber } from "@subscribers/chan_connection.subscriber";
 import { MessageSubscriber } from "@subscribers/message.subscriber";
+import { ChanInvitationSubscriber } from "@subscribers/chan_invitation.subscriber";
 
 @Module({
 	imports: [MessageModule, UserModule, AuthModule, ChannelModule, ChanConnectionModule],
@@ -20,6 +21,7 @@ import { MessageSubscriber } from "@subscribers/message.subscriber";
 		RelationSubscriber,
 		ChannelSubscriber,
 		ChanConnectionSubscriber,
+		ChanInvitationSubscriber,
 		MessageSubscriber,
 	],
 })

@@ -108,6 +108,9 @@ export default Vue.extend({
 		this.socket.on("removeConnection", (connection: ChanConnection) => {
 			chatStore.removeChanConnection(connection);
 		});
+		this.socket.on("newInvitation", (id: number) => {
+			this.chat.chanInvitation.getInvitation(id);
+		});
 		this.socket.on("updateChanInvitations", () => {
 			this.chat.chanInvitation.getChanInvitations();
 		});

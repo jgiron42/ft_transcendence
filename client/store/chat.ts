@@ -92,6 +92,19 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
+	pushChanInvitation(invitation: ChanInvitation) {
+		const id = this.chanInvitations.findIndex((c: ChanInvitation) => c.id === invitation.id);
+		if (id !== -1) this.chanInvitations.splice(id, 1);
+		this.chanInvitations.push(invitation);
+	}
+
+	@Mutation
+	removeChanInvitation(invitation: ChanInvitation) {
+		const id = this.chanInvitations.findIndex((c: ChanInvitation) => c.id === invitation.id);
+		if (id !== -1) this.chanInvitations.splice(id, 1);
+	}
+
+	@Mutation
 	pushUser(connection: ChanConnection) {
 		this.chanConnections.push(connection);
 	}

@@ -29,19 +29,13 @@
 			</div>
 		</div>
 		<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" :state="showInvitations" />
-		<ListChannels
+		<ListChanInvitations
 			v-if="selection === 0 && showInvitations && invitations.length !== 0"
-			:channels="invitations"
-			list-type="invitation"
+			:invitations="invitations"
 		/>
 		<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
-		<ListChannels v-if="selection === 0" :channels="myChannels" :current-channel="currentChannel" list-type="own" />
-		<ListChannels
-			v-if="selection === 1"
-			:channels="visibleChannels"
-			:current-channel="currentChannel"
-			list-type="all"
-		/>
+		<ListChannels v-if="selection === 0" :channels="myChannels" list-type="own" />
+		<ListChannels v-if="selection === 1" :channels="visibleChannels" list-type="all" />
 	</div>
 </template>
 
@@ -66,14 +60,11 @@ export default Vue.extend({
 			get myChannels() {
 				return chatStore.myChannels;
 			},
-			get currentChannel() {
-				return chatStore.currentChannel;
-			},
 			get invitations() {
 				return chatStore.chanInvitations || [];
 			},
 			get isOnChannel() {
-				return this.currentChannel.name;
+				return chatStore.currentChannel.name;
 			},
 			selection: 0,
 			showInvitations: true,
