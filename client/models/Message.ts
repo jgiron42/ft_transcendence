@@ -11,4 +11,5 @@ export class Message {
 	channel: Channel | number;
 	content: string;
 	created_at: Date;
+	blocked: boolean;
 }

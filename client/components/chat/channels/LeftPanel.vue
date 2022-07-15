@@ -1,7 +1,7 @@
 <template>
 	<div id="chat-selection" class="h-full" :class="isOnChannel ? 'on-channel' : ''">
 		<div class="flex flex-row">
-			<div id="channel-title" class="pl-11 w-full text-center mt-auto mb-auto">Channels</div>
+			<div class="pl-11 chat-title">Channels</div>
 			<button
 				id="channel-creation"
 				class="items-center cut-text w-95 btn pr-3 pl-3"
@@ -15,10 +15,7 @@
 				<button
 					class="btn-group btn-left"
 					:class="selection === 0 ? 'btn-selected' : ''"
-					@click.prevent="
-						selection = 0;
-						showInvitations = false;
-					"
+					@click.prevent="selection = 0"
 				>
 					mine
 				</button>
@@ -30,62 +27,47 @@
 					list
 				</button>
 			</div>
-			<!--UsersInChannel v-if="selection === 0" :socket="socket" />
-			<AdminPanel v-if="selection === 1" /-->
 		</div>
-		<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" />
-		<ListChannels
+		<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" :state="showInvitations" />
+		<ListChanInvitations
 			v-if="selection === 0 && showInvitations && invitations.length !== 0"
-			:channels="invitations"
-			list-type="invitation"
+			:invitations="invitations"
 		/>
 		<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
-		<ListChannels v-if="selection === 0" :channels="myChannels" :current-channel="currentChannel" list-type="own" />
-		<ListChannels
-			v-if="selection === 1"
-			:channels="visibleChannels"
-			:current-channel="currentChannel"
-			list-type=""
-		/>
+		<ListChannels v-if="selection === 0" :channels="myChannels" list-type="own" />
+		<ListChannels v-if="selection === 1" :channels="visibleChannels" list-type="all" />
 	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { chatStore } from "@/store";
+import { ChannelType } from "@/models/Channel";
 
 export default Vue.extend({
-	name: "ChannelSelection",
+	name: "LeftPanel",
 	props: {
-		socket: {
-			type: Object,
-			default: () => {},
-		},
 		align: {
 			type: String,
 			default: "left",
-		},
-		isOnChannel: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	data() {
 		return {
 			get visibleChannels() {
-				return chatStore.visibleChannels;
+				return chatStore.visibleChannels.filter((channel) => channel.type !== ChannelType.DM);
 			},
 			get myChannels() {
 				return chatStore.myChannels;
 			},
-			get currentChannel() {
-				return chatStore.currentChannel;
-			},
 			get invitations() {
 				return chatStore.chanInvitations || [];
 			},
+			get isOnChannel() {
+				return chatStore.currentChannel.name;
+			},
 			selection: 0,
-			showInvitations: false,
+			showInvitations: true,
 		};
 	},
 	mounted() {
@@ -97,7 +79,7 @@ export default Vue.extend({
 				containerTest.scrollLeft = containerTest.scrollWidth;
 			}
 		}
-		this.chat.getChanInvitations();
+		this.chat.chanInvitation.getChanInvitations();
 	},
 	methods: {
 		onShowInvitations() {

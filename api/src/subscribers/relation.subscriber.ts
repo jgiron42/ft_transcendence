@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent, Connection } from "typeorm";
+import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent, RemoveEvent, Connection } from "typeorm";
 import { Relation } from "@entities/relation.entity";
 import { SocketService } from "@services/socket.service";
 
@@ -22,5 +22,11 @@ export class RelationSubscriber implements EntitySubscriberInterface<Relation> {
 		const relation = event.entity as Relation;
 		this.socketService.sendMessageToClient("updateRelations", null, relation.owner);
 		this.socketService.sendMessageToClient("updateRelations", null, relation.target);
+	}
+
+	beforeRemove(event: RemoveEvent<Relation>) {
+		const relation = event.entity;
+		this.socketService.sendMessageToClient("removeRelation", relation.id, relation.owner);
+		this.socketService.sendMessageToClient("removeRelation", relation.id, relation.target);
 	}
 }

@@ -6,7 +6,7 @@
 				class="flex gap-3 items-center chan-name"
 				:class="chan.id == currentChannel.id ? 'selected' : ''"
 			>
-				<button class="cut-text btn text-left" @click="join(chan)">
+				<button class="cut-text btn text-left" @click="joinChannel(chan)">
 					<div class="flex">
 						<div v-if="chan.type === ChannelType.PUBLIC" class="w-5">#</div>
 						<div v-if="chan.type === ChannelType.PASSWORD" class="w-5 h-5">
@@ -35,7 +35,11 @@
 						</div>
 					</div>
 				</button>
-				<button v-if="listType === 'own'" class="w-4 h-3" @click.prevent="leaveChannel(chan.id)">
+				<button
+					v-if="listType === 'own' && chan.type !== ChannelType.DM"
+					class="w-4 h-3"
+					@click.prevent="leaveChannel(chan.id)"
+				>
 					<svg version="1.1" viewBox="0 0 1000 1000" height="10px">
 						<g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">
 							<path
@@ -45,6 +49,13 @@
 						</g>
 					</svg>
 				</button>
+			</div>
+			<div v-for="(_chan, _index) of channels" v-else :key="_index">
+				<div class="cut-text btn text-left">
+					<div class="w-full">
+						<b>{{ chan.name }}</b>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -62,10 +73,6 @@ export default Vue.extend({
 			type: Array,
 			default: () => [],
 		},
-		currentChannel: {
-			type: Object,
-			default: new Channel(),
-		},
 		listType: {
 			type: String,
 			default: "own",
@@ -82,21 +89,24 @@ export default Vue.extend({
 			get myChannels() {
 				return chatStore.myChannels;
 			},
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 		};
 	},
 	methods: {
 		checkPrivateChannel(chanId: number) {
 			return this.myChannels.filter((chan) => chan.id === chanId).length > 0;
 		},
-		join(chan: Channel) {
+		joinChannel(chan: Channel) {
 			if (chan.type === ChannelType.PASSWORD) {
-				if (this.checkPrivateChannel(chan.id)) this.chat.joinChannel(chan);
+				if (this.checkPrivateChannel(chan.id)) this.chat.channel.joinChannel(chan);
 				else {
 					chatStore.updateJoiningChannel(chan);
 					this.$modal.show("join_protected_chan");
 				}
 			} else {
-				this.chat.joinChannel(chan);
+				this.chat.channel.joinChannel(chan);
 			}
 		},
 		leaveChannel(chanId: number) {
@@ -104,7 +114,7 @@ export default Vue.extend({
 				if (chanId === chatStore.currentChannel.id) {
 					chatStore.resetCurrentChannel();
 				}
-				this.$nuxt.$emit("updateChannels");
+				chatStore.leaveChannel(chanId);
 			});
 		},
 	},

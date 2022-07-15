@@ -24,8 +24,13 @@ export default {
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
 	plugins: [
 		{ src: "@/plugins/vue-js-modal", mode: "client" },
-		{ src: "@/plugins/apiManager", mode: "client" },
-		{ src: "@/plugins/chatManager", mode: "client" },
+		{ src: "@/plugins/api.plugin", mode: "client" },
+		{ src: "@/plugins/chat.plugin", mode: "client" },
+		{ src: "@/plugins/channel.plugin", mode: "client" },
+		{ src: "@/plugins/chan_connection.plugin", mode: "client" },
+		{ src: "@/plugins/chan_invitation.plugin", mode: "client" },
+		{ src: "@/plugins/message.plugin", mode: "client" },
+		{ src: "@/plugins/relation.plugin", mode: "client" },
 		{ src: "@/plugins/socketManager", mode: "client" },
 	],
 
@@ -62,6 +67,12 @@ export default {
 		apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
 	},
 	components: {
-		dirs: ["~/components", "~/components/chat", "~/components/chat/channels", "~/components/chat/users"],
+		dirs: [
+			"~/components",
+			"~/components/chat",
+			"~/components/chat/channels",
+			"~/components/chat/users",
+			"~/components/chat/channels/popup",
+		],
 	},
 };

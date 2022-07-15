@@ -35,10 +35,14 @@ export default Vue.extend({
 			type: Function,
 			default: () => {},
 		},
+		state: {
+			type: Boolean,
+			default: () => true,
+		},
 	},
 	data() {
 		return {
-			selected: false,
+			selected: this.state,
 		};
 	},
 	methods: {

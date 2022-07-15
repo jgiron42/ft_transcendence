@@ -98,7 +98,7 @@ export class ChannelsController {
 	) {
 		if (channel.type === ChannelType.DM) throw new BadRequestException("use user/:id/dm to create a dm channel");
 		if (channel.password) channel.password = await ChannelService.hashPassword(channel.password);
-		await this.channelService.getQuery().own_channel(user.id).update(channel, id);
+		return await this.channelService.getQuery().own_channel(user.id).updateWithSave(channel, id);
 	}
 
 	/**

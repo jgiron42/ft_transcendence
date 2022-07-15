@@ -1,7 +1,8 @@
 import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
-import { Channel } from "@/models/Channel";
+import { Channel, ChannelType } from "@/models/Channel";
+import { Message } from "@/models/Message";
 import { Relation } from "@/models/Relation";
 import { ChanInvitation } from "@/models/ChanInvitation";
 
@@ -11,10 +12,12 @@ export interface ChatInterface {
 	myChannels: Array<Channel>;
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
+	messages: Array<Message>;
 	chanConnections: Array<ChanConnection>;
 	chanInvitations: Array<ChanInvitation>;
 	relations: Array<Relation>;
 	joiningChannel: Channel | undefined;
+	blockedUsers: Array<Relation>;
 }
 
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
@@ -24,10 +27,12 @@ export default class Chat extends VuexModule implements ChatInterface {
 	visibleChannels: Channel[] = [];
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
+	messages: Message[] = [];
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
 	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
 	relations: Array<Relation> = [] as Relation[];
 	joiningChannel: Channel | undefined = new Channel();
+	blockedUsers: Relation[] = [];
 
 	@Mutation
 	resetAll() {
@@ -42,6 +47,15 @@ export default class Chat extends VuexModule implements ChatInterface {
 	resetCurrentChannel() {
 		this.currentChannel = new Channel();
 		this.roleOnCurrentChannel = ChannelRole.USER;
+	}
+
+	@Mutation
+	leaveChannel(chanId: number) {
+		this.chanConnections = this.chanConnections.filter((c: ChanConnection) => c.channel.id !== chanId);
+		this.visibleChannels = this.visibleChannels.filter(
+			(c: Channel) => !(c.id === chanId && c.type === ChannelType.PRIVATE),
+		);
+		this.myChannels = this.myChannels.filter((c: Channel) => c.id !== chanId);
 	}
 
 	@Mutation
@@ -60,8 +74,34 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
+	removeChanConnection(connection: ChanConnection) {
+		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
+		if (id !== -1) this.chanConnections.splice(id, 1);
+	}
+
+	@Mutation
+	pushChanConnection(connection: ChanConnection) {
+		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
+		if (id !== -1) this.chanConnections.splice(id, 1);
+		this.chanConnections.push(connection);
+	}
+
+	@Mutation
 	updateChanInvitations(invitations: ChanInvitation[]) {
 		this.chanInvitations = invitations;
+	}
+
+	@Mutation
+	pushChanInvitation(invitation: ChanInvitation) {
+		const id = this.chanInvitations.findIndex((c: ChanInvitation) => c.id === invitation.id);
+		if (id !== -1) this.chanInvitations.splice(id, 1);
+		this.chanInvitations.push(invitation);
+	}
+
+	@Mutation
+	removeChanInvitation(invitation: ChanInvitation) {
+		const id = this.chanInvitations.findIndex((c: ChanInvitation) => c.id === invitation.id);
+		if (id !== -1) this.chanInvitations.splice(id, 1);
 	}
 
 	@Mutation
@@ -72,6 +112,16 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	updateCurrentChannel(chan: Channel) {
 		this.currentChannel = chan;
+	}
+
+	@Mutation
+	updateMessages(messages: Message[]) {
+		this.messages = messages;
+	}
+
+	@Mutation
+	pushMessage(message: Message) {
+		this.messages.push(message);
 	}
 
 	@Mutation
@@ -89,8 +139,32 @@ export default class Chat extends VuexModule implements ChatInterface {
 		this.visibleChannels = chans;
 	}
 
-	@Mutation pushVisibleChannels(chan: Channel) {
+	@Mutation
+	pushVisibleChannels(chan: Channel) {
 		this.visibleChannels.push(chan);
+	}
+
+	@Mutation
+	updateChannel(chan: Channel) {
+		const id = this.chanConnections.findIndex((c: ChanConnection) => c.channel.id === chan.id);
+		const vid = this.visibleChannels.findIndex((c: Channel) => c.id === chan.id);
+		if (id !== -1) {
+			const _id = this.myChannels.findIndex((c: Channel) => c.id === chan.id);
+			this.myChannels.splice(_id, 1);
+			this.myChannels.push(chan);
+			this.visibleChannels.splice(vid, 1);
+			this.visibleChannels.push(chan);
+		} else {
+			if (vid !== -1) {
+				this.visibleChannels.splice(vid, 1);
+			}
+			if (chan.type !== ChannelType.PRIVATE) {
+				this.visibleChannels.push(chan);
+			}
+		}
+		if (chan.id === this.currentChannel.id) {
+			this.currentChannel = chan;
+		}
 	}
 
 	@Mutation
@@ -100,6 +174,10 @@ export default class Chat extends VuexModule implements ChatInterface {
 
 	@Mutation
 	pushMyChannels(chan: Channel) {
+		const id = this.myChannels.findIndex((c: Channel) => c.id === chan.id);
+		if (id !== -1) {
+			this.myChannels.splice(id, 1);
+		}
 		this.myChannels.push(chan);
 	}
 
@@ -109,7 +187,32 @@ export default class Chat extends VuexModule implements ChatInterface {
 	}
 
 	@Mutation
-	pushRelations(relation: Relation) {
-		this.relations.push(relation);
+	pushRelations(rel: Relation) {
+		const id = this.relations.findIndex((r: Relation) => r.id === rel.id);
+		if (id === -1) {
+			this.relations.push(rel);
+		} else {
+			this.relations[id] = rel;
+		}
+	}
+
+	@Mutation
+	updateBlockedUsers(rel: Relation[]) {
+		this.blockedUsers = rel;
+	}
+
+	@Mutation
+	pushBlockedUsers(rel: Relation) {
+		const id = this.blockedUsers.findIndex((r: Relation) => r.id === rel.id);
+		if (id === -1) {
+			this.blockedUsers.push(rel);
+		} else {
+			this.blockedUsers[id] = rel;
+		}
+	}
+
+	@Mutation
+	spliceBlockedUsers(id: number) {
+		this.blockedUsers.splice(id, 1);
 	}
 }

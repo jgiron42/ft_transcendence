@@ -1,7 +1,7 @@
 import Vue from "vue";
 import axios from "axios";
 
-class ApiClass extends Vue {
+class Api extends Vue {
 	async post(route: string, data?: any, params?: Object, onSuccess?: Function, onError?: Function) {
 		await axios
 			.post(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
@@ -24,12 +24,34 @@ class ApiClass extends Vue {
 				onError?.(err);
 			});
 	}
+
+	async delete(route: string, params?: Object, onSuccess?: Function, onError?: Function) {
+		await axios
+			.delete(process.env.apiBaseUrl + route, { withCredentials: true, params })
+			.then((response) => {
+				onSuccess?.(response);
+			})
+			.catch((err) => {
+				onError?.(err);
+			});
+	}
+
+	async put(route: string, data?: any, params?: Object, onSuccess?: Function, onError?: Function) {
+		await axios
+			.put(process.env.apiBaseUrl + route, data, { withCredentials: true, params })
+			.then((response) => {
+				onSuccess?.(response);
+			})
+			.catch((err) => {
+				onError?.(err);
+			});
+	}
 }
 
 declare module "vue/types/vue" {
 	interface Vue {
-		api: ApiClass;
+		api: Api;
 	}
 }
 
-Vue.prototype.api = new ApiClass();
+Vue.prototype.api = new Api();

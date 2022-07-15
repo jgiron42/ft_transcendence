@@ -35,7 +35,7 @@ export default Vue.extend({
 	},
 	methods: {
 		joinChannel() {
-			this.chat.joinChannel(this.joiningChannel, this.password, () => {
+			this.chat.channel.joinChannel(this.joiningChannel, this.password, () => {
 				this.$modal.hide("join_protected_chan");
 			});
 			this.password = "";
@@ -43,3 +43,21 @@ export default Vue.extend({
 	},
 });
 </script>
+
+<style scoped>
+.area-chan-name {
+	border: none;
+	border-bottom: 1px solid #333;
+	background-color: #1c2638;
+	border-radius: 7px;
+	outline: none;
+	width: 80%;
+	padding-top: 12px;
+	resize: none;
+	font: 1em "Open Sans", sans-serif;
+	display: inline;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+</style>

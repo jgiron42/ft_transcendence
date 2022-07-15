@@ -31,8 +31,18 @@ export class SocketService {
 		this.clientMap.delete(socket);
 	}
 
-	sendMessage(msg: string, content: any = null, room = "") {
-		if (room !== "") this.server.to(room).emit(msg, content);
+	async leaveRoom(uid: string, room: string): Promise<void> {
+		console.log(`User ${uid} leaving room ${room}`);
+		for (const [_socket, _user] of this.clientMap) {
+			if (_user.id === uid) {
+				await _socket.leave(room);
+				return;
+			}
+		}
+	}
+
+	sendMessage(msg: string, content: any = null, room?: string) {
+		if (room) this.server.to(room).emit(msg, content);
 		else this.server.emit(msg, content);
 	}
 

@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent, Connection } from "typeorm";
-import { ChanConnection } from "@entities/chan_connection.entity";
+import { EventSubscriber, EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent, Connection } from "typeorm";
+import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { SocketService } from "@services/socket.service";
+import { User } from "@entities/user.entity";
+import { Channel, ChannelType } from "@entities/channel.entity";
 
 @EventSubscriber()
 @Injectable()
@@ -16,6 +18,22 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 	}
 
 	afterInsert(event: InsertEvent<ChanConnection>) {
-		this.socketService.sendMessage("updateChanConnections", null, event.entity.channel.name);
+		if (event.entity.channel.type !== ChannelType.DM) {
+			this.socketService.sendMessage("newConnection", event.entity, event.entity.channel.name);
+		} else {
+			this.socketService.sendMessageToClient("newConnection", event.entity, event.entity.user);
+		}
+	}
+
+	async beforeRemove(event: RemoveEvent<ChanConnection>) {
+		this.socketService.sendMessage("removeConnection", event.entity, event.entity.channel.name);
+		await this.socketService.leaveRoom(event.entity.user.id, event.entity.channel.name);
+	}
+
+	async afterUpdate(event: UpdateEvent<ChanConnection>) {
+		this.socketService.sendMessage("updateConnection", event.entity, (event.entity.channel as Channel).name);
+		if (event.entity.role === ChannelRole.BANNED) {
+			await this.socketService.leaveRoom((event.entity.user as User).id, (event.entity.channel as Channel).name);
+		}
 	}
 }

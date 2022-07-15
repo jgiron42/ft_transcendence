@@ -29,11 +29,12 @@
 			</button>
 		</div>
 		<div id="container-test" class="flex flex-row justify-between items-center overflow-y-hidden">
-			<ChannelSelection v-if="showChannels" :socket="socket" :is-on-channel="isOnChannel" />
+			<LeftPanel v-if="showChannels" :socket="socket" />
 			<Chatbox v-if="isOnChannel" :socket="socket" />
-			<ChannelProperties v-if="showUsers && isOnChannel" />
+			<RightPanel v-if="showUsers && isOnChannel" />
 			<Popup name="user_profile" component="chat/users/UserProfile" />
-			<Popup name="create_channel" component="chat/channels/ChannelCreation" />
+			<Popup name="create_channel" component="chat/channels/popup/ChannelCreation" />
+			<Popup name="edit_channel" component="chat/channels/popup/ChannelEdition" />
 			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
 		</div>
 	</div>
@@ -41,9 +42,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Channel } from "@/models/Channel";
+import { Channel, ChannelType } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
+import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "Chat",
@@ -57,8 +59,7 @@ export default Vue.extend({
 				return chatStore.currentChannel;
 			},
 			get isOnChannel() {
-				const name = this.currentChannel.name;
-				return name !== undefined && name.length !== 0;
+				return this.currentChannel.name;
 			},
 		};
 	},
@@ -75,23 +76,50 @@ export default Vue.extend({
 		this.socket.emit("HC", {
 			token: this.$cookies.get("connect.sid"),
 		});
+		this.socket.on("updateChannel", (chan: Channel) => {
+			chatStore.updateChannel(chan);
+		});
 		this.socket.on("updateChannels", () => {
 			this.updateChannels();
 		});
 		this.socket.on("updateRelations", () => {
-			this.chat.getRelations();
+			this.chat.relation.getRelations();
 		});
-		this.socket.on("updateChanConnections", () => {
-			this.updateChannels();
+		this.socket.on("removeRelation", (id: number) => {
+			const relations = chatStore.relations.filter((r) => r.id !== id);
+			chatStore.updateRelations(relations);
+		});
+		this.socket.on("newConnection", (connection: ChanConnection) => {
+			chatStore.pushChanConnection(connection);
+			if (connection.channel.type === ChannelType.DM) {
+				chatStore.pushMyChannels(connection.channel);
+			}
+		});
+		this.socket.on("updateConnection", (connection: ChanConnection) => {
+			chatStore.pushChanConnection(connection);
+			if (chatStore.me.id === connection.user.id && connection.channel.id === chatStore.currentChannel.id) {
+				chatStore.updateMyRole(connection.role);
+				if (connection.role === ChannelRole.BANNED) {
+					chatStore.resetCurrentChannel();
+					chatStore.leaveChannel(connection.channel.id);
+				}
+			}
+		});
+		this.socket.on("removeConnection", (connection: ChanConnection) => {
+			chatStore.removeChanConnection(connection);
+		});
+		this.socket.on("newInvitation", (id: number) => {
+			this.chat.chanInvitation.getInvitation(id);
 		});
 		this.socket.on("updateChanInvitations", () => {
-			this.chat.getChanInvitations();
+			this.chat.chanInvitation.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			this.$nuxt.$emit("MSG", message);
+			this.chat.message.getMessage(message);
+			// chatStore.pushMessage(message);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
-			this.$nuxt.$emit("JC", messages);
+			chatStore.updateMessages(messages);
 		});
 
 		// Nuxt events
@@ -99,7 +127,7 @@ export default Vue.extend({
 			this.updateChannels();
 		});
 		this.$nuxt.$on("createChannel", async (chan: Channel) => {
-			const c = await this.chat.joinChannel(chan);
+			const c = await this.chat.channel.joinChannel(chan);
 			if (c) this.socket.emit("JC", c.id);
 		});
 	},
@@ -108,11 +136,11 @@ export default Vue.extend({
 	},
 	methods: {
 		async updateChannels() {
-			await this.chat.getMyChannels();
-			await this.chat.getVisibleChannels();
-			await this.chat.getChanConnections();
-			await this.chat.getRelations();
-			await this.chat.getChanInvitations();
+			await this.chat.chanConnection.getUserChanConnections();
+			await this.chat.channel.getChannels();
+			await this.chat.chanConnection.getChanConnections();
+			await this.chat.relation.getRelations();
+			await this.chat.chanInvitation.getChanInvitations();
 		},
 		onShowChannels() {
 			if (this.$device.isMobile) {

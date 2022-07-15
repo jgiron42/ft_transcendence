@@ -17,26 +17,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
 
 export default Vue.extend({
 	name: "Messages",
 	data() {
 		return {
-			messages: [] as Message[],
+			get messages() {
+				return chatStore.messages;
+			},
 			get me() {
 				return chatStore.me;
 			},
 		};
-	},
-	mounted() {
-		this.$nuxt.$on("JC", (messages: Message[]) => {
-			this.messages = messages;
-		});
-		this.$nuxt.$on("MSG", (message: Message) => {
-			this.messages.push(message);
-		});
 	},
 	destroyed() {
 		this.$nuxt.$off("JC");
