@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Channel } from "@/models/Channel";
+import { Channel, ChannelType } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
@@ -91,6 +91,9 @@ export default Vue.extend({
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
 			chatStore.pushChanConnection(connection);
+			if (connection.channel.type === ChannelType.DM) {
+				chatStore.pushMyChannels(connection.channel);
+			}
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
 			chatStore.pushChanConnection(connection);

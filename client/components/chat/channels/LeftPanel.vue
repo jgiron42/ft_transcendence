@@ -48,6 +48,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { chatStore } from "@/store";
+import { ChannelType } from "@/models/Channel";
 
 export default Vue.extend({
 	name: "LeftPanel",
@@ -60,7 +61,7 @@ export default Vue.extend({
 	data() {
 		return {
 			get visibleChannels() {
-				return chatStore.visibleChannels;
+				return chatStore.visibleChannels.filter((channel) => channel.type !== ChannelType.DM);
 			},
 			get myChannels() {
 				return chatStore.myChannels;

@@ -2,6 +2,7 @@ import Vue from "vue";
 import { chatStore } from "@/store";
 import { Channel } from "@/models/Channel";
 import { ChannelRole } from "@/models/ChanConnection";
+import { User } from "@/models/User";
 
 export class ChannelPlugin extends Vue {
 	async joinChannel(chan: Channel, password?: string, onSuccess?: Function): Promise<Channel | undefined> {
@@ -59,6 +60,14 @@ export class ChannelPlugin extends Vue {
 		let ret = false;
 		await this.api.put("/channels/" + chan.id, chan, undefined, () => {
 			ret = true;
+		});
+		return ret;
+	}
+
+	async sendDm(user: User): Promise<Channel | undefined> {
+		let ret: Channel | undefined;
+		await this.api.get("/users/" + user.id + "/dm", undefined, async (r: { data: Channel }) => {
+			ret = await this.joinChannel(r.data);
 		});
 		return ret;
 	}

@@ -3,7 +3,7 @@ import { EventSubscriber, EntitySubscriberInterface, InsertEvent, RemoveEvent, U
 import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { SocketService } from "@services/socket.service";
 import { User } from "@entities/user.entity";
-import { Channel } from "@entities/channel.entity";
+import { Channel, ChannelType } from "@entities/channel.entity";
 
 @EventSubscriber()
 @Injectable()
@@ -18,7 +18,11 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 	}
 
 	afterInsert(event: InsertEvent<ChanConnection>) {
-		this.socketService.sendMessage("newConnection", event.entity, event.entity.channel.name);
+		if (event.entity.channel.type !== ChannelType.DM) {
+			this.socketService.sendMessage("newConnection", event.entity, event.entity.channel.name);
+		} else {
+			this.socketService.sendMessageToClient("newConnection", event.entity, event.entity.user);
+		}
 	}
 
 	async beforeRemove(event: RemoveEvent<ChanConnection>) {

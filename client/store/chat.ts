@@ -161,6 +161,10 @@ export default class Chat extends VuexModule implements ChatInterface {
 
 	@Mutation
 	pushMyChannels(chan: Channel) {
+		const id = this.myChannels.findIndex((c: Channel) => c.id === chan.id);
+		if (id !== -1) {
+			this.myChannels.splice(id, 1);
+		}
 		this.myChannels.push(chan);
 	}
 
