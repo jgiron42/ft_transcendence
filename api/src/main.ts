@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { existsSync, mkdirSync } from "fs";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@modules/app.module";
 import helmet from "helmet";
@@ -9,6 +10,9 @@ import { useContainer } from "class-validator";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
+	// create upload dir if it doesn't exist
+	if (!existsSync(config.uploadsPath)) mkdirSync(config.uploadsPath);
+
 	// Instanciate Nest app
 	const app = await NestFactory.create(AppModule);
 

@@ -9,7 +9,6 @@ import { SetMode } from "@utils/set-mode";
 export class User {
 	constructor() {
 		this.id = undefined;
-		this.image_url = ""; // may be a default avatar path
 		this.nb_game = 0;
 		this.nb_win = 0;
 		this.totp_enabled = false;
@@ -25,11 +24,6 @@ export class User {
 	@Column({ unique: true })
 	@SetMode("cru")
 	username: string;
-
-	// path to the avatar of the user
-	@Column()
-	@SetMode("cru")
-	image_url: string;
 
 	// number of game played by the user
 	@Column()
