@@ -144,7 +144,7 @@ export class ChannelsController {
 	@Post(":id/leave")
 	@UseGuards(DevelopmentGuard)
 	async leaveChannel(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return await this.chanConnectionService.getQuery().channel(id).user(user.id).notBan().remove();
+		return await this.chanConnectionService.getQuery().channel(id).user(user.id).notdm().notBan().remove();
 	}
 
 	/**

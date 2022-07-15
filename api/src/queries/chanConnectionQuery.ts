@@ -1,6 +1,6 @@
 import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { ChannelType } from "@entities/channel.entity";
-import { Brackets, Repository } from "typeorm";
+import { Brackets, Not, Repository } from "typeorm";
 import { QueryCooker } from "@src/queries/QueryCooker";
 
 export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
@@ -28,6 +28,11 @@ export class ChanConnectionQuery extends QueryCooker<ChanConnection> {
 	 */
 	channel(channelId: number) {
 		this.query = this.query.andWhere({ channel: channelId });
+		return this;
+	}
+
+	notdm() {
+		this.query = this.query.andWhere({ channel: { type: Not(ChannelType.DM) } });
 		return this;
 	}
 
