@@ -45,7 +45,7 @@ import Vue from "vue";
 import { Channel } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { chatStore } from "@/store";
-import { ChanConnection } from "@/models/ChanConnection";
+import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "Chat",
@@ -94,8 +94,12 @@ export default Vue.extend({
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
 			chatStore.pushChanConnection(connection);
-			if (connection.channel.id === chatStore.currentChannel.id) {
+			if (chatStore.me.id === connection.user.id && connection.channel.id === chatStore.currentChannel.id) {
 				chatStore.updateMyRole(connection.role);
+				if (connection.role === ChannelRole.BANNED) {
+					chatStore.resetCurrentChannel();
+					chatStore.leaveChannel(connection.channel.id);
+				}
 			}
 		});
 		this.socket.on("removeConnection", (connection: ChanConnection) => {

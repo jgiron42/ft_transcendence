@@ -60,7 +60,7 @@ export default Vue.extend({
 			if (this.selection === 1) this.selection = 0;
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
-			if (connection.role < ChannelRole.ADMIN && this.selection === 1) {
+			if (chatStore.me.id === connection.user.id && connection.role < ChannelRole.ADMIN && this.selection === 1) {
 				this.selection = 0;
 			}
 		});

@@ -1,18 +1,26 @@
 import Vue from "vue";
 import { chatStore } from "@/store";
 import { Channel } from "@/models/Channel";
+import { ChannelRole } from "@/models/ChanConnection";
 
 export class ChannelPlugin extends Vue {
 	async joinChannel(chan: Channel, password?: string, onSuccess?: Function): Promise<Channel | undefined> {
 		let ret: Channel | undefined;
+		let isBanned = false;
 		await this.api.post(
 			"/channels/" + chan.id + "/join",
 			undefined,
 			{ password },
-			(d = { data: { channel: new Channel() } }) => {
+			(d = { data: { channel: new Channel(), role: ChannelRole.USER } }) => {
 				ret = d.data.channel;
+				if (d.data.role === ChannelRole.BANNED) {
+					isBanned = true;
+				}
 			},
 		);
+		if (isBanned) {
+			return undefined;
+		}
 		if (ret !== undefined) {
 			await this.api.get("/channels/" + chan.id, undefined, (d = { data: new Channel() }) => {
 				ret = d.data;

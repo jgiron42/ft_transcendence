@@ -20,14 +20,14 @@
 				:margin="true"
 			/>
 			<div v-if="isOwner">
-				<button v-if="!showEditAdmin" id="edit-admins-button" @click="editAdmin">Manage admins</button>
-				<button v-if="showEditAdmin" id="edit-admins-button" @click="saveEditAdmin">Save!</button>
+				<button v-if="!showEditAdmin" class="edit-button" @click="editAdmin">Manage admins</button>
+				<button v-if="showEditAdmin" class="edit-button" @click="saveEditAdmin">Save!</button>
 				<ListUsers
-					v-if="showEditAdmin && adminConnections.length !== 0"
+					v-if="showEditAdmin && usersInChannel.length !== 0"
 					:connections="usersInChannel"
 					:pre-selected="adminConnections"
 					:margin="true"
-					type="selection"
+					type="admin-selection"
 					@select="selectAdmin"
 				/>
 			</div>
@@ -41,6 +41,18 @@
 				:margin="true"
 			/>
 			<div v-else-if="showBanned" class="empty-text">No banned users.</div>
+			<div v-if="isAdmin">
+				<button v-if="!showEditBanned" class="edit-button" @click="editBanned">Manage banned</button>
+				<button v-if="showEditBanned" class="edit-button" @click="saveEditBanned">Save!</button>
+				<ListUsers
+					v-if="showEditBanned && usersInChannel.length !== 0"
+					:connections="usersInChannelExceptOwner"
+					:pre-selected="bannedConnections"
+					:margin="true"
+					type="banned-selection"
+					@select="selectBanned"
+				/>
+			</div>
 		</div>
 		<hr />
 		<div id="mute-list">
@@ -87,20 +99,33 @@ export default Vue.extend({
 			get usersInChannel() {
 				return chatStore.chanConnections;
 			},
+			get usersInChannelExceptOwner() {
+				return chatStore.chanConnections.filter((connection) => connection.role !== ChannelRole.OWNER);
+			},
 			get isOwner(): boolean {
 				return chatStore.roleOnCurrentChannel === ChannelRole.OWNER;
 			},
-			selectedUsers: [] as ChanConnection[],
+			get isAdmin(): boolean {
+				return chatStore.roleOnCurrentChannel >= ChannelRole.ADMIN;
+			},
+			selectedAdmins: [] as ChanConnection[],
+			selectedBanned: [] as ChanConnection[],
 			showChanProps: true,
 			showAdmin: true,
 			showEditAdmin: false,
 			showBanned: true,
+			showEditBanned: false,
 			showMuted: true,
 		};
 	},
 	mounted() {
+		this.selectedAdmins = [];
+		this.selectedBanned = [];
 		for (const connection of this.adminConnections) {
-			this.selectedUsers.push(connection);
+			this.selectedAdmins.push(connection);
+		}
+		for (const connection of this.bannedConnections) {
+			this.bannedConnections.push(connection);
 		}
 	},
 	methods: {
@@ -120,23 +145,46 @@ export default Vue.extend({
 			this.showEditAdmin = true;
 		},
 		saveEditAdmin() {
-			for (const connection of this.selectedUsers) {
+			for (const connection of this.selectedAdmins) {
 				if (connection.role !== ChannelRole.ADMIN && connection.role !== ChannelRole.OWNER) {
 					const _con = { id: connection.id, role: ChannelRole.ADMIN } as ChanConnection;
 					this.chat.chanConnection.updateChanConnection(_con);
 				}
 			}
 			for (const connection of this.adminConnections) {
-				if (!this.selectedUsers.includes(connection)) {
+				if (!this.selectedAdmins.includes(connection)) {
 					const _con = { id: connection.id, role: ChannelRole.USER } as ChanConnection;
 					this.chat.chanConnection.updateChanConnection(_con);
 				}
 			}
-			this.selectedUsers = [];
+			this.selectedAdmins = [];
 			this.showEditAdmin = false;
 		},
 		selectAdmin(connections: ChanConnection[]) {
-			this.selectedUsers = connections;
+			this.selectedAdmins = connections;
+		},
+		editBanned() {
+			this.showEditBanned = true;
+		},
+		saveEditBanned() {
+			console.log("banned: " + JSON.stringify(this.selectedBanned, null, 4));
+			for (const connection of this.selectedBanned) {
+				if (connection.role !== ChannelRole.OWNER) {
+					const _con = { id: connection.id, role: ChannelRole.BANNED } as ChanConnection;
+					this.chat.chanConnection.updateChanConnection(_con);
+				}
+			}
+			for (const connection of this.bannedConnections) {
+				if (!this.selectedBanned.includes(connection)) {
+					const _con = { id: connection.id, role: ChannelRole.USER } as ChanConnection;
+					this.chat.chanConnection.updateChanConnection(_con);
+				}
+			}
+			this.selectedBanned = [];
+			this.showEditBanned = false;
+		},
+		selectBanned(connections: ChanConnection[]) {
+			this.selectedBanned = connections;
 		},
 	},
 });
@@ -156,7 +204,7 @@ hr {
 	border-color: #555;
 }
 
-#edit-admins-button {
+.edit-button {
 	font: 0.75em "Open Sans", sans-serif;
 	border-radius: 5px;
 	color: #222;

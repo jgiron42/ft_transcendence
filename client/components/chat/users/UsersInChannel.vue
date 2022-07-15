@@ -16,6 +16,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { chatStore } from "@/store";
+import { ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "UsersInChannel",
@@ -29,7 +30,7 @@ export default Vue.extend({
 		return {
 			showUsers: true,
 			get chanConnections() {
-				return chatStore.chanConnections;
+				return chatStore.chanConnections.filter((connection) => connection.role !== ChannelRole.BANNED);
 			},
 			get currentChannel() {
 				return chatStore.currentChannel;

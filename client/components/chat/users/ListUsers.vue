@@ -2,7 +2,7 @@
 	<div>
 		<div v-for="(connection, index) of connections" :key="index">
 			<button
-				v-if="type === 'selection'"
+				v-if="type === 'admin-selection' || type === 'banned-selection'"
 				:class="[isSelected(connection) ? 'selected' : '', margin ? 'pad-left' : '']"
 				class="user-button cut-text btn text-left"
 				@click="select(connection)"
@@ -146,7 +146,9 @@ export default Vue.extend({
 		},
 		select(connection: ChanConnection) {
 			if (this.selected.includes(connection)) {
-				if (connection.role !== ChannelRole.OWNER)
+				if (this.type === "admin-selection" && connection.role !== ChannelRole.OWNER)
+					this.selected = this.selected.filter((c) => c.id !== connection.id);
+				else if (this.type === "banned-selection")
 					this.selected = this.selected.filter((c) => c.id !== connection.id);
 			} else {
 				this.selected.push(connection);
