@@ -1,7 +1,7 @@
 <template>
 	<div id="chat-selection" class="h-full" :class="isOnChannel ? 'on-channel' : ''">
 		<div class="flex flex-col h-full">
-			<div class="flex">
+			<div class="flex p-2">
 				<div class="pl-11 chat-title">Channels</div>
 				<button
 					id="channel-creation"
@@ -12,7 +12,7 @@
 				</button>
 			</div>
 			<div class="flex flex-col">
-				<div class="flex p-2">
+				<div class="flex pb-2">
 					<button
 						class="btn-group btn-left"
 						:class="selection === 0 ? 'btn-selected' : ''"
@@ -29,21 +29,14 @@
 					</button>
 				</div>
 			</div>
-			<div class="h-full overflow-auto p-2">
-				<ArrowDropdown
-					v-if="selection === 0"
-					name="invitations"
-					:click="onShowInvitations"
-					:state="showInvitations"
-				/>
-				<ListChanInvitations
-					v-if="selection === 0 && showInvitations && invitations.length !== 0"
-					:invitations="invitations"
-				/>
-				<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
-				<ListChannels v-if="selection === 0" :channels="myChannels" list-type="own" />
-				<ListChannels v-if="selection === 1" :channels="visibleChannels" list-type="all" />
-			</div>
+			<ArrowDropdown v-if="selection === 0" name="invitations" :click="onShowInvitations" :state="showInvitations" />
+			<ListChanInvitations
+				v-if="selection === 0 && showInvitations && invitations.length !== 0"
+				:invitations="invitations"
+			/>
+			<div v-else-if="selection === 0 && showInvitations" class="empty-text">No invitations.</div>
+			<ListChannels v-if="selection === 0" :channels="myChannels" list-type="own" />
+			<ListChannels v-if="selection === 1" :channels="visibleChannels" list-type="all" />
 		</div>
 	</div>
 </template>
@@ -101,6 +94,7 @@ export default Vue.extend({
 <style>
 #chat-selection {
 	overflow: auto;
+	padding: 0.5rem;
 	width: 35%;
 	min-width: min(500px, 100%);
 	margin-left: auto;

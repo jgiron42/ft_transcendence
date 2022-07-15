@@ -1,7 +1,7 @@
 <template>
 	<div id="user-pannel" class="h-full w-full">
-		<div class="flex flex-col">
-			<div class="flex pb-2">
+		<div class="flex flex-col h-full">
+			<div class="flex p-2">
 				<button
 					class="btn-group btn-left"
 					:class="selection === 0 ? 'btn-selected' : ''"
@@ -25,9 +25,11 @@
 					Social
 				</button>
 			</div>
-			<UsersInChannel :selection="selection" />
-			<AdminPanel :selection="selection" />
-			<SocialPanel :selection="selection" />
+			<div class="h-full overflow-auto p-2">
+				<UsersInChannel :selection="selection" />
+				<AdminPanel :selection="selection" />
+				<SocialPanel :selection="selection" />
+			</div>
 		</div>
 	</div>
 </template>
@@ -71,7 +73,6 @@ export default Vue.extend({
 <style>
 #user-pannel {
 	overflow: auto;
-	padding: 0.5rem;
 	width: 240px;
 	min-width: 240px;
 	background-color: #252525;
@@ -101,5 +102,12 @@ export default Vue.extend({
 
 .empty-friends {
 	color: #d5d5d5;
+}
+</style>
+
+<style scoped>
+.btn-group {
+	font-size: small;
+	width: 33.33%;
 }
 </style>
