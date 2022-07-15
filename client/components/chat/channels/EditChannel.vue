@@ -12,7 +12,7 @@
 				<p v-if="currentChannel.type === ChannelType.PASSWORD">Protected</p>
 			</div>
 		</div>
-		<button id="edit-button" @click="editChan">edit</button>
+		<button v-if="isAdmin" id="edit-button" @click="editChan">edit</button>
 	</div>
 </template>
 
@@ -20,6 +20,7 @@
 import Vue from "vue";
 import { chatStore } from "@/store";
 import { ChannelType } from "@/models/Channel";
+import { ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "EditChannel",
@@ -30,6 +31,9 @@ export default Vue.extend({
 			},
 			get ChannelType() {
 				return ChannelType;
+			},
+			get isAdmin(): boolean {
+				return chatStore.roleOnCurrentChannel === ChannelRole.OWNER;
 			},
 		};
 	},

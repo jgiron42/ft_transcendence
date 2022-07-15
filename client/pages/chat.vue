@@ -92,6 +92,12 @@ export default Vue.extend({
 		this.socket.on("newConnection", (connection: ChanConnection) => {
 			chatStore.pushChanConnection(connection);
 		});
+		this.socket.on("updateConnection", (connection: ChanConnection) => {
+			chatStore.pushChanConnection(connection);
+			if (connection.channel.id === chatStore.currentChannel.id) {
+				chatStore.updateMyRole(connection.role);
+			}
+		});
 		this.socket.on("removeConnection", (connection: ChanConnection) => {
 			chatStore.removeChanConnection(connection);
 		});

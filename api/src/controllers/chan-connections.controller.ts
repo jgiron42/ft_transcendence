@@ -41,7 +41,10 @@ export class ChanConnectionsController {
 	) {
 		if (chanConnection.role === ChannelRole.OWNER)
 			throw new BadRequestException("You can't change the role to owner");
-		await this.chanConnectionService.getQuery().connection_chan_admin(user.id).update(chanConnection, id);
+		return await this.chanConnectionService
+			.getQuery()
+			.connection_chan_admin(user.id)
+			.updateWithSave(chanConnection, id);
 	}
 
 	@Delete(":id")

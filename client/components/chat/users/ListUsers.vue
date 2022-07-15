@@ -2,6 +2,15 @@
 	<div>
 		<div v-for="(connection, index) of connections" :key="index">
 			<button
+				v-if="type === 'selection'"
+				:class="[isSelected(connection) ? 'selected' : '', margin ? 'pad-left' : '']"
+				class="user-button cut-text btn text-left"
+				@click="select(connection)"
+			>
+				<b>{{ connection.user.username }}</b>
+			</button>
+			<button
+				v-else
 				class="user-button cut-text btn text-left"
 				:class="margin ? 'pad-left' : ''"
 				@click="showUserConnection(connection)"
@@ -75,7 +84,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { chatStore, userProfile } from "@/store";
-import { ChanConnection } from "@/models/ChanConnection";
+import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Relation } from "@/models/Relation";
 
 export default Vue.extend({
@@ -97,6 +106,10 @@ export default Vue.extend({
 			type: String,
 			default: "",
 		},
+		preSelected: {
+			type: Array,
+			default: () => [],
+		},
 	},
 	data() {
 		return {
@@ -104,7 +117,11 @@ export default Vue.extend({
 				return chatStore.me;
 			},
 			rel: this.relations,
+			selected: [] as ChanConnection[],
 		};
+	},
+	mounted() {
+		this.selected = this.preSelected as ChanConnection[];
 	},
 	methods: {
 		acceptFriendRequest(id: number) {
@@ -126,6 +143,18 @@ export default Vue.extend({
 		},
 		unblock(rel: Relation) {
 			this.chat.relation.unblockUser(rel.target);
+		},
+		select(connection: ChanConnection) {
+			if (this.selected.includes(connection)) {
+				if (connection.role !== ChannelRole.OWNER)
+					this.selected = this.selected.filter((c) => c.id !== connection.id);
+			} else {
+				this.selected.push(connection);
+			}
+			this.$emit("select", this.selected);
+		},
+		isSelected(connection: ChanConnection) {
+			return this.selected.includes(connection);
 		},
 	},
 });

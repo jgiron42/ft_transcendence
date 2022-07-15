@@ -35,7 +35,7 @@ export default Vue.extend({
 	},
 	methods: {
 		joinChannel() {
-			this.chat.joinChannel(this.joiningChannel, this.password, () => {
+			this.chat.channel.joinChannel(this.joiningChannel, this.password, () => {
 				this.$modal.hide("join_protected_chan");
 			});
 			this.password = "";

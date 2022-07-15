@@ -10,7 +10,7 @@
 					Channel
 				</button>
 				<button
-					v-if="checkOwner()"
+					v-if="isAdmin"
 					class="btn-group"
 					:class="selection === 1 ? 'btn-selected' : ''"
 					@click.prevent="selection = 1"
@@ -34,13 +34,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ChannelRole } from "@/models/ChanConnection";
 import { chatStore } from "@/store";
+import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "RightPanel",
 	data() {
 		return {
+			socket: this.$socket.getSocket(),
 			selection: 0,
 			showInvitations: true,
 			get currentChannel() {
@@ -49,8 +50,8 @@ export default Vue.extend({
 			get me() {
 				return chatStore.me;
 			},
-			get myRole() {
-				return chatStore.roleOnCurrentChannel;
+			get isAdmin(): boolean {
+				return chatStore.roleOnCurrentChannel >= ChannelRole.ADMIN;
 			},
 		};
 	},
@@ -58,11 +59,11 @@ export default Vue.extend({
 		this.$nuxt.$on("updateChannels", () => {
 			if (this.selection === 1) this.selection = 0;
 		});
-	},
-	methods: {
-		checkOwner(): boolean {
-			return this.myRole === ChannelRole.OWNER;
-		},
+		this.socket.on("updateConnection", (connection: ChanConnection) => {
+			if (connection.role < ChannelRole.ADMIN && this.selection === 1) {
+				this.selection = 0;
+			}
+		});
 	},
 });
 </script>

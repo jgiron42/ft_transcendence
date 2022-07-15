@@ -37,4 +37,13 @@ export class ChanConnectionPlugin extends Vue {
 		);
 		return ret;
 	}
+
+	async updateChanConnection(connection: ChanConnection): Promise<ChanConnection | undefined> {
+		let ret: ChanConnection | undefined;
+		await this.api.put("/connections/" + connection.id, connection, undefined, (r: { data: ChanConnection }) => {
+			ret = r.data;
+			chatStore.pushChanConnection(ret);
+		});
+		return ret;
+	}
 }
