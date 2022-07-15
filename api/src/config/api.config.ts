@@ -6,4 +6,5 @@ export default {
 	baseUrl: process.env.API_BASE_URL || "http://localhost:3000",
 	itemPerPage: process.env.API_ITEM_PER_PAGE || 10,
 	maxItemPerPage: Number(process.env.API_MAX_ITEM_PER_PAGE) || 100,
+	uploadsPath: process.env.API_UPLOADS_PATH || "/uploads", // absolute upload path
 };
