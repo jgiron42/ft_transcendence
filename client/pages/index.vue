@@ -1,6 +1,9 @@
 <template>
-	<div class="flex h-full justify-center items-center">
+	<div class="flex flex-col h-full justify-center items-center">
 		<Auth />
+		<box-slot>
+			<NuxtLink to="/settings/security">Go to settings</NuxtLink>
+		</box-slot>
 	</div>
 </template>
 
