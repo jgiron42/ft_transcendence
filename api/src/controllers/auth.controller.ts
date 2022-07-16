@@ -6,7 +6,6 @@ import {
 	Redirect,
 	Req,
 	Session,
-	UseFilters,
 	UseGuards,
 	Request as RequestDecorator,
 } from "@nestjs/common";
@@ -15,15 +14,11 @@ import { SessionGuard } from "@guards/session.guard";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "@src/types/request.d";
 import { SessionT } from "@src/types/session";
-import { LoggedGuard } from "@guards/logged.guard";
-import { antiAuthFilter } from "@filters/antiAuth.filter";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
 import { DevelopmentGuard } from "@guards/development.guard";
 import config from "@config/api.config"
 
 @Controller("auth")
-@UseGuards(LoggedGuard)
-@UseFilters(antiAuthFilter)
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
@@ -72,7 +67,7 @@ export class AuthController {
 	@Redirect(config.webroot)
 	callback(@Session() ses: Record<string, any>, @Req() req: Request) {
 		ses.user = req.user;
-		ses.ftIdentified = Date.now();
+		ses.lastAuthDateFT = Date.now();
 		console.log("ses:", ses);
 		return req.session;
 	}
@@ -82,10 +77,10 @@ export class AuthController {
 	 * @apiParam {String} code the totp token
 	 */
 	@Post("totp")
-	@Redirect(config.webroot)
 	@UseGuards(SessionGuardFt, AuthGuard("totp"))
 	totpAuth(@Session() ses: Record<string, any>) {
-		ses.totpIdentified = true;
+		ses.isTOTPIdentified = true;
+		return ses;
 	}
 
 	/**
