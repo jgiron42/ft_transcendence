@@ -1,6 +1,5 @@
 <template>
-	<div class="flex">
-		<Settings />
+	<div class="flex h-full justify-center items-center">
 		<Auth />
 	</div>
 </template>
