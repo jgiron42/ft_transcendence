@@ -33,10 +33,14 @@ export default Vue.extend({
 			this.input = input;
 		},
 		async connect() {
-			const response = await this.$axios.$post(this.$config.ft_api.url + "/auth/totp", "code=" + this.input, {
-				withCredentials: true,
-			});
-			if (response.isTOTPIdentified) this.$router.push("/");
+			try {
+				const response = await this.$axios.$post(this.$config.ft_api.url + "/auth/totp", "code=" + this.input, {
+					withCredentials: true,
+				});
+				if (response.isTOTPIdentified) this.$router.push("/");
+			} catch (err) {
+				this.$nuxt.$emit("addAlert", { title: "TOTP", message: err });
+			}
 		},
 	},
 });

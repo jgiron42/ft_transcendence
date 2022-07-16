@@ -2,6 +2,7 @@
 <template>
 	<div id="app" class="w-full h-full overflow-hidden flex flex-col">
 		<Header />
+		<AlertManager />
 		<div id="page" class="flex flex-col flex-grow min-h-0 min-w-0 overflow-x-auto w-full h-full">
 			<Nuxt />
 		</div>
