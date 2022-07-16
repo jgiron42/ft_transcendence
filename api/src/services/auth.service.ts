@@ -14,7 +14,7 @@ export class AuthService {
 	 */
 	static getTotpKey(this: void, user: User, done: (error: string, key: Buffer, period: number) => any): any {
 		const key = {
-			key: Buffer.from(user.totp_key, "hex"),
+			key: Buffer.from(user.totp_key),
 			period: 30,
 		};
 		return done(null, key.key, key.period);
@@ -35,9 +35,9 @@ export class AuthService {
 	 */
 	logout(session: SessionT) {
 		// Reset 42 authentication date
-		session.ftIdentified = undefined;
+		session.lastAuthDateFT = undefined;
 		// Reset TOTP validation
-		session.totpIdentified = false;
+		session.isTOTPIdentified = false;
 	}
 
 	/**
@@ -53,7 +53,7 @@ export class AuthService {
 	 */
 	isFtLogged(ses: SessionT): boolean {
 		// Return true if the time since last authentication is inferior to the timeout
-		return ses.ftIdentified && ses.ftIdentified + this.getTimeout() > Date.now();
+		return ses.lastAuthDateFT && ses.lastAuthDateFT / 1000 + this.getTimeout() * 1000 > Date.now() / 1000;
 	}
 
 	/**
@@ -62,7 +62,7 @@ export class AuthService {
 	 */
 	isTOTPLogged(req: Request): boolean {
 		// Ensure user has TOTP enabled and is authenticated.
-		return !this.hasTOTP(req.user) || req.session.totpIdentified;
+		return !this.hasTOTP(req.user) || req.session.isTOTPIdentified;
 	}
 
 	/**
