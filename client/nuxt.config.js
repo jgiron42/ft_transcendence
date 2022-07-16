@@ -22,7 +22,7 @@ export default {
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-	plugins: [{ src: "@/plugins/api.plugin", mode: "all" }],
+	plugins: [{ src: "@/plugins/axios", mode: "all" }],
 
 	// Auto import components: https://go.nuxtjs.dev/config-components
 	components: true,
@@ -64,7 +64,5 @@ export default {
 	io: {},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
-	build: {
-		transpile: ["lodash-es"],
-	},
+	build: {},
 };
