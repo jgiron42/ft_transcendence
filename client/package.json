@@ -15,15 +15,21 @@
 		"lintfix": "prettier --write --list-different . && npm run lint:js -- --fix && npm run lint:style -- --fix && npm run lint:prettier -- --fix"
 	},
 	"dependencies": {
+		"@chenfengyuan/vue-qrcode": "^1.0.2",
+		"@niyari/base32-ts": "^0.0.4",
+		"@nuxt/typescript-build": "^2.1.0",
+		"@nuxtjs/axios": "^5.13.6",
+		"@nuxtjs/device": "^2.1.0",
+		"@nuxtjs/stylelint-module": "^4.1.0",
+		"@nuxtjs/tailwindcss": "^4.2.1",
+		"@types/chenfengyuan__vue-qrcode": "^1.0.3",
 		"core-js": "^3.19.3",
 		"nuxt": "^2.15.8",
 		"vue": "^2.6.14",
 		"vue-server-renderer": "^2.6.14",
 		"vue-template-compiler": "^2.6.14",
-		"webpack": "^4.46.0",
-		"@nuxtjs/stylelint-module": "^4.1.0",
-		"@nuxtjs/tailwindcss": "^4.2.1",
-		"@nuxt/typescript-build": "^2.1.0"
+		"vuex-module-decorators": "^0.17.0",
+		"webpack": "^4.46.0"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.16.3",

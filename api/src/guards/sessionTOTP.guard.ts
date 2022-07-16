@@ -24,6 +24,7 @@ export class SessionGuardTOTP implements CanActivate {
 			statusCode: 401,
 			error: "Unauthorized",
 			reason: "not authenticated",
+			id: req.session.user.id,
 			authMethod: "TOTP",
 		});
 	}

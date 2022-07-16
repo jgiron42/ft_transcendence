@@ -1,13 +1,6 @@
 FROM node:17.4.0
 
-# ARG NUXT_ENV_API_URL NUXT_ENV_SENTRY_DISABLED NUXT_ENV_SENTRY_DSN
-# ENV NUXT_ENV_API_URL ${NUXT_ENV_API_URL}
-# ENV NUXT_ENV_SENTRY_DISABLED ${NUXT_ENV_SENTRY_DISABLED}
-# ENV NUXT_ENV_SENTRY_DSN ${NUXT_ENV_SENTRY_DSN}
-
 ARG NODE_ENV=production
-
-ARG CLIENT_PORT=4000
 
 WORKDIR /app
 
@@ -21,6 +14,6 @@ RUN npm run build
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
-EXPOSE ${CLIENT_PORT}
+EXPOSE 4000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl --fail 127.0.0.1:${CLIENT_PORT} > /dev/null 2>&1 || pkill node
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s CMD curl --fail 127.0.0.1:4000 > /dev/null 2>&1 || exit 1

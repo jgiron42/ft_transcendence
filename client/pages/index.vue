@@ -1,11 +1,9 @@
 <template>
-	<div id="app" class="w-screen h-screen overflow-hidden flex flex-col">
-		<Header />
-		<div id="page" class="flex flex-row items-center flex-grow min-h-0 min-w-0 overflow-x-auto">
-			<div class="flex w-1/2 h-1/2">
-				<Settings />
-			</div>
-		</div>
+	<div class="flex flex-col h-full justify-center items-center">
+		<Auth />
+		<box-slot>
+			<NuxtLink to="/settings/security">Go to settings</NuxtLink>
+		</box-slot>
 	</div>
 </template>
 

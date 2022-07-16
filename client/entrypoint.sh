@@ -11,13 +11,15 @@ then
 	then
 		export "RUN_SCRIPT=start"
 	else
+		npm i
 		export "RUN_SCRIPT=dev"
 	fi
 fi
 
-echo NPM VERSION: "$(npm --version)"
-echo NODE VERSION: "$(node --version)"
-echo NODE_ENV: $NODE_ENV
-echo RUN_SCRIPT: $RUN_SCRIPT
-
-npm run $RUN_SCRIPT
+# Check if another command is provided & execute them
+if [[ ! -z "$@" ]]
+then
+	$@
+else
+	npm run $RUN_SCRIPT
+fi
