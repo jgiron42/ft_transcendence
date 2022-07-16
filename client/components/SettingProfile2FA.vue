@@ -75,7 +75,6 @@ export default Vue.extend({
 			this.generating2FA = true;
 			this.secret = this.user.totp_key;
 		}
-		console.log("user:", this.user);
 
 		//  Set handler for "SAVE" button press
 		this.$nuxt.$on("saveSettings2FA", async () => {
@@ -93,7 +92,6 @@ export default Vue.extend({
 
 			// Update 2FA flag
 			this.is2FAEnabled = this.user.totp_enabled;
-			console.log("newUser:", this.user);
 		});
 	},
 	methods: {

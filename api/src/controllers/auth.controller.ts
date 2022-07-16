@@ -52,7 +52,6 @@ export class AuthController {
 	callback(@Session() ses: Record<string, any>, @Req() req: Request) {
 		ses.user = req.user;
 		ses.lastAuthDateFT = Date.now();
-		console.log("ses:", ses);
 		return req.session;
 	}
 

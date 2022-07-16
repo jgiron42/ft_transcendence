@@ -3,7 +3,6 @@ import { Context } from "@nuxt/types";
 export default function ({ $axios, redirect, $config }: Context) {
 	// Handle all 401 errors to redirect to required authentication handler
 	$axios.onError((error) => {
-		console.log("axios err:", { ...error });
 		// Ensure error code is 401
 		if (error.response && error.response.status === 401) {
 			// Ensure missing auth is TOTP

@@ -49,7 +49,6 @@ export class UserSingleton {
 			if (err.response && err.response.data.authMethod) {
 				if (err.response.data.authMethod === "42") {
 					const user = this.user;
-					console.log(err.response);
 					user.id = err.response.data.id;
 					if (user.id) user.totp_enabled = false;
 					this.setUser(user);

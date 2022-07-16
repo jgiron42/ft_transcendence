@@ -37,7 +37,6 @@ export default Vue.extend({
 				withCredentials: true,
 			});
 			if (response.isTOTPIdentified) this.$router.push("/");
-			console.log("rep:", response);
 		},
 	},
 });

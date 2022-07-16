@@ -46,7 +46,7 @@ export default Vue.extend({
 			// Ensure the element exist and it has files
 			if (input && input.files) {
 				// TODO: Send files to API
-				console.log("sending file:", input.files[0]);
+				// console.log("sending file:", input.files[0]);
 			}
 		},
 	},
