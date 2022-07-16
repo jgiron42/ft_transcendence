@@ -43,8 +43,8 @@ export class AppController {
 			created_at: new Date(),
 		} as User;
 		await this.userService.create(usr);
-		ses.ftIdentified = 9999999999999;
-		ses.totpIdentified = true;
+		ses.lastAuthDateFT = 9999999999999;
+		ses.isTOTPIdentified = true;
 		ses.user = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
 		return this.userService.findAll();
 	}
