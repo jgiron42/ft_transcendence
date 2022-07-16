@@ -34,7 +34,7 @@ export default Vue.extend({
 	name: "MutePanel",
 	data() {
 		return {
-			selected: 0,
+			selected: "0",
 			value: 0,
 			get connection() {
 				return chatStore.mutePopup;
@@ -42,10 +42,10 @@ export default Vue.extend({
 		};
 	},
 	methods: {
-		selectCategory(event) {
-			this.selected = event.target.value;
+		selectCategory(event: Event) {
+			this.selected = (event.target as HTMLInputElement).value;
 		},
-		validateInput() {
+		async validateInput() {
 			let seconds = 0;
 			switch (this.selected) {
 				case "0":
@@ -63,10 +63,13 @@ export default Vue.extend({
 				default:
 					return;
 			}
-			this.chat.chanConnection.updateChanConnection({
-				id: this.connection.id,
-				mute_end: new Date(Date.now() + seconds * 1000)
-			});
+			if (
+				await this.chat.chanConnection.updateChanConnection({
+					id: this.connection.id,
+					mute_end: new Date(Date.now() + seconds * 1000),
+				})
+			)
+				this.$modal.hide("mute_pannel");
 		},
 	},
 });

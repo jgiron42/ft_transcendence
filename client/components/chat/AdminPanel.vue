@@ -64,7 +64,7 @@
 		<div id="mute-list">
 			<ArrowDropdown name="muted users" :click="onShowMuted" :state="showMuted" />
 			<ListUsers
-				v-if="showEditMuted && mutedConnections.length !== 0"
+				v-if="showMuted && mutedConnections.length !== 0"
 				:connections="mutedConnections"
 				:margin="true"
 				type="muted-selection"
@@ -82,7 +82,6 @@
 					@select="selectMuted"
 				/>
 			</div>
-
 		</div>
 	</div>
 </template>
@@ -143,8 +142,6 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.$nuxt.$on("mute", (sec: number) => {
-		});
 		setInterval(() => {
 			this.mutedList = chatStore.chanConnections.filter((connection) => {
 				if (connection.mute_end !== null) {
@@ -155,7 +152,6 @@ export default Vue.extend({
 		}, 1000);
 		this.selectedAdmins = [];
 		this.selectedBanned = [];
-		this.selectedMuted = [];
 		for (const connection of this.adminConnections) {
 			this.selectedAdmins.push(connection);
 		}

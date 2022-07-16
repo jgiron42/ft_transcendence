@@ -3,6 +3,12 @@ import { chatStore } from "@/store";
 import { Channel } from "@/models/Channel";
 import { ChanConnection } from "@/models/ChanConnection";
 
+type PartialConnection<T> = T extends object
+	? {
+			[P in keyof T]?: PartialConnection<T[P]>;
+	  }
+	: T;
+
 export class ChanConnectionPlugin extends Vue {
 	async getUserChanConnections() {
 		await this.api.get(
@@ -38,7 +44,7 @@ export class ChanConnectionPlugin extends Vue {
 		return ret;
 	}
 
-	async updateChanConnection(connection: ChanConnection): Promise<ChanConnection | undefined> {
+	async updateChanConnection(connection: PartialConnection<ChanConnection>): Promise<ChanConnection | undefined> {
 		let ret: ChanConnection | undefined;
 		await this.api.put("/connections/" + connection.id, connection, undefined, (r: { data: ChanConnection }) => {
 			ret = r.data;
