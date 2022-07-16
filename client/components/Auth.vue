@@ -1,34 +1,24 @@
 <template>
 	<div>
-		<DebugCookies />
-		<BoxButton v-if="authenticated" font="font-mono" :content="['You are', 'authenticated']" />
-		<BoxSlot v-else font="font-mono">
-			<form action="/api/auth/42" method="POST">
-				<label for="submit1">42 auth</label>
-				<input id="submit1" class="bg-black" type="submit" value="submit" />
-			</form>
-			<form action="/api/auth/totp" method="POST">
-				<label for="totp">totp auth</label>
-				<input id="totp" class="bg-black" type="text" name="code" />
-				<input id="submit2" class="bg-black" type="submit" value="submit" />
-			</form>
-		</BoxSlot>
-		<ObjectDebug :param="user" />
+		<Loader v-if="loading" class="mx-auto animate-spin h-full" />
+		<ObjectDebug v-else :param="user" />
 	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { User } from "~/models/User";
+
 export default Vue.extend({
 	data: () => ({
-		authenticated: false,
-		user: {
-			name: "userName",
-		},
+		missingAuth: "",
+		user: new User(),
+		loading: true,
 	}),
 	mounted() {
-		this.$nuxt.$on("mustAuthenticate", () => {
-			this.authenticated = false;
+		this.$axios.get(this.$config.ft_api.url + "/me").then((ret) => {
+			this.user = ret.data as User;
+			this.loading = false;
 		});
 	},
 	methods: {},

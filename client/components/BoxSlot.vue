@@ -1,6 +1,6 @@
 <template>
 	<div
-		:class="`${font} m-1 p-4 py-6 ${color} break-words border-design_white border-4 rounded rounded-br-none text-3xl text-design_white text-center cursor-default`"
+		:class="`${font} m-1 p-4 py-6 ${color} break-words border-design_white border-4 rounded rounded-br-none text-3xl text-design_white text-center cursor-default flex flex-col max-w-full`"
 	>
 		<slot />
 	</div>
