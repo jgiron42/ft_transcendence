@@ -28,7 +28,7 @@ export class SessionGuardFt implements CanActivate {
 			return true;
 		}
 		// Reset totp verification
-		req.session.totpIdentified = false;
+		req.session.isTOTPIdentified = false;
 		// Throw an HTTP 401 error
 		throw new UnauthorizedException({
 			statusCode: 401,
