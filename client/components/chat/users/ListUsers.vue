@@ -60,10 +60,7 @@
 						:class="margin ? 'pad-left' : ''"
 						@click="showUserRelation(relation)"
 					>
-						<b v-if="relation.owner.id !== me.id">{{ relation.owner.username }}</b>
-						<b v-if="relation.target.id !== me.id || relation.owner.id == relation.target.id">{{
-							relation.target.username
-						}}</b>
+						<b>{{ other(relation).username }}</b>
 					</button>
 					<button v-if="type === 'blocked'" class="w-4 h-3" @click.prevent="unblock(relation)">
 						<svg version="1.1" viewBox="0 0 1000 1000" height="10px">
@@ -75,6 +72,11 @@
 							</g>
 						</svg>
 					</button>
+					<button
+						v-else-if="type === 'friends' && !isAlreadyOnCurrentChannel(other(relation))"
+						class="w-12 h-6 invite-icon"
+						@click.prevent="inviteInCurrentChannel(other(relation))"
+					/>
 				</div>
 			</div>
 		</div>
@@ -86,6 +88,7 @@ import Vue from "vue";
 import { chatStore, userProfile } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Relation } from "@/models/Relation";
+import { User } from "@/models/User";
 
 export default Vue.extend({
 	name: "ListUsers",
@@ -158,6 +161,18 @@ export default Vue.extend({
 		isSelected(connection: ChanConnection) {
 			return this.selected.includes(connection);
 		},
+		inviteInCurrentChannel(user: User) {
+			this.chat.channel.invite(chatStore.currentChannel, user);
+		},
+		other(relation: Relation) {
+			return relation.owner.id === this.me.id ? relation.target : relation.owner;
+		},
+		isAlreadyOnCurrentChannel(user: User) {
+			if (chatStore.chanConnections.find((c) => c.user.id === user.id)) {
+				return true;
+			}
+			return false;
+		},
 	},
 });
 </script>
@@ -178,5 +193,10 @@ export default Vue.extend({
 .user-button:hover {
 	background-color: #393939;
 	color: #999;
+}
+
+.invite-icon {
+	background-color: #8c8c8c;
+	mask: url("~assets/invite.svg") no-repeat center;
 }
 </style>

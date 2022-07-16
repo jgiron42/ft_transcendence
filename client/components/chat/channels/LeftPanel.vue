@@ -70,7 +70,11 @@ export default Vue.extend({
 				return chatStore.myChannels;
 			},
 			get invitations() {
-				return chatStore.chanInvitations || [];
+				return chatStore.chanInvitations.filter((invitation) => {
+					return !chatStore.chanConnections.some((connection) => {
+						return connection.channel.id === invitation.channel.id;
+					});
+				});
 			},
 			get isOnChannel() {
 				return chatStore.currentChannel.name;

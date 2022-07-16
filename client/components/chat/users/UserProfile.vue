@@ -72,6 +72,9 @@ export default Vue.extend({
 			get ratio(): number {
 				return this.user.nb_win / this.user.nb_game;
 			},
+			get currentChannel() {
+				return chatStore.currentChannel;
+			},
 		};
 	},
 	methods: {
@@ -115,6 +118,7 @@ export default Vue.extend({
 	overflow: hidden;
 	color: black;
 	font: 1em "Open Sans", sans-serif;
+	font-size: small;
 	width: 100%;
 	padding: 10px;
 	border-radius: 10px;
