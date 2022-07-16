@@ -44,7 +44,7 @@ function onSegment(p: Vector2D, q: Vector2D, r: Vector2D) {
 		return true;
 }
 
-// Check intersectoin orientation
+// Check intersection orientation
 function orientation(p: Vector2D, q: Vector2D, r: Vector2D) {
 	const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.x);
 	if (val === 0) return 0;
@@ -61,12 +61,11 @@ function intersect(p1: Vector2D, q1: Vector2D, p2: Vector2D, q2: Vector2D) {
 
 	if (o1 !== o2 && o3 !== o4) return true;
 
-	// Cas speciaux
+	// Special cases
 	if (o1 === 0 && onSegment(p1, p2, q1)) return true;
 	if (o2 === 0 && onSegment(p1, q2, q1)) return true;
 	if (o3 === 0 && onSegment(p2, p1, q2)) return true;
-	if (o4 === 0 && onSegment(p2, q1, q2)) return true;
-	return false;
+	return o4 === 0 && onSegment(p2, q1, q2);
 }
 
 class Player {
@@ -86,21 +85,28 @@ class Player {
 		this.acc = 0.2;
 	}
 
-	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D) {
-		if (vkUp && this.pos.y - this.speed > 40) {
-			this.pos.y -= this.speed;
-			if (this.vel.y + this.acc <= this.minmaxVel.w) this.vel.y += this.acc;
-			if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
-		} else if (vkDown && this.pos.y + this.speed < res.y - this.size.y - 40) {
-			this.pos.y += this.speed;
-			if (this.vel.y + this.acc <= this.minmaxVel.w) this.vel.y += this.acc;
-			if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
-		}
-		if (!vkUp && !vkDown) {
-			this.vel.y = this.minmaxVel.y;
-			this.vel.x = this.minmaxVel.x;
+	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D, gameMode: boolean, justPressed: boolean) {
+		if (!gameMode) {
+			// Standard controls
+			if (vkUp && this.pos.y - this.speed > 40) {
+				this.pos.y -= this.speed;
+				if (this.vel.y + this.acc <= this.minmaxVel.w) this.vel.y += this.acc;
+				if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
+			} else if (vkDown && this.pos.y + this.speed < res.y - this.size.y - 40) {
+				this.pos.y += this.speed;
+				if (this.vel.y + this.acc <= this.minmaxVel.w) this.vel.y += this.acc;
+				if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
+			}
+			if (!vkUp && !vkDown) {
+				this.vel.y = this.minmaxVel.y;
+				this.vel.x = this.minmaxVel.x;
+			} else {
+				this.speed = 7;
+			}
 		} else {
-			this.speed = 7;
+			this.speed = 4;
+			if (this.pos.y + this.speed + this.size.y <= res.y) this.pos.y += this.speed;
+			if (justPressed && this.pos.y - 1.5 * this.size.y >= 0) this.pos.y -= 1.5 * this.size.y;
 		}
 	}
 
@@ -174,12 +180,12 @@ class Ball {
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
 		if (part === 0) this.dir.y = -1 * this.speed;
 		else if (part === 1) this.dir.y = 0;
-		else this.dir.y = 1 * this.speed;
+		else this.dir.y = this.speed;
 	}
 
 	leftVerticalCol(pad: Player) {
 		this.speed += this.acc;
-		this.dir.x = -this.dir.x * 1 + this.acc * pad.vel.x;
+		this.dir.x = -this.dir.x + this.acc * pad.vel.x;
 		let part = 0;
 		if (
 			this.pos.y + this.dir.y + this.size.x > pad.pos.y + pad.size.y / 3 &&
@@ -189,7 +195,7 @@ class Ball {
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
 		if (part === 0) this.dir.y = -1 * this.speed;
 		else if (part === 1) this.dir.y = 0;
-		else this.dir.y = 1 * this.speed * pad.vel.y;
+		else this.dir.y = this.speed * pad.vel.y;
 	}
 
 	topHorizontalCol(pad: Player) {
@@ -199,7 +205,7 @@ class Ball {
 				new Vector2D(this.pos.x + this.dir.x, this.pos.y + this.dir.y + this.size.x),
 				pad.pos,
 				new Vector2D(pad.pos.x + pad.size.x, pad.pos.y),
-			) === true
+			)
 		) {
 			if (this.dir.y > 0) this.dir.y = -this.dir.y;
 		}
@@ -212,7 +218,7 @@ class Ball {
 				new Vector2D(this.pos.x + this.dir.x + this.size.x, this.pos.y + this.dir.y),
 				new Vector2D(pad.pos.x, pad.pos.y + pad.size.y),
 				new Vector2D(pad.pos.x + pad.size.x, pad.pos.y + pad.size.y),
-			) === true
+			)
 		) {
 			if (this.dir.y < 0) this.dir.y = -this.dir.y;
 		}
@@ -242,6 +248,12 @@ class Ball {
 }
 
 export default Vue.extend({
+	props: {
+		menuid: {
+			type: Number,
+			default: 3,
+		},
+	},
 	data: () => ({
 		ingame: false,
 		canvas: null as HTMLCanvasElement | null,
@@ -254,6 +266,8 @@ export default Vue.extend({
 		res: null as Vector2D | null,
 		ball: new Ball(new Vector2D(450, 300)),
 		players: null as Array<Player> | null,
+		lastMousePos: null as Vector2D | null,
+		justPressed: false,
 	}),
 	mounted() {
 		// Init Canvas and apply ratio
@@ -268,14 +282,13 @@ export default Vue.extend({
 			this.players[0] = p1;
 			this.players[1] = p2;
 		}
-
 		// Init canvas ctx
 		this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
 		// Adding event hooks
 		document.addEventListener("keydown", this.handleKeyPress, false);
 		document.addEventListener("keyup", this.handleKeyRelease, false);
-		document.addEventListener("resize", this.sizeCanvas, false);
+		document.addEventListener("mousedown", this.handleMouse, false);
 
 		// Create Entities
 		setInterval(this.draw, 10);
@@ -287,6 +300,8 @@ export default Vue.extend({
 				this.update();
 				this.redraw();
 			}
+			// reset justPressed Singleton
+			if (this.justPressed) this.justPressed = false;
 		},
 		redraw() {
 			// render
@@ -325,13 +340,19 @@ export default Vue.extend({
 			if (this.res && this.players) {
 				this.scorePoint();
 
-				// Update Players
-				this.players[0].update(this.vkUp, this.vkDown, this.res);
+				// If in menu, p1 follow ball else move on input
+				this.players[0].update(
+					this.vkUp,
+					this.vkDown,
+					this.res,
+					this.menuid === 3 || this.menuid === 4,
+					this.justPressed,
+				);
 				// 	Simulate p2 input
 				if (this.ball.pos.y + this.ball.dir.y < this.players[1].pos.y + this.players[1].size.y / 2)
-					this.players[1].update(true, false, this.res);
+					this.players[1].update(true, false, this.res, this.menuid === 3 || this.menuid === 4, true);
 				else if (this.ball.pos.y + this.ball.dir.y > this.players[1].pos.y + this.players[1].size.y / 2)
-					this.players[1].update(false, true, this.res);
+					this.players[1].update(false, true, this.res, this.menuid === 3 || this.menuid === 4, false);
 				// Update ball
 				this.ball.update(this.res, this.players);
 			}
@@ -339,10 +360,6 @@ export default Vue.extend({
 				this.score_p1 = 0;
 				this.score_p2 = 0;
 			}
-		},
-		sizeCanvas() {
-			this.canvas.width = innerWidth;
-			this.canvas.height = innerHeight * 0.5;
 		},
 		// display background, playground and scores
 		clear() {
@@ -363,14 +380,21 @@ export default Vue.extend({
 				}
 			}
 		},
-		// Keyboard event Handler
+		// Event Handling
 		handleKeyPress(event: KeyboardEvent) {
-			if (event.key === "Up" || event.key === "ArrowUp") this.vkUp = true;
-			else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = true;
+			if (event.key === "Up" || event.key === "ArrowUp") {
+				this.vkUp = true;
+				this.justPressed = true;
+			} else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = true;
 		},
 		handleKeyRelease(event: KeyboardEvent) {
 			if (event.key === "Up" || event.key === "ArrowUp") this.vkUp = false;
 			else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = false;
+		},
+		handleMouse(event: MouseEvent) {
+			if (!this.canvas) return;
+			const rect = this.canvas.getBoundingClientRect();
+			this.lastMousePos = new Vector2D(event.clientX - rect.left, event.clientY - rect.top);
 		},
 	},
 });
@@ -383,12 +407,11 @@ canvas {
 	display: block;
 }
 
-.game_bis{
+.game_bis {
 	margin-left: auto;
 	margin-right: auto;
-	display:grid;
+	display: grid;
 	align-content: center;
 	justify-content: center;
 }
-
 </style>
