@@ -1,9 +1,13 @@
 <template>
 	<div id="content" class="flex flex-col w-full max-h-full justify-center items-center text-center overflow-y-scroll">
+		<!-- Title -->
 		<span class="bg-design_mgray p-3 m-10 text-white text-3xl break-all"> AUTHENTICATION </span>
+		<!-- Box with input for sending your TOTP token -->
 		<box-slot>
+			<!-- Input title -->
 			ENTER YOUR TOTP<br />
 			CODE:
+			<!-- Input text field for TOTP token -->
 			<div class="mt-8 mb-7">
 				<input
 					type="number"
@@ -11,6 +15,7 @@
 					@input="updateInput($event.target.value)"
 				/>
 			</div>
+			<!-- Button for sending the TOTP token to the API -->
 			<button id="connect" class="hover:text-gray-400" @click="connect">CONNECT</button>
 		</box-slot>
 	</div>

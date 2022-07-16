@@ -25,6 +25,7 @@ export class User {
 	created_at: Date;
 }
 
+// Wrapper of UserStore allowing to automatically fetch, store, save and return the user when needed.
 export class UserSingleton {
 	constructor(ctx: Context) {
 		this.ctx = ctx;

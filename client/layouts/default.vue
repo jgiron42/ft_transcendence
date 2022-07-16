@@ -1,3 +1,4 @@
+<!-- Don't change widths and heights in this layout, trust me -->
 <template>
 	<div id="app" class="w-full h-full overflow-hidden flex flex-col">
 		<Header />
