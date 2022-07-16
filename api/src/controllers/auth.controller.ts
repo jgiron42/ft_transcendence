@@ -16,7 +16,7 @@ import { Request } from "@src/types/request.d";
 import { SessionT } from "@src/types/session";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
 import { DevelopmentGuard } from "@guards/development.guard";
-import config from "@config/api.config"
+import config from "@config/api.config";
 
 @Controller("auth")
 export class AuthController {
@@ -31,7 +31,6 @@ export class AuthController {
 	logout(@Session() ses: SessionT) {
 		this.authService.logout(ses);
 	}
-
 
 	/**
 	 * Route to login with the 42 OAuth

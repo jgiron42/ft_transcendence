@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, UnauthorizedException } from "@nestjs/common";
 import { Response } from "express";
-import config from "@config/api.config"
+import config from "@config/api.config";
 
 /**
  * Redirects a client to the root page when it is authenticated and try accessing the login page
