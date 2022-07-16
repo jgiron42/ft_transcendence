@@ -1,21 +1,8 @@
 <template>
 	<li class="arrow-button" @click="onClick">
 		<div class="flex w-full">
-			<svg
-				class="arrow-panel"
-				:class="selected ? 'arrow-selected' : ''"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-			>
-				<path
-					fill="currentColor"
-					fill-rule="evenodd"
-					clip-rule="evenodd"
-					d="M16.59 8.59004L12 13.17L7.41 8.59004L6 10L12 16L18 10L16.59 8.59004Z"
-				/>
-			</svg>
-			<b>{{ name }}</b>
+			<img src="~/assets/arrow-dropdown.svg" class="arrow-panel w-3" :class="selected ? 'arrow-selected' : ''" />
+			<b class="pl-1">{{ name }}</b>
 		</div>
 	</li>
 </template>

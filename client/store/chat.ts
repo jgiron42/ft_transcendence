@@ -32,7 +32,13 @@ export default class Chat extends VuexModule implements ChatInterface {
 	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
 	relations: Array<Relation> = [] as Relation[];
 	joiningChannel: Channel | undefined = new Channel();
+	mutePopup: ChanConnection = new ChanConnection();
 	blockedUsers: Relation[] = [];
+
+	@Mutation
+	updateMutePopup(connection: ChanConnection) {
+		this.mutePopup = connection;
+	}
 
 	@Mutation
 	resetAll() {

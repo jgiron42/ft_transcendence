@@ -23,7 +23,7 @@
 				<button v-if="!showEditAdmin" class="edit-button" @click="editAdmin">Manage admins</button>
 				<button v-if="showEditAdmin" class="edit-button" @click="saveEditAdmin">Save!</button>
 				<ListUsers
-					v-if="showEditAdmin && usersInChannel.length !== 0"
+					v-if="showEditAdmin"
 					:connections="usersInChannel"
 					:pre-selected="adminConnections"
 					:margin="true"
@@ -46,23 +46,43 @@
 				<button v-if="showEditBanned" class="edit-button" @click="saveEditBanned">Save!</button>
 				<ListUsers
 					v-if="showEditBanned && usersInChannel.length !== 0"
-					:connections="usersInChannelExceptOwner"
+					:connections="usersFilter((connection) => connection.role < ChannelRole.OWNER)"
 					:pre-selected="bannedConnections"
 					:margin="true"
 					type="banned-selection"
 					@select="selectBanned"
 				/>
 			</div>
+			<div
+				v-if="showEditBanned && usersFilter((connection) => connection.role < ChannelRole.OWNER).length === 0"
+				class="empty-text"
+			>
+				No users.
+			</div>
 		</div>
 		<hr />
 		<div id="mute-list">
 			<ArrowDropdown name="muted users" :click="onShowMuted" :state="showMuted" />
 			<ListUsers
-				v-if="showMuted && mutedConnections.length !== 0"
+				v-if="showEditMuted && mutedConnections.length !== 0"
 				:connections="mutedConnections"
 				:margin="true"
+				type="muted-selection"
+				@select="selectMuted"
 			/>
 			<div v-else-if="showMuted" class="empty-text">No muted users.</div>
+			<div v-if="isAdmin">
+				<button v-if="!showEditMuted" class="edit-button" @click="editMuted">Manage muted</button>
+				<button v-if="showEditMuted" class="edit-button" @click="showEditMuted = false">Done!</button>
+				<ListUsers
+					v-if="showEditMuted && usersInChannel.length !== 0"
+					:connections="usersFilter((connection) => connection.role < ChannelRole.ADMIN)"
+					:margin="true"
+					type="muted-selection"
+					@select="selectMuted"
+				/>
+			</div>
+
 		</div>
 	</div>
 </template>
@@ -71,6 +91,8 @@
 import Vue from "vue";
 import { chatStore } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
+
+type Filter = (connection: ChanConnection) => boolean;
 
 export default Vue.extend({
 	name: "AdminPanel",
@@ -82,6 +104,9 @@ export default Vue.extend({
 	},
 	data() {
 		return {
+			get ChannelRole() {
+				return ChannelRole;
+			},
 			get currentChannel() {
 				return chatStore.currentChannel;
 			},
@@ -94,13 +119,10 @@ export default Vue.extend({
 				return chatStore.chanConnections.filter((connection) => connection.role === ChannelRole.BANNED);
 			},
 			get mutedConnections() {
-				return chatStore.chanConnections.filter((connection) => connection.muted);
+				return this.mutedList;
 			},
 			get usersInChannel() {
 				return chatStore.chanConnections;
-			},
-			get usersInChannelExceptOwner() {
-				return chatStore.chanConnections.filter((connection) => connection.role !== ChannelRole.OWNER);
 			},
 			get isOwner(): boolean {
 				return chatStore.roleOnCurrentChannel === ChannelRole.OWNER;
@@ -110,17 +132,30 @@ export default Vue.extend({
 			},
 			selectedAdmins: [] as ChanConnection[],
 			selectedBanned: [] as ChanConnection[],
+			mutedList: [] as ChanConnection[],
 			showChanProps: true,
 			showAdmin: true,
 			showEditAdmin: false,
 			showBanned: true,
 			showEditBanned: false,
 			showMuted: true,
+			showEditMuted: false,
 		};
 	},
 	mounted() {
+		this.$nuxt.$on("mute", (sec: number) => {
+		});
+		setInterval(() => {
+			this.mutedList = chatStore.chanConnections.filter((connection) => {
+				if (connection.mute_end !== null) {
+					return new Date(connection.mute_end).getTime() > Date.now();
+				}
+				return false;
+			});
+		}, 1000);
 		this.selectedAdmins = [];
 		this.selectedBanned = [];
+		this.selectedMuted = [];
 		for (const connection of this.adminConnections) {
 			this.selectedAdmins.push(connection);
 		}
@@ -129,6 +164,9 @@ export default Vue.extend({
 		}
 	},
 	methods: {
+		usersFilter(filter: Filter) {
+			return this.usersInChannel.filter(filter);
+		},
 		onShowAdmin() {
 			this.showAdmin = !this.showAdmin;
 		},
@@ -144,18 +182,14 @@ export default Vue.extend({
 		editAdmin() {
 			this.showEditAdmin = true;
 		},
-		saveEditAdmin() {
-			for (const connection of this.selectedAdmins) {
-				if (connection.role !== ChannelRole.ADMIN && connection.role !== ChannelRole.OWNER) {
-					const _con = { id: connection.id, role: ChannelRole.ADMIN } as ChanConnection;
-					this.chat.chanConnection.updateChanConnection(_con);
-				}
-			}
+		async saveEditAdmin() {
 			for (const connection of this.adminConnections) {
-				if (!this.selectedAdmins.includes(connection)) {
-					const _con = { id: connection.id, role: ChannelRole.USER } as ChanConnection;
-					this.chat.chanConnection.updateChanConnection(_con);
-				}
+				if (!this.selectedAdmins.includes(connection))
+					await this.chat.chanConnection.updateChanConnection({ id: connection.id, role: ChannelRole.USER });
+			}
+			for (const connection of this.selectedAdmins) {
+				if (connection.role < ChannelRole.ADMIN)
+					await this.chat.chanConnection.updateChanConnection({ id: connection.id, role: ChannelRole.ADMIN });
 			}
 			this.selectedAdmins = [];
 			this.showEditAdmin = false;
@@ -166,25 +200,31 @@ export default Vue.extend({
 		editBanned() {
 			this.showEditBanned = true;
 		},
-		saveEditBanned() {
-			console.log("banned: " + JSON.stringify(this.selectedBanned, null, 4));
-			for (const connection of this.selectedBanned) {
-				if (connection.role !== ChannelRole.OWNER) {
-					const _con = { id: connection.id, role: ChannelRole.BANNED } as ChanConnection;
-					this.chat.chanConnection.updateChanConnection(_con);
-				}
-			}
+		async saveEditBanned() {
 			for (const connection of this.bannedConnections) {
 				if (!this.selectedBanned.includes(connection)) {
-					const _con = { id: connection.id, role: ChannelRole.USER } as ChanConnection;
-					this.chat.chanConnection.updateChanConnection(_con);
+					await this.chat.chanConnection.updateChanConnection({ id: connection.id, role: ChannelRole.USER });
 				}
+			}
+			for (const connection of this.selectedBanned) {
+				if (connection.role < ChannelRole.OWNER)
+					await this.chat.chanConnection.updateChanConnection({
+						id: connection.id,
+						role: ChannelRole.BANNED,
+					});
 			}
 			this.selectedBanned = [];
 			this.showEditBanned = false;
 		},
 		selectBanned(connections: ChanConnection[]) {
 			this.selectedBanned = connections;
+		},
+		editMuted() {
+			this.showEditMuted = true;
+		},
+		selectMuted(connection: ChanConnection) {
+			chatStore.updateMutePopup(connection);
+			this.$modal.show("mute_pannel");
 		},
 	},
 });

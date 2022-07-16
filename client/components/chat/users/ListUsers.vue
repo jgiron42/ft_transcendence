@@ -2,7 +2,7 @@
 	<div>
 		<div v-for="(connection, index) of connections" :key="index">
 			<button
-				v-if="type === 'admin-selection' || type === 'banned-selection'"
+				v-if="type === 'admin-selection' || type === 'banned-selection' || type === 'muted-selection'"
 				:class="[isSelected(connection) ? 'selected' : '', margin ? 'pad-left' : '']"
 				class="user-button cut-text btn text-left"
 				@click="select(connection)"
@@ -124,7 +124,10 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.selected = this.preSelected as ChanConnection[];
+		if (this.type === "banned-selection" || this.type === "admin-selection") {
+			this.selected = this.preSelected as ChanConnection[];
+			this.$emit("select", this.selected);
+		}
 	},
 	methods: {
 		acceptFriendRequest(id: number) {
@@ -148,15 +151,20 @@ export default Vue.extend({
 			this.chat.relation.unblockUser(rel.target);
 		},
 		select(connection: ChanConnection) {
-			if (this.selected.includes(connection)) {
-				if (this.type === "admin-selection" && connection.role !== ChannelRole.OWNER)
-					this.selected = this.selected.filter((c) => c.id !== connection.id);
-				else if (this.type === "banned-selection")
-					this.selected = this.selected.filter((c) => c.id !== connection.id);
+			console.log("select: " + JSON.stringify(connection));
+			if (this.type === "muted-selection") {
+				this.$emit("select", connection);
 			} else {
-				this.selected.push(connection);
+				if (this.selected.includes(connection)) {
+					if (this.type === "admin-selection" && connection.role !== ChannelRole.OWNER)
+						this.selected = this.selected.filter((c) => c.id !== connection.id);
+					else if (this.type === "banned-selection")
+						this.selected = this.selected.filter((c) => c.id !== connection.id);
+				} else {
+					this.selected.push(connection);
+				}
+				this.$emit("select", this.selected);
 			}
-			this.$emit("select", this.selected);
 		},
 		isSelected(connection: ChanConnection) {
 			return this.selected.includes(connection);

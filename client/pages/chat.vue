@@ -36,6 +36,7 @@
 			<Popup name="create_channel" component="chat/channels/popup/ChannelCreation" />
 			<Popup name="edit_channel" component="chat/channels/popup/ChannelEdition" />
 			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
+			<Popup name="mute_pannel" component="chat/MutePanel" />
 		</div>
 	</div>
 </template>

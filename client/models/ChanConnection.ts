@@ -11,7 +11,6 @@ export enum ChannelRole {
 export class ChanConnection {
 	constructor() {
 		this.role = 0;
-		this.muted = false;
 		this.created_at = new Date();
 	}
 
@@ -19,7 +18,6 @@ export class ChanConnection {
 	channel: Channel;
 	user: User;
 	role: ChannelRole;
-	muted: boolean;
 	mute_end: Date;
 	created_at: Date;
 }
