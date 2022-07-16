@@ -4,7 +4,7 @@ export default {
 		host: "0.0.0.0",
 	},
 	// Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-	ssr: false,
+	ssr: true,
 
 	// Global page headers: https://go.nuxtjs.dev/config-head
 	head: {
@@ -22,7 +22,10 @@ export default {
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-	plugins: [],
+	plugins: [
+		{ src: "@/plugins/api.plugin", mode: "all" },
+		{ src: "@/plugins/axios.ts", mode: "all" },
+	],
 
 	// Auto import components: https://go.nuxtjs.dev/config-components
 	components: true,
@@ -35,6 +38,7 @@ export default {
 		"@nuxtjs/stylelint-module",
 		// https://go.nuxtjs.dev/tailwindcss
 		"@nuxtjs/tailwindcss",
+		"@nuxtjs/device",
 	],
 
 	css: ["~/layouts/global.css"],
@@ -42,22 +46,28 @@ export default {
 	// Modules: https://go.nuxtjs.dev/config-modules
 	modules: ["@nuxtjs/axios"],
 
-	axios: {
-		baseURL: process.env.baseURL || "http://localhost:4000", // Used as fallback if no runtime config is provided
-	},
+	// axios: {
+	// 	baseURL: process.env.baseURL || "http://localhost:4000", // Used as fallback if no runtime config is provided
+	// },
 	publicRuntimeConfig: {
-		axios: {
-			browserBaseURL: process.env.BROWSER_BASE_URL + "/api" || "http://localhost:4000",
+		// axios: {
+		// 	browserBaseURL: process.env.BROWSER_BASE_URL + "/api" || "http://localhost:4000",
+		// },
+		ft_api: {
+			url:
+				process.env.API_URL ||
+				(process.browser ? `http://${window.location.hostname}:3000` : "http://localhost:3000"),
 		},
 	},
-
-	privateRuntimeConfig: {
-		axios: {
-			baseURL: process.env.BASE_URL,
-		},
-	},
+	// privateRuntimeConfig: {
+	// 	axios: {
+	// 		baseURL: process.env.BASE_URL,
+	// 	},
+	// },
 	io: {},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
-	build: {},
+	build: {
+		transpile: ["lodash-es"],
+	},
 };
