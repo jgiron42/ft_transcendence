@@ -10,7 +10,7 @@
 		<div class="flex justify-around w-10">
 			<input id="selectedFile" class="box-border" type="file" style="display: none" @change="onFileChange" />
 			<input
-				class="box-border m-1 p-4 py-6 bg-design_blue break-words border-design_white border-4 rounded rounded-br-none text-md text-design_white text-center hover:text-gray-400"
+				class="cursor-pointer box-border m-1 p-4 py-6 bg-design_blue break-words border-design_white border-4 rounded rounded-br-none text-md text-design_white text-center hover:text-gray-400"
 				type="button"
 				value="UPLOAD PICTURE"
 				onclick="document.getElementById('selectedFile').click();"
