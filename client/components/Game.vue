@@ -1,3 +1,8 @@
+<!-- change component mode by changing menuid prop -->
+<!-- 0 = online standard						   -->
+<!-- 1 = local standard							   -->
+<!-- 2 = online flappypong						   -->
+<!-- 3 = local flappypong						   -->
 <template>
 	<div class="flex w-full h-full">
 		<div class="game_bis top-1/3">
@@ -261,13 +266,15 @@ export default Vue.extend({
 		interval: 5,
 		vkUp: false,
 		vkDown: false,
+		p1Up: false,
+		p1Down: false,
 		score_p1: 0,
 		score_p2: 0,
 		res: null as Vector2D | null,
 		ball: new Ball(new Vector2D(450, 300)),
 		players: null as Array<Player> | null,
-		lastMousePos: null as Vector2D | null,
 		justPressed: false,
+		p1Pressed: false,
 	}),
 	mounted() {
 		// Init Canvas and apply ratio
@@ -288,7 +295,6 @@ export default Vue.extend({
 		// Adding event hooks
 		document.addEventListener("keydown", this.handleKeyPress, false);
 		document.addEventListener("keyup", this.handleKeyRelease, false);
-		document.addEventListener("mousedown", this.handleMouse, false);
 
 		// Create Entities
 		setInterval(this.draw, 10);
@@ -300,8 +306,9 @@ export default Vue.extend({
 				this.update();
 				this.redraw();
 			}
-			// reset justPressed Singleton
+			// reset single press Singleton
 			if (this.justPressed) this.justPressed = false;
+			if (this.p1Pressed) this.p1Pressed = false;
 		},
 		redraw() {
 			// render
@@ -342,17 +349,18 @@ export default Vue.extend({
 
 				// If in menu, p1 follow ball else move on input
 				this.players[0].update(
-					this.vkUp,
-					this.vkDown,
+					this.p1Down,
+					this.p1Up,
 					this.res,
-					this.menuid === 3 || this.menuid === 4,
-					this.justPressed,
+					this.menuid === 2 || this.menuid === 3,
+					this.p1Pressed,
 				);
-				// 	Simulate p2 input
-				if (this.ball.pos.y + this.ball.dir.y < this.players[1].pos.y + this.players[1].size.y / 2)
-					this.players[1].update(true, false, this.res, this.menuid === 3 || this.menuid === 4, true);
-				else if (this.ball.pos.y + this.ball.dir.y > this.players[1].pos.y + this.players[1].size.y / 2)
-					this.players[1].update(false, true, this.res, this.menuid === 3 || this.menuid === 4, false);
+				// 	player 2 inputs
+				if (this.menuid === 1 || this.menuid === 3) {
+					this.players[1].update(this.vkUp, this.vkDown, this.res, this.menuid === 3, this.justPressed);
+				} else {
+					// get p2 inputs from server
+				}
 				// Update ball
 				this.ball.update(this.res, this.players);
 			}
@@ -385,16 +393,19 @@ export default Vue.extend({
 			if (event.key === "Up" || event.key === "ArrowUp") {
 				this.vkUp = true;
 				this.justPressed = true;
-			} else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = true;
+			} else if (event.key === "Down" || event.key === "ArrowDown") {
+				this.vkDown = true;
+			} else if (event.keyCode === 83) {
+				this.p1Up = true;
+			} else if (event.keyCode === 87) {
+				this.p1Down = true;
+			}
 		},
 		handleKeyRelease(event: KeyboardEvent) {
 			if (event.key === "Up" || event.key === "ArrowUp") this.vkUp = false;
 			else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = false;
-		},
-		handleMouse(event: MouseEvent) {
-			if (!this.canvas) return;
-			const rect = this.canvas.getBoundingClientRect();
-			this.lastMousePos = new Vector2D(event.clientX - rect.left, event.clientY - rect.top);
+			else if (event.keyCode === 83) this.p1Up = false;
+			else if (event.keyCode === 87) this.p1Down = false;
 		},
 	},
 });
