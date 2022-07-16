@@ -13,6 +13,7 @@
 					type="number"
 					class="font-mono rounded-md text-design_black text-center text-msg-bg w-full box-border"
 					@input="updateInput($event.target.value)"
+					@keyup.enter="connect"
 				/>
 			</div>
 			<!-- Button for sending the TOTP token to the API -->
