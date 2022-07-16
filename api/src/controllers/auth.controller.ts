@@ -22,22 +22,6 @@ import config from "@config/api.config"
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-	// TODO: Move to client
-	@Get()
-	login(): string {
-		return (
-			'<form action="auth/42" method="POST">' +
-			'<label for="submit1">42 auth</label>' +
-			'<input type="submit" id="submit1" value="submit">' +
-			" </form>" +
-			'<form action="auth/totp" method="POST">' +
-			'<label for="totp">totp auth</label>' +
-			'<input type="text" name="code" id="totp">' +
-			'<input type="submit" id="submit2" value="submit">' +
-			" </form>"
-		);
-	}
-
 	/**
 	 * route to logout a session
 	 */
