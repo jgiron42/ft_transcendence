@@ -1,5 +1,4 @@
 import { Context } from "@nuxt/types";
-import { cloneDeep } from "lodash-es";
 
 export class User {
 	constructor() {
@@ -34,7 +33,7 @@ export class UserSingleton {
 	private ctx: Context;
 
 	private get user(): User {
-		return cloneDeep(this.ctx.store.getters.getUser);
+		return { ...this.ctx.store.getters.getUser };
 	}
 
 	async fetch(): Promise<User> {

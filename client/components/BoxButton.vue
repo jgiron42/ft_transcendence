@@ -33,7 +33,7 @@ export default {
 		size: {
 			type: String,
 			default: "text-3xl",
-		}
+		},
 	},
 };
 </script>
