@@ -17,7 +17,7 @@ import { useContainer } from "class-validator";
 		session({
 			name: "NESTJS_SESSION_ID",
 			secret: "my-secret", // TODO: voir la doc
-			resave: false,
+			resave: true,
 			saveUninitialized: false,
 		}),
 	);
