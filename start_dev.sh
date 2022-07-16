@@ -18,6 +18,8 @@ if [ -n "$GITPOD_WORKSPACE_ID" ];then
 fi
 
 export NODE_ENV=development
+cd api ; npm i ; cd ..
+cd client ; npm i ; cd ..
 
 cp .env.sample .env
 cp api.env.sample api.env
