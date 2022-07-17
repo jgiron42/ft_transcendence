@@ -4,7 +4,6 @@ import Chat from "@/store/chat";
 import MessageStore from "@/store/message";
 import UserProfile from "@/store/userProfile";
 
-/* eslint import/no-mutable-exports: 0 */
 export class StoreAccessor {
 	chat: Chat;
 	message: MessageStore;

@@ -47,6 +47,7 @@ import { Channel, ChannelType } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
+import { initialiseStores } from "@/utils/store-accessor";
 
 export default Vue.extend({
 	name: "Chat",
@@ -63,6 +64,9 @@ export default Vue.extend({
 				return this.currentChannel.name;
 			},
 		};
+	},
+	created() {
+		initialiseStores(this.$store);
 	},
 	mounted() {
 		if (this.currentChannel.id !== undefined) {
@@ -116,8 +120,7 @@ export default Vue.extend({
 			this.chat.chanInvitation.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			this.chat.message.getMessage(message);
-			// store.chat.pushMessage(message);
+			store.message.fetchMessage(message);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			store.message.setMessages(messages);

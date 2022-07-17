@@ -29,7 +29,6 @@ export default {
 		{ src: "@/plugins/channel.plugin", mode: "client" },
 		{ src: "@/plugins/chan_connection.plugin", mode: "client" },
 		{ src: "@/plugins/chan_invitation.plugin", mode: "client" },
-		{ src: "@/plugins/message.plugin", mode: "client" },
 		{ src: "@/plugins/relation.plugin", mode: "client" },
 		{ src: "@/plugins/socketManager", mode: "client" },
 	],

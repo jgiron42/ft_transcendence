@@ -1,4 +1,5 @@
-import { VuexModule, Module, Mutation } from "vuex-module-decorators";
+import Vue from "vue";
+import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import { Message } from "@/models/Message";
 
 export interface IMessageStore {
@@ -22,5 +23,15 @@ export default class MessageStore extends VuexModule implements IMessageStore {
 	@Mutation
 	removeMessage(message: Message) {
 		this.messages = this.messages.filter((m) => m.id !== message.id);
+	}
+
+	@Action
+	async fetchMessage(message: Message) {
+		let ret = new Message();
+		await Vue.prototype.api.get(`/messages/${message.id}`, {}, (response: { data: Message }) => {
+			this.context.commit("addMessage", response.data);
+			ret = response.data;
+		});
+		return ret;
 	}
 }
