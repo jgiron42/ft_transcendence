@@ -48,7 +48,7 @@ import { Message } from "@/models/Message";
 import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { initialiseStores } from "@/utils/store-accessor";
-import { RelationType } from "@/models/Relation";
+import { Relation, RelationType } from "@/models/Relation";
 
 export default Vue.extend({
 	name: "Chat",
@@ -90,15 +90,18 @@ export default Vue.extend({
 		});
 		this.socket.on("addRelation", (rel: Relation) => {
 			store.relation.retrieveRelation(rel.id);
-		});
-		this.socket.on("updateRelation", (rel: Relation) => {
-			store.relation.retrieveRelation(rel.id);
 			if (rel.type === RelationType.BLOCK) {
 				this.socket.emit("JC", store.chat.currentChannel.id);
 			}
 		});
-		this.socket.on("removeRelation", (rel: relation) => {
+		this.socket.on("updateRelation", (rel: Relation) => {
+			store.relation.retrieveRelation(rel.id);
+		});
+		this.socket.on("removeRelation", (rel: Relation) => {
 			store.relation.removeRelation(rel);
+			if (rel.type === RelationType.BLOCK) {
+				this.socket.emit("JC", store.chat.currentChannel.id);
+			}
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
 			store.chat.pushChanConnection(connection);
@@ -126,7 +129,9 @@ export default Vue.extend({
 			this.chat.chanInvitation.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			store.message.retrieveMessage(message.id);
+			if (!store.relation.relations.find((r) => r.target.id === message.user && r.type === RelationType.BLOCK)) {
+				store.message.retrieveMessage(message.id);
+			}
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			store.message.setMessages(messages);

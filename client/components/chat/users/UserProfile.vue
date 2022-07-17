@@ -56,15 +56,11 @@ export default Vue.extend({
 				return store.chat.me;
 			},
 			get relation() {
-				for (const relation of store.relation.relations) {
-					if (
+				return store.relation.relations.find(
+					(relation) =>
 						(relation.owner.id !== this.user.id && relation.target.id === this.user.id) ||
-						(relation.owner.id === this.user.id && relation.target.id !== this.user.id)
-					) {
-						return relation;
-					}
-				}
-				return undefined;
+						(relation.owner.id === this.user.id && relation.target.id !== this.user.id),
+				);
 			},
 			get isBlocked() {
 				return store.relation.relations.find(
