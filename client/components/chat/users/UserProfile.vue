@@ -46,11 +46,11 @@ import { Relation, RelationType } from "@/models/Relation";
 import { store } from "@/store";
 
 export default Vue.extend({
-	name: "UserProfile",
+	name: "PopupUser",
 	data() {
 		return {
 			get user() {
-				return store.userProfile.user;
+				return store.popupUser.user;
 			},
 			get me() {
 				return store.chat.me;

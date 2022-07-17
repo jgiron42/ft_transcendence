@@ -140,11 +140,11 @@ export default Vue.extend({
 			let user;
 			if (relation.owner.id === this.me.id || relation.owner.id === relation.target.id) user = relation.target;
 			else if (relation.target.id === this.me.id) user = relation.owner;
-			if (user) store.userProfile.updateUser(user);
+			if (user) store.popupUser.setUser(user);
 			this.$modal.show("user_profile");
 		},
 		showUserConnection(connection: ChanConnection) {
-			store.userProfile.updateUser(connection.user);
+			store.popupUser.setUser(connection.user);
 			this.$modal.show("user_profile");
 		},
 		unblock(rel: Relation) {

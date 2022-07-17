@@ -2,12 +2,12 @@ import { Store } from "vuex";
 import { getModule } from "vuex-module-decorators";
 import Chat from "@/store/chat";
 import MessageStore from "@/store/message";
-import UserProfile from "@/store/userProfile";
+import PopupUser from "@/store/popupUser";
 
 export class StoreAccessor {
 	chat: Chat;
 	message: MessageStore;
-	userProfile: UserProfile;
+	popupUser: PopupUser;
 }
 
 const store = new StoreAccessor();
@@ -15,7 +15,7 @@ const store = new StoreAccessor();
 function initialiseStores(_store: Store<any>): void {
 	store.chat = getModule(Chat, _store);
 	store.message = getModule(MessageStore, _store);
-	store.userProfile = getModule(UserProfile, _store);
+	store.popupUser = getModule(PopupUser, _store);
 }
 
 export { initialiseStores, store };
