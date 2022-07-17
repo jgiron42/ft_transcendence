@@ -17,6 +17,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ChanInvitation } from "@/models/ChanInvitation";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "ListChanInvitations",
@@ -28,10 +29,10 @@ export default Vue.extend({
 	},
 	methods: {
 		acceptRequest(invitation: ChanInvitation) {
-			this.chat.chanInvitation.acceptChanInvitation(invitation);
+			store.invitation.acceptInvitation(invitation);
 		},
 		declineRequest(invitation: ChanInvitation) {
-			this.chat.chanInvitation.declineChanInvitation(invitation);
+			store.invitation.declineInvitation(invitation);
 		},
 	},
 });

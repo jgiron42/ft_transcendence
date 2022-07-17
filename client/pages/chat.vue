@@ -123,10 +123,7 @@ export default Vue.extend({
 			store.chat.removeChanConnection(connection);
 		});
 		this.socket.on("newInvitation", (id: number) => {
-			this.chat.chanInvitation.getInvitation(id);
-		});
-		this.socket.on("updateChanInvitations", () => {
-			this.chat.chanInvitation.getChanInvitations();
+			store.invitation.retrieveInvitation(id);
 		});
 		this.socket.on("MSG", (message: Message) => {
 			if (!store.relation.relations.find((r) => r.target.id === message.user && r.type === RelationType.BLOCK)) {
@@ -155,7 +152,7 @@ export default Vue.extend({
 			await this.chat.channel.getChannels();
 			await this.chat.chanConnection.getChanConnections();
 			await store.relation.retrieveRelations();
-			await this.chat.chanInvitation.getChanInvitations();
+			await store.invitation.retrieveInvitations();
 		},
 		onShowChannels() {
 			if (this.$device.isMobile) {

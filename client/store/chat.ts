@@ -3,7 +3,6 @@ import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Channel, ChannelType } from "@/models/Channel";
 import { Relation } from "@/models/Relation";
-import { ChanInvitation } from "@/models/ChanInvitation";
 
 export interface ChatInterface {
 	me: User;
@@ -12,7 +11,6 @@ export interface ChatInterface {
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
 	chanConnections: Array<ChanConnection>;
-	chanInvitations: Array<ChanInvitation>;
 	joiningChannel: Channel | undefined;
 	blockedUsers: Array<Relation>;
 }
@@ -25,7 +23,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
-	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
 	joiningChannel: Channel | undefined = new Channel();
 	mutePopup: ChanConnection = new ChanConnection();
 	blockedUsers: Relation[] = [];
@@ -85,24 +82,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
 		if (id !== -1) this.chanConnections.splice(id, 1);
 		this.chanConnections.push(connection);
-	}
-
-	@Mutation
-	updateChanInvitations(invitations: ChanInvitation[]) {
-		this.chanInvitations = invitations;
-	}
-
-	@Mutation
-	pushChanInvitation(invitation: ChanInvitation) {
-		const id = this.chanInvitations.findIndex((c: ChanInvitation) => c.id === invitation.id);
-		if (id !== -1) this.chanInvitations.splice(id, 1);
-		this.chanInvitations.push(invitation);
-	}
-
-	@Mutation
-	removeChanInvitation(invitation: ChanInvitation) {
-		const id = this.chanInvitations.findIndex((c: ChanInvitation) => c.id === invitation.id);
-		if (id !== -1) this.chanInvitations.splice(id, 1);
 	}
 
 	@Mutation

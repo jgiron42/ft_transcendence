@@ -70,7 +70,7 @@ export default Vue.extend({
 				return store.chat.myChannels;
 			},
 			get invitations() {
-				return store.chat.chanInvitations.filter((invitation) => {
+				return store.invitation.chanInvitations.filter((invitation) => {
 					return !store.chat.chanConnections.some((connection) => {
 						return connection.channel.id === invitation.channel.id;
 					});
@@ -92,7 +92,7 @@ export default Vue.extend({
 				containerTest.scrollLeft = containerTest.scrollWidth;
 			}
 		}
-		this.chat.chanInvitation.getChanInvitations();
+		store.invitation.retrieveInvitations();
 	},
 	methods: {
 		onShowInvitations() {
