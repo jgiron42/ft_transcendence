@@ -48,7 +48,7 @@ export default Vue.extend({
 		return {
 			get friends() {
 				const ret = [] as Relation[];
-				for (const relation of store.chat.relations) {
+				for (const relation of store.relation.relations) {
 					if (relation.type === RelationType.FRIEND) {
 						ret.push(relation);
 					}
@@ -57,7 +57,7 @@ export default Vue.extend({
 			},
 			get invitations() {
 				const ret = [] as Relation[];
-				for (const relation of store.chat.relations) {
+				for (const relation of store.relation.relations) {
 					if (
 						relation.target.id === store.chat.me.id &&
 						relation.type === RelationType.FRIEND_REQUEST &&

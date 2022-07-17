@@ -1,35 +1,25 @@
 import Vue from "vue";
 import { store } from "@/store";
-import { Relation, RelationType } from "@/models/Relation";
+import { Relation } from "@/models/Relation";
 import { User } from "@/models/User";
 
 export class RelationPlugin extends Vue {
-	async getRelations(): Promise<Array<Relation> | undefined> {
-		let ret: Array<Relation> | undefined;
-		await this.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
-			const relations = [] as Relation[];
-			r.data.forEach((relation: Relation) => {
-				if (relation.type === RelationType.BLOCK) store.chat.pushBlockedUsers(relation);
-				else relations.push(relation);
-			});
-			ret = relations;
-			store.chat.updateRelations(relations);
-		});
-		return ret;
-	}
-
-	async addFriend(user: User): Promise<void> {
-		await this.api.post("/users/" + user.id + "/invite_friend", undefined, undefined, () => {
-			this.getRelations();
-		});
-	}
+	//	async getRelations(): Promise<Array<Relation> | undefined> {
+	//		let ret: Array<Relation> | undefined;
+	//		await this.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
+	//			const relations = [] as Relation[];
+	//			r.data.forEach((relation: Relation) => {
+	//				if (relation.type === RelationType.BLOCK) store.chat.pushBlockedUsers(relation);
+	//				else relations.push(relation);
+	//			});
+	//			ret = relations;
+	//			store.chat.updateRelations(relations);
+	//		});
+	//		return ret;
+	//	}
 
 	async acceptFriend(id: number): Promise<void> {
 		await this.api.post("/relations/" + id + "/accept_friend");
-	}
-
-	async removeFriend(relation: Relation): Promise<void> {
-		await this.api.delete("/relations/" + relation.id);
 	}
 
 	async blockUser(user: User): Promise<void> {

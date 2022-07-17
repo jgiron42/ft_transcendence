@@ -15,18 +15,18 @@ export class RelationSubscriber implements EntitySubscriberInterface<Relation> {
 	}
 
 	afterInsert(event: InsertEvent<Relation>) {
-		this.socketService.sendMessageToClient("updateRelations", null, event.entity.target);
+		this.socketService.sendMessageToClient("addRelation", event.entity, event.entity.target);
 	}
 
 	afterUpdate(event: UpdateEvent<Relation>) {
 		const relation = event.entity as Relation;
-		this.socketService.sendMessageToClient("updateRelations", null, relation.owner);
-		this.socketService.sendMessageToClient("updateRelations", null, relation.target);
+		this.socketService.sendMessageToClient("updateRelation", event.entity, relation.owner);
+		this.socketService.sendMessageToClient("updateRelation", event.entity, relation.target);
 	}
 
 	beforeRemove(event: RemoveEvent<Relation>) {
 		const relation = event.entity;
-		this.socketService.sendMessageToClient("removeRelation", relation.id, relation.owner);
-		this.socketService.sendMessageToClient("removeRelation", relation.id, relation.target);
+		this.socketService.sendMessageToClient("removeRelation", relation, relation.owner);
+		this.socketService.sendMessageToClient("removeRelation", relation, relation.target);
 	}
 }

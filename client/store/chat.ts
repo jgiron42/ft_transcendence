@@ -13,7 +13,6 @@ export interface ChatInterface {
 	currentChannel: Channel;
 	chanConnections: Array<ChanConnection>;
 	chanInvitations: Array<ChanInvitation>;
-	relations: Array<Relation>;
 	joiningChannel: Channel | undefined;
 	blockedUsers: Array<Relation>;
 }
@@ -27,7 +26,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 	currentChannel: Channel = new Channel();
 	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
 	chanInvitations: Array<ChanInvitation> = [] as ChanInvitation[];
-	relations: Array<Relation> = [] as Relation[];
 	joiningChannel: Channel | undefined = new Channel();
 	mutePopup: ChanConnection = new ChanConnection();
 	blockedUsers: Relation[] = [];
@@ -172,21 +170,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 			this.myChannels.splice(id, 1);
 		}
 		this.myChannels.push(chan);
-	}
-
-	@Mutation
-	updateRelations(relations: Relation[]) {
-		this.relations = relations;
-	}
-
-	@Mutation
-	pushRelations(rel: Relation) {
-		const id = this.relations.findIndex((r: Relation) => r.id === rel.id);
-		if (id === -1) {
-			this.relations.push(rel);
-		} else {
-			this.relations[id] = rel;
-		}
 	}
 
 	@Mutation

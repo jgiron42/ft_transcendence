@@ -87,12 +87,14 @@ export default Vue.extend({
 		this.socket.on("updateChannels", () => {
 			this.updateChannels();
 		});
-		this.socket.on("updateRelations", () => {
-			this.chat.relation.getRelations();
+		this.socket.on("addRelation", (rel: Relation) => {
+			store.relation.retrieveRelation(rel.id);
 		});
-		this.socket.on("removeRelation", (id: number) => {
-			const relations = store.chat.relations.filter((r) => r.id !== id);
-			store.chat.updateRelations(relations);
+		this.socket.on("updateRelation", (rel: Relation) => {
+			store.relation.updateRelation(rel);
+		});
+		this.socket.on("removeRelation", (rel: relation) => {
+			store.relation.removeRelation(rel);
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
 			store.chat.pushChanConnection(connection);
@@ -120,7 +122,7 @@ export default Vue.extend({
 			this.chat.chanInvitation.getChanInvitations();
 		});
 		this.socket.on("MSG", (message: Message) => {
-			store.message.fetchMessage(message);
+			store.message.retrieveMessage(message.id);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
 			store.message.setMessages(messages);
@@ -143,7 +145,7 @@ export default Vue.extend({
 			await this.chat.chanConnection.getUserChanConnections();
 			await this.chat.channel.getChannels();
 			await this.chat.chanConnection.getChanConnections();
-			await this.chat.relation.getRelations();
+			await store.relation.retrieveRelations();
 			await this.chat.chanInvitation.getChanInvitations();
 		},
 		onShowChannels() {

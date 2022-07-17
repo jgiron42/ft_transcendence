@@ -26,9 +26,9 @@ export default class MessageStore extends VuexModule implements IMessageStore {
 	}
 
 	@Action
-	async fetchMessage(message: Message) {
+	async retrieveMessage(id: number) {
 		let ret = new Message();
-		await Vue.prototype.api.get(`/messages/${message.id}`, {}, (response: { data: Message }) => {
+		await Vue.prototype.api.get(`/messages/${id}`, {}, (response: { data: Message }) => {
 			this.context.commit("addMessage", response.data);
 			ret = response.data;
 		});

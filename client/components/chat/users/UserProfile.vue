@@ -56,7 +56,7 @@ export default Vue.extend({
 				return store.chat.me;
 			},
 			get relation() {
-				for (const relation of store.chat.relations) {
+				for (const relation of store.relation.relations) {
 					if (
 						(relation.owner.id !== this.user.id && relation.target.id === this.user.id) ||
 						(relation.owner.id === this.user.id && relation.target.id !== this.user.id)
@@ -79,14 +79,14 @@ export default Vue.extend({
 	},
 	methods: {
 		addFriend() {
-			this.chat.relation.addFriend(this.user);
+			store.relation.addFriend(this.user);
 		},
 		acceptFriend() {
-			if (this.relation) this.chat.relation.acceptFriend(this.relation.id);
+			if (this.relation) store.relation.acceptFriend(this.relation.id);
 		},
 		removeFriend() {
 			if (this.relation) {
-				this.chat.relation.removeFriend(this.relation);
+				store.relation.removeFriend(this.relation);
 			}
 		},
 		blockUser() {
