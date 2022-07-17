@@ -29,7 +29,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Message } from "@/models/Message";
-import { chatStore } from "@/store/";
+import { store } from "@/store/";
 
 export default Vue.extend({
 	name: "Chatbox",
@@ -44,7 +44,7 @@ export default Vue.extend({
 			title: "ChatBox",
 			msgContent: "",
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 		};
 	},

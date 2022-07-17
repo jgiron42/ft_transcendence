@@ -1,11 +1,10 @@
 import { Middleware } from "@nuxt/types";
-import { chatStore } from "@/store/";
-// import { chatStore } from "@/store/"
+import { store } from "@/store";
 
 const auth: Middleware = (context) => {
 	const path =
 		context.route.path.length && context.route.path[0] === "/" ? context.route.path.slice(1) : context.route.path;
-	if (chatStore.me.id === null) {
+	if (store.chat.me.id === null) {
 		context.redirect("/login?redirect=" + path);
 	}
 };

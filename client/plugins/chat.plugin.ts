@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { User } from "@/models/User";
 import { ChannelPlugin } from "@/plugins/channel.plugin";
 import { ChanConnectionPlugin } from "@/plugins/chan_connection.plugin";
@@ -26,8 +26,8 @@ class ChatPlugin extends Vue implements IChatPlugin {
 	async whoAmI(): Promise<User | undefined> {
 		let ret;
 		await this.api.get("/me", undefined, (r: { data: User }) => {
-			chatStore.updateMe(r.data);
-			ret = chatStore.me;
+			store.chat.updateMe(r.data);
+			ret = store.chat.me;
 		});
 		return ret;
 	}

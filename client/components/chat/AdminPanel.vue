@@ -88,7 +88,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 
 type Filter = (connection: ChanConnection) => boolean;
@@ -107,27 +107,27 @@ export default Vue.extend({
 				return ChannelRole;
 			},
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 			get adminConnections() {
-				return chatStore.chanConnections.filter((connection) =>
+				return store.chat.chanConnections.filter((connection) =>
 					[ChannelRole.OWNER, ChannelRole.ADMIN].includes(connection.role),
 				);
 			},
 			get bannedConnections() {
-				return chatStore.chanConnections.filter((connection) => connection.role === ChannelRole.BANNED);
+				return store.chat.chanConnections.filter((connection) => connection.role === ChannelRole.BANNED);
 			},
 			get mutedConnections() {
 				return this.mutedList;
 			},
 			get usersInChannel() {
-				return chatStore.chanConnections;
+				return store.chat.chanConnections;
 			},
 			get isOwner(): boolean {
-				return chatStore.roleOnCurrentChannel === ChannelRole.OWNER;
+				return store.chat.roleOnCurrentChannel === ChannelRole.OWNER;
 			},
 			get isAdmin(): boolean {
-				return chatStore.roleOnCurrentChannel >= ChannelRole.ADMIN;
+				return store.chat.roleOnCurrentChannel >= ChannelRole.ADMIN;
 			},
 			selectedAdmins: [] as ChanConnection[],
 			selectedBanned: [] as ChanConnection[],
@@ -143,7 +143,7 @@ export default Vue.extend({
 	},
 	mounted() {
 		setInterval(() => {
-			this.mutedList = chatStore.chanConnections.filter((connection) => {
+			this.mutedList = store.chat.chanConnections.filter((connection) => {
 				if (connection.mute_end !== null) {
 					return new Date(connection.mute_end).getTime() > Date.now();
 				}
@@ -219,7 +219,7 @@ export default Vue.extend({
 			this.showEditMuted = true;
 		},
 		selectMuted(connection: ChanConnection) {
-			chatStore.updateMutePopup(connection);
+			store.chat.updateMutePopup(connection);
 			this.$modal.show("mute_pannel");
 		},
 	},

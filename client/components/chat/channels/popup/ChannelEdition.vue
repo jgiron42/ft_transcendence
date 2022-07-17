@@ -50,19 +50,19 @@
 <script lang="ts">
 import Vue from "vue";
 import { ChannelType } from "@/models/Channel";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "ChannelCreation",
 	data() {
 		return {
 			channel: {
-				id: chatStore.currentChannel.id,
-				name: chatStore.currentChannel.name,
-				type: chatStore.currentChannel.type,
+				id: store.chat.currentChannel.id,
+				name: store.chat.currentChannel.name,
+				type: store.chat.currentChannel.type,
 				password: "",
 			},
-			selectedType: chatStore.currentChannel.type,
+			selectedType: store.chat.currentChannel.type,
 			get selectedTypeName() {
 				switch (this.selectedType) {
 					case ChannelType.PUBLIC:
@@ -74,7 +74,7 @@ export default Vue.extend({
 				}
 			},
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 		};
 	},

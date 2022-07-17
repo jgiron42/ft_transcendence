@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
@@ -47,13 +47,13 @@ export default Vue.extend({
 			selection: 0,
 			showInvitations: true,
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 			get me() {
-				return chatStore.me;
+				return store.chat.me;
 			},
 			get isAdmin(): boolean {
-				return chatStore.roleOnCurrentChannel >= ChannelRole.ADMIN;
+				return store.chat.roleOnCurrentChannel >= ChannelRole.ADMIN;
 			},
 		};
 	},
@@ -62,7 +62,11 @@ export default Vue.extend({
 			if (this.selection === 1) this.selection = 0;
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
-			if (chatStore.me.id === connection.user.id && connection.role < ChannelRole.ADMIN && this.selection === 1) {
+			if (
+				store.chat.me.id === connection.user.id &&
+				connection.role < ChannelRole.ADMIN &&
+				this.selection === 1
+			) {
 				this.selection = 0;
 			}
 		});

@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { ChannelType } from "@/models/Channel";
 import { ChannelRole } from "@/models/ChanConnection";
 
@@ -27,13 +27,13 @@ export default Vue.extend({
 	data() {
 		return {
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 			get ChannelType() {
 				return ChannelType;
 			},
 			get isAdmin(): boolean {
-				return chatStore.roleOnCurrentChannel === ChannelRole.OWNER;
+				return store.chat.roleOnCurrentChannel === ChannelRole.OWNER;
 			},
 		};
 	},

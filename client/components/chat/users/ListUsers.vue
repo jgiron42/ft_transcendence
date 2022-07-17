@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore, userProfile } from "@/store";
+import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Relation } from "@/models/Relation";
 import { User } from "@/models/User";
@@ -117,7 +117,7 @@ export default Vue.extend({
 	data() {
 		return {
 			get me() {
-				return chatStore.me;
+				return store.chat.me;
 			},
 			rel: this.relations,
 			selected: [] as ChanConnection[],
@@ -140,11 +140,11 @@ export default Vue.extend({
 			let user;
 			if (relation.owner.id === this.me.id || relation.owner.id === relation.target.id) user = relation.target;
 			else if (relation.target.id === this.me.id) user = relation.owner;
-			if (user) userProfile.updateUser(user);
+			if (user) store.userProfile.updateUser(user);
 			this.$modal.show("user_profile");
 		},
 		showUserConnection(connection: ChanConnection) {
-			userProfile.updateUser(connection.user);
+			store.userProfile.updateUser(connection.user);
 			this.$modal.show("user_profile");
 		},
 		unblock(rel: Relation) {
@@ -170,13 +170,13 @@ export default Vue.extend({
 			return this.selected.includes(connection);
 		},
 		inviteInCurrentChannel(user: User) {
-			this.chat.channel.invite(chatStore.currentChannel, user);
+			this.chat.channel.invite(store.chat.currentChannel, user);
 		},
 		other(relation: Relation) {
 			return relation.owner.id === this.me.id ? relation.target : relation.owner;
 		},
 		isAlreadyOnCurrentChannel(user: User) {
-			if (chatStore.chanConnections.find((c) => c.user.id === user.id)) {
+			if (store.chat.chanConnections.find((c) => c.user.id === user.id)) {
 				return true;
 			}
 			return false;

@@ -21,7 +21,7 @@
 
 <script>
 import Vue from "vue";
-import { chatStore } from "@/store/";
+import { store } from "@/store/";
 
 export default Vue.extend({
 	name: "JoinProtectedChan",
@@ -29,7 +29,7 @@ export default Vue.extend({
 		return {
 			password: "",
 			get joiningChannel() {
-				return chatStore.joiningChannel;
+				return store.chat.joiningChannel;
 			},
 		};
 	},

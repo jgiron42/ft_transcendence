@@ -64,7 +64,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Channel, ChannelType } from "@/models/Channel";
-import { chatStore } from "@/store/";
+import { store } from "@/store/";
 
 export default Vue.extend({
 	name: "ListChannels",
@@ -84,13 +84,13 @@ export default Vue.extend({
 				return ChannelType;
 			},
 			get chanConnections() {
-				return chatStore.chanConnections;
+				return store.chat.chanConnections;
 			},
 			get myChannels() {
-				return chatStore.myChannels;
+				return store.chat.myChannels;
 			},
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 		};
 	},
@@ -102,7 +102,7 @@ export default Vue.extend({
 			if (chan.type === ChannelType.PASSWORD) {
 				if (this.checkPrivateChannel(chan.id)) this.chat.channel.joinChannel(chan);
 				else {
-					chatStore.updateJoiningChannel(chan);
+					store.chat.updateJoiningChannel(chan);
 					this.$modal.show("join_protected_chan");
 				}
 			} else {
@@ -111,10 +111,10 @@ export default Vue.extend({
 		},
 		leaveChannel(chanId: number) {
 			this.api.post("/channels/" + chanId + "/leave", undefined, undefined, () => {
-				if (chanId === chatStore.currentChannel.id) {
-					chatStore.resetCurrentChannel();
+				if (chanId === store.chat.currentChannel.id) {
+					store.chat.resetCurrentChannel();
 				}
-				chatStore.leaveChannel(chanId);
+				store.chat.leaveChannel(chanId);
 			});
 		},
 	},

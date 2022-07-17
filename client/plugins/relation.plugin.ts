@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { Relation, RelationType } from "@/models/Relation";
 import { User } from "@/models/User";
 
@@ -9,11 +9,11 @@ export class RelationPlugin extends Vue {
 		await this.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
 			const relations = [] as Relation[];
 			r.data.forEach((relation: Relation) => {
-				if (relation.type === RelationType.BLOCK) chatStore.pushBlockedUsers(relation);
+				if (relation.type === RelationType.BLOCK) store.chat.pushBlockedUsers(relation);
 				else relations.push(relation);
 			});
 			ret = relations;
-			chatStore.updateRelations(relations);
+			store.chat.updateRelations(relations);
 		});
 		return ret;
 	}
@@ -35,18 +35,18 @@ export class RelationPlugin extends Vue {
 	async blockUser(user: User): Promise<void> {
 		await this.api.post("/users/" + user.id + "/block", undefined, undefined, (r: { data: Relation }) => {
 			this.api.get("/relations/" + r.data.id, undefined, (_r: { data: Relation }) => {
-				chatStore.pushBlockedUsers(_r.data as Relation);
+				store.chat.pushBlockedUsers(_r.data as Relation);
 			});
-			Vue.prototype.$socket.getSocket()?.emit("JC", chatStore.currentChannel.id);
+			Vue.prototype.$socket.getSocket()?.emit("JC", store.chat.currentChannel.id);
 		});
 	}
 
 	async unblockUser(user: User): Promise<void> {
-		const index = chatStore.blockedUsers.findIndex((r: Relation) => r.target.id === user.id);
+		const index = store.chat.blockedUsers.findIndex((r: Relation) => r.target.id === user.id);
 		if (index !== -1) {
-			await this.api.delete("/relations/" + chatStore.blockedUsers[index].id, undefined, () => {
-				chatStore.spliceBlockedUsers(index);
-				Vue.prototype.$socket.getSocket()?.emit("JC", chatStore.currentChannel.id);
+			await this.api.delete("/relations/" + store.chat.blockedUsers[index].id, undefined, () => {
+				store.chat.spliceBlockedUsers(index);
+				Vue.prototype.$socket.getSocket()?.emit("JC", store.chat.currentChannel.id);
 			});
 		}
 	}

@@ -43,20 +43,20 @@
 <script lang="ts">
 import Vue from "vue";
 import { Relation, RelationType } from "@/models/Relation";
-import { userProfile, chatStore } from "@/store";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "UserProfile",
 	data() {
 		return {
 			get user() {
-				return userProfile.user;
+				return store.userProfile.user;
 			},
 			get me() {
-				return chatStore.me;
+				return store.chat.me;
 			},
 			get relation() {
-				for (const relation of chatStore.relations) {
+				for (const relation of store.chat.relations) {
 					if (
 						(relation.owner.id !== this.user.id && relation.target.id === this.user.id) ||
 						(relation.owner.id === this.user.id && relation.target.id !== this.user.id)
@@ -67,13 +67,13 @@ export default Vue.extend({
 				return undefined;
 			},
 			get isBlocked() {
-				return chatStore.blockedUsers.find((r) => r.target.id === this.user.id);
+				return store.chat.blockedUsers.find((r) => r.target.id === this.user.id);
 			},
 			get ratio(): number {
 				return this.user.nb_win / this.user.nb_game;
 			},
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 		};
 	},

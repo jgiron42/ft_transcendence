@@ -34,7 +34,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Relation, RelationType } from "@/models/Relation";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "SocialPanel",
@@ -48,7 +48,7 @@ export default Vue.extend({
 		return {
 			get friends() {
 				const ret = [] as Relation[];
-				for (const relation of chatStore.relations) {
+				for (const relation of store.chat.relations) {
 					if (relation.type === RelationType.FRIEND) {
 						ret.push(relation);
 					}
@@ -57,11 +57,11 @@ export default Vue.extend({
 			},
 			get invitations() {
 				const ret = [] as Relation[];
-				for (const relation of chatStore.relations) {
+				for (const relation of store.chat.relations) {
 					if (
-						relation.target.id === chatStore.me.id &&
+						relation.target.id === store.chat.me.id &&
 						relation.type === RelationType.FRIEND_REQUEST &&
-						!chatStore.blockedUsers.find((r) => r.target.id === relation.owner.id)
+						!store.chat.blockedUsers.find((r) => r.target.id === relation.owner.id)
 					) {
 						ret.push(relation);
 					}
@@ -69,7 +69,7 @@ export default Vue.extend({
 				return ret;
 			},
 			get blocked() {
-				return chatStore.blockedUsers;
+				return store.chat.blockedUsers;
 			},
 			showInvitations: true,
 			showBlocked: true,

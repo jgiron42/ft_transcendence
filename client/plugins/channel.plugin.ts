@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { Channel } from "@/models/Channel";
 import { ChannelRole } from "@/models/ChanConnection";
 import { User } from "@/models/User";
@@ -26,7 +26,7 @@ export class ChannelPlugin extends Vue {
 		if (ret !== undefined) {
 			await this.api.get(`/channels/${chan.id}`, undefined, (d = { data: new Channel() }) => {
 				ret = d.data;
-				chatStore.updateCurrentChannel(d.data);
+				store.chat.updateCurrentChannel(d.data);
 				this.chat.chanConnection.getChanConnections();
 			});
 			Vue.prototype.$socket.getSocket()?.emit("JC", ret.id);
@@ -38,10 +38,10 @@ export class ChannelPlugin extends Vue {
 
 	async leaveChannel(chan: Channel) {
 		await this.api.post(`/channels/${chan.id}/leave`, undefined, undefined, () => {
-			if (chan.id === chatStore.currentChannel.id) {
-				chatStore.resetCurrentChannel();
+			if (chan.id === store.chat.currentChannel.id) {
+				store.chat.resetCurrentChannel();
 			}
-			chatStore.leaveChannel(chan.id);
+			store.chat.leaveChannel(chan.id);
 		});
 	}
 
@@ -53,7 +53,7 @@ export class ChannelPlugin extends Vue {
 
 	async getChannels() {
 		await this.api.get("/channels", { page: 1, per_page: 100 }, (r: { data: Channel[] }) => {
-			if (r.data instanceof Array) chatStore.updateVisibleChannels(r.data);
+			if (r.data instanceof Array) store.chat.updateVisibleChannels(r.data);
 		});
 	}
 

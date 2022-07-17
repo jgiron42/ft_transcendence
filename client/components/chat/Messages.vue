@@ -17,17 +17,17 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "Messages",
 	data() {
 		return {
 			get messages() {
-				return chatStore.messages;
+				return store.message.messages;
 			},
 			get me() {
-				return chatStore.me;
+				return store.chat.me;
 			},
 		};
 	},

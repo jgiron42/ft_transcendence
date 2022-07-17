@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "Login",
@@ -23,7 +23,7 @@ export default Vue.extend({
 		if (redirect) {
 			this.path += redirect;
 		}
-		if (chatStore.me.id !== null) {
+		if (store.chat.me.id !== null) {
 			this.$router.push(this.path);
 		}
 	},

@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { ChannelType } from "@/models/Channel";
 
 export default Vue.extend({
@@ -64,20 +64,20 @@ export default Vue.extend({
 	data() {
 		return {
 			get visibleChannels() {
-				return chatStore.visibleChannels.filter((channel) => channel.type !== ChannelType.DM);
+				return store.chat.visibleChannels.filter((channel) => channel.type !== ChannelType.DM);
 			},
 			get myChannels() {
-				return chatStore.myChannels;
+				return store.chat.myChannels;
 			},
 			get invitations() {
-				return chatStore.chanInvitations.filter((invitation) => {
-					return !chatStore.chanConnections.some((connection) => {
+				return store.chat.chanInvitations.filter((invitation) => {
+					return !store.chat.chanConnections.some((connection) => {
 						return connection.channel.id === invitation.channel.id;
 					});
 				});
 			},
 			get isOnChannel() {
-				return chatStore.currentChannel.name;
+				return store.chat.currentChannel.name;
 			},
 			selection: 0,
 			showInvitations: true,

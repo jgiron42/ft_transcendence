@@ -45,7 +45,7 @@
 import Vue from "vue";
 import { Channel, ChannelType } from "@/models/Channel";
 import { Message } from "@/models/Message";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 
 export default Vue.extend({
@@ -57,7 +57,7 @@ export default Vue.extend({
 			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
 			get currentChannel() {
-				return chatStore.currentChannel;
+				return store.chat.currentChannel;
 			},
 			get isOnChannel() {
 				return this.currentChannel.name;
@@ -78,7 +78,7 @@ export default Vue.extend({
 			token: this.$cookies.get("connect.sid"),
 		});
 		this.socket.on("updateChannel", (chan: Channel) => {
-			chatStore.updateChannel(chan);
+			store.chat.updateChannel(chan);
 		});
 		this.socket.on("updateChannels", () => {
 			this.updateChannels();
@@ -87,27 +87,27 @@ export default Vue.extend({
 			this.chat.relation.getRelations();
 		});
 		this.socket.on("removeRelation", (id: number) => {
-			const relations = chatStore.relations.filter((r) => r.id !== id);
-			chatStore.updateRelations(relations);
+			const relations = store.chat.relations.filter((r) => r.id !== id);
+			store.chat.updateRelations(relations);
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
-			chatStore.pushChanConnection(connection);
+			store.chat.pushChanConnection(connection);
 			if (connection.channel.type === ChannelType.DM) {
-				chatStore.pushMyChannels(connection.channel);
+				store.chat.pushMyChannels(connection.channel);
 			}
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
-			chatStore.pushChanConnection(connection);
-			if (chatStore.me.id === connection.user.id && connection.channel.id === chatStore.currentChannel.id) {
-				chatStore.updateMyRole(connection.role);
+			store.chat.pushChanConnection(connection);
+			if (store.chat.me.id === connection.user.id && connection.channel.id === store.chat.currentChannel.id) {
+				store.chat.updateMyRole(connection.role);
 				if (connection.role === ChannelRole.BANNED) {
-					chatStore.resetCurrentChannel();
-					chatStore.leaveChannel(connection.channel.id);
+					store.chat.resetCurrentChannel();
+					store.chat.leaveChannel(connection.channel.id);
 				}
 			}
 		});
 		this.socket.on("removeConnection", (connection: ChanConnection) => {
-			chatStore.removeChanConnection(connection);
+			store.chat.removeChanConnection(connection);
 		});
 		this.socket.on("newInvitation", (id: number) => {
 			this.chat.chanInvitation.getInvitation(id);
@@ -117,10 +117,10 @@ export default Vue.extend({
 		});
 		this.socket.on("MSG", (message: Message) => {
 			this.chat.message.getMessage(message);
-			// chatStore.pushMessage(message);
+			// store.chat.pushMessage(message);
 		});
 		this.socket.on("JC", (messages: Message[]) => {
-			chatStore.updateMessages(messages);
+			store.message.setMessages(messages);
 		});
 
 		// Nuxt events

@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "MutePanel",
@@ -37,7 +37,7 @@ export default Vue.extend({
 			selected: "0",
 			value: 0,
 			get connection() {
-				return chatStore.mutePopup;
+				return store.chat.mutePopup;
 			},
 		};
 	},

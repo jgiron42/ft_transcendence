@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { Channel } from "@/models/Channel";
 import { ChanConnection } from "@/models/ChanConnection";
 
@@ -12,12 +12,12 @@ type PartialConnection<T> = T extends object
 export class ChanConnectionPlugin extends Vue {
 	async getUserChanConnections() {
 		await this.api.get(
-			"/users/" + (await chatStore.me.id) + "/chan_connections",
+			"/users/" + (await store.chat.me.id) + "/chan_connections",
 			{ page: 1, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
-				chatStore.updateMyChannels([] as Channel[]);
+				store.chat.updateMyChannels([] as Channel[]);
 				for (const connection of r.data) {
-					chatStore.pushMyChannels(connection.channel);
+					store.chat.pushMyChannels(connection.channel);
 				}
 			},
 		);
@@ -25,20 +25,20 @@ export class ChanConnectionPlugin extends Vue {
 
 	async getChanConnections(): Promise<Array<ChanConnection> | undefined> {
 		let ret: Array<ChanConnection> | undefined;
-		if (chatStore.currentChannel.id === undefined) return ret;
+		if (store.chat.currentChannel.id === undefined) return ret;
 		await this.api.get(
-			"/channels/" + chatStore.currentChannel.id + "/chan_connections",
+			"/channels/" + store.chat.currentChannel.id + "/chan_connections",
 			{ page: 1, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
 				const connections = [] as ChanConnection[];
 				r.data.forEach((connection: ChanConnection) => {
-					if (connection.user.id === chatStore.me.id) {
-						chatStore.updateMyRole(connection.role);
+					if (connection.user.id === store.chat.me.id) {
+						store.chat.updateMyRole(connection.role);
 					}
 					connections.push(connection);
 				});
 				ret = connections;
-				chatStore.updateChanConnections(connections);
+				store.chat.updateChanConnections(connections);
 			},
 		);
 		return ret;
@@ -48,7 +48,7 @@ export class ChanConnectionPlugin extends Vue {
 		let ret: ChanConnection | undefined;
 		await this.api.put("/connections/" + connection.id, connection, undefined, (r: { data: ChanConnection }) => {
 			ret = r.data;
-			chatStore.pushChanConnection(ret);
+			store.chat.pushChanConnection(ret);
 		});
 		return ret;
 	}

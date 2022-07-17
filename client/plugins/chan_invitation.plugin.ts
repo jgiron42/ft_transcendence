@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { chatStore } from "@/store";
+import { store } from "@/store";
 import { ChanInvitation } from "@/models/ChanInvitation";
 import { ChanConnection } from "@/models/ChanConnection";
 
@@ -9,12 +9,12 @@ export class ChanInvitationPlugin extends Vue {
 		await this.api.get("/invitations", { page: 1, per_page: 100 }, (r: { data: ChanInvitation[] }) => {
 			const invitations = [] as ChanInvitation[];
 			r.data.forEach((invitation: ChanInvitation) => {
-				if (invitation.invited_by.id !== chatStore.me.id) {
+				if (invitation.invited_by.id !== store.chat.me.id) {
 					invitations.push(invitation);
 				}
 			});
 			ret = invitations;
-			chatStore.updateChanInvitations(invitations);
+			store.chat.updateChanInvitations(invitations);
 		});
 		return ret;
 	}
@@ -28,7 +28,7 @@ export class ChanInvitationPlugin extends Vue {
 			(r: { data: ChanConnection }) => {
 				ret = r.data;
 				this.chat.channel.joinChannel(ret.channel);
-				chatStore.removeChanInvitation(invitation);
+				store.chat.removeChanInvitation(invitation);
 			},
 		);
 		return ret;
@@ -36,14 +36,14 @@ export class ChanInvitationPlugin extends Vue {
 
 	async declineChanInvitation(invitation: ChanInvitation): Promise<void> {
 		await this.api.delete(`/invitations/${invitation.id}`, undefined, () => {
-			chatStore.removeChanInvitation(invitation);
+			store.chat.removeChanInvitation(invitation);
 		});
 	}
 
 	async getInvitation(id: number): Promise<ChanInvitation | undefined> {
 		let ret;
 		await this.api.get(`/invitations/${id}`, undefined, (r: { data: ChanInvitation }) => {
-			chatStore.pushChanInvitation(r.data);
+			store.chat.pushChanInvitation(r.data);
 			ret = r.data;
 		});
 		return ret;
