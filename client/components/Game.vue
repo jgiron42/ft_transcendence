@@ -232,8 +232,8 @@ class Ball {
 	collide(pad: Player, res: Vector2D) {
 		// Collisions verticales
 		if (
-			this.pos.y + this.dir.y + this.size.x / 2 >= pad.pos.y &&
-			this.pos.y + this.dir.y + this.size.x / 2 <= pad.pos.y + pad.size.y
+			this.pos.y + this.dir.y + this.size.x / 2 >= pad.pos.y - this.size.x &&
+			this.pos.y + this.dir.y + this.size.x / 2 <= pad.pos.y + pad.size.y + this.size.x
 		) {
 			if (this.pos.x + this.size.x / 2 > res.x / 2) {
 				if (this.pos.x + this.dir.x < pad.pos.x && this.pos.x + this.dir.x + this.size.x > pad.pos.x)
@@ -256,7 +256,7 @@ export default Vue.extend({
 	props: {
 		menuid: {
 			type: Number,
-			default: 3,
+			default: 1,
 		},
 	},
 	data: () => ({
