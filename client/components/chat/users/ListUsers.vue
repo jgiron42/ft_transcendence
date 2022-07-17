@@ -148,7 +148,7 @@ export default Vue.extend({
 			this.$modal.show("user_profile");
 		},
 		unblock(rel: Relation) {
-			this.chat.relation.unblockUser(rel.target);
+			store.relation.unblockUser(rel.target);
 		},
 		select(connection: ChanConnection) {
 			console.log("select: " + JSON.stringify(connection));

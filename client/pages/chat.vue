@@ -48,6 +48,7 @@ import { Message } from "@/models/Message";
 import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { initialiseStores } from "@/utils/store-accessor";
+import { RelationType } from "@/models/Relation";
 
 export default Vue.extend({
 	name: "Chat",
@@ -91,7 +92,10 @@ export default Vue.extend({
 			store.relation.retrieveRelation(rel.id);
 		});
 		this.socket.on("updateRelation", (rel: Relation) => {
-			store.relation.updateRelation(rel);
+			store.relation.retrieveRelation(rel.id);
+			if (rel.type === RelationType.BLOCK) {
+				this.socket.emit("JC", store.chat.currentChannel.id);
+			}
 		});
 		this.socket.on("removeRelation", (rel: relation) => {
 			store.relation.removeRelation(rel);

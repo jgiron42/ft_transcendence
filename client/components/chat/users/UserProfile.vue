@@ -67,7 +67,9 @@ export default Vue.extend({
 				return undefined;
 			},
 			get isBlocked() {
-				return store.chat.blockedUsers.find((r) => r.target.id === this.user.id);
+				return store.relation.relations.find(
+					(r) => r.target.id === this.user.id && r.type === RelationType.BLOCK,
+				);
 			},
 			get ratio(): number {
 				return this.user.nb_win / this.user.nb_game;
@@ -90,10 +92,10 @@ export default Vue.extend({
 			}
 		},
 		blockUser() {
-			this.chat.relation.blockUser(this.user);
+			store.relation.blockUser(this.user);
 		},
 		unblockUser() {
-			this.chat.relation.unblockUser(this.user);
+			store.relation.unblockUser(this.user);
 		},
 		isFriend(relation: Relation) {
 			return relation?.type === RelationType.FRIEND;

@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Relation, RelationType } from "@/models/Relation";
+import { RelationType } from "@/models/Relation";
 import { store } from "@/store";
 
 export default Vue.extend({
@@ -46,30 +46,21 @@ export default Vue.extend({
 	},
 	data() {
 		return {
-			get friends() {
-				const ret = [] as Relation[];
-				for (const relation of store.relation.relations) {
-					if (relation.type === RelationType.FRIEND) {
-						ret.push(relation);
-					}
-				}
-				return ret;
-			},
 			get invitations() {
-				const ret = [] as Relation[];
-				for (const relation of store.relation.relations) {
-					if (
-						relation.target.id === store.chat.me.id &&
-						relation.type === RelationType.FRIEND_REQUEST &&
-						!store.chat.blockedUsers.find((r) => r.target.id === relation.owner.id)
-					) {
-						ret.push(relation);
-					}
-				}
-				return ret;
+				return store.relation.relations
+					.filter((r) => r.type === RelationType.FRIEND_REQUEST)
+					.filter(
+						(r) =>
+							!store.relation.relations.find(
+								(r2) => r2.type === RelationType.BLOCK && r2.target.id === r.owner.id,
+							),
+					);
+			},
+			get friends() {
+				return store.relation.relations.filter((r) => r.type === RelationType.FRIEND);
 			},
 			get blocked() {
-				return store.chat.blockedUsers;
+				return store.relation.relations.filter((r) => r.type === RelationType.BLOCK);
 			},
 			showInvitations: true,
 			showBlocked: true,

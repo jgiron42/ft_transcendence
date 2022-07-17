@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
-import { Relation } from "@/models/Relation";
+import { Relation, RelationType } from "@/models/Relation";
 import { User } from "@/models/User";
 
 export interface IRelationStore {
@@ -17,12 +17,12 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 	}
 
 	@Mutation
-	pushRelation(relation: Relation) {
+	async pushRelation(relation: Relation) {
 		const index = this.relations.findIndex((r) => r.id === relation.id);
 		if (index !== -1) {
-			this.relations[index] = relation;
+			await this.relations.splice(index, 1, relation);
 		} else {
-			this.relations.push(relation);
+			await this.relations.push(relation);
 		}
 	}
 
@@ -35,8 +35,8 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 	async retrieveRelations() {
 		await Vue.prototype.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
 			const relations = [] as Relation[];
-			r.data.forEach((relation: Relation) => {
-				relations.push(relation);
+			r.data.forEach(async (relation: Relation) => {
+				await relations.push(relation);
 			});
 			this.setRelations(relations);
 		});
@@ -44,8 +44,8 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 
 	@Action
 	async retrieveRelation(id: number) {
-		await Vue.prototype.api.get(`/relations/${id}`, {}, (r: { data: Relation }) => {
-			this.pushRelation(r.data);
+		await Vue.prototype.api.get(`/relations/${id}`, {}, async (r: { data: Relation }) => {
+			await this.pushRelation(r.data);
 		});
 	}
 
@@ -55,8 +55,8 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 			`/users/${user.id}/invite_friend`,
 			undefined,
 			undefined,
-			(r: { data: Relation }) => {
-				this.pushRelation(r.data);
+			async (r: { data: Relation }) => {
+				await this.pushRelation(r.data);
 			},
 		);
 	}
@@ -70,8 +70,21 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 
 	@Action
 	async acceptFriend(id: number): Promise<void> {
-		await Vue.prototype.api.post(`/relations/${id}/accept_friend`, {}, {}, (r: { data: Relation }) => {
-			this.pushRelation(r.data);
-		});
+		await Vue.prototype.api.post(`/relations/${id}/accept_friend`);
+	}
+
+	@Action
+	async blockUser(user: User) {
+		await Vue.prototype.api.post(`/users/${user.id}/block`);
+	}
+
+	@Action
+	async unblockUser(user: User) {
+		const index = this.relations.findIndex((r) => r.target.id === user.id && r.type === RelationType.BLOCK);
+		if (index !== -1) {
+			await Vue.prototype.api.delete(`/relations/${this.relations[index].id}`, undefined, () => {
+				this.removeRelation(this.relations[index]);
+			});
+		}
 	}
 }
