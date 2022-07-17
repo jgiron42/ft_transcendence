@@ -27,7 +27,7 @@ export class ChannelPlugin extends Vue {
 			await this.api.get(`/channels/${chan.id}`, undefined, (d = { data: new Channel() }) => {
 				ret = d.data;
 				store.chat.updateCurrentChannel(d.data);
-				this.chat.chanConnection.getChanConnections();
+				store.connection.retrieveChanConnections();
 			});
 			Vue.prototype.$socket.getSocket()?.emit("JC", ret.id);
 			this.$nuxt.$emit("updateChannels");

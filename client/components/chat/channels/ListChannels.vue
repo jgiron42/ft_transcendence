@@ -84,7 +84,7 @@ export default Vue.extend({
 				return ChannelType;
 			},
 			get chanConnections() {
-				return store.chat.chanConnections;
+				return store.connection.chanConnections;
 			},
 			get myChannels() {
 				return store.chat.myChannels;

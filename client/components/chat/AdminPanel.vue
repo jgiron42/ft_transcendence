@@ -110,18 +110,18 @@ export default Vue.extend({
 				return store.chat.currentChannel;
 			},
 			get adminConnections() {
-				return store.chat.chanConnections.filter((connection) =>
+				return store.connection.chanConnections.filter((connection) =>
 					[ChannelRole.OWNER, ChannelRole.ADMIN].includes(connection.role),
 				);
 			},
 			get bannedConnections() {
-				return store.chat.chanConnections.filter((connection) => connection.role === ChannelRole.BANNED);
+				return store.connection.chanConnections.filter((connection) => connection.role === ChannelRole.BANNED);
 			},
 			get mutedConnections() {
 				return this.mutedList;
 			},
 			get usersInChannel() {
-				return store.chat.chanConnections;
+				return store.connection.chanConnections;
 			},
 			get isOwner(): boolean {
 				return store.chat.roleOnCurrentChannel === ChannelRole.OWNER;
@@ -143,7 +143,7 @@ export default Vue.extend({
 	},
 	mounted() {
 		setInterval(() => {
-			this.mutedList = store.chat.chanConnections.filter((connection) => {
+			this.mutedList = store.connection.chanConnections.filter((connection) => {
 				if (connection.mute_end !== null) {
 					return new Date(connection.mute_end).getTime() > Date.now();
 				}
@@ -181,11 +181,11 @@ export default Vue.extend({
 		async saveEditAdmin() {
 			for (const connection of this.adminConnections) {
 				if (!this.selectedAdmins.includes(connection))
-					await this.chat.chanConnection.updateChanConnection({ id: connection.id, role: ChannelRole.USER });
+					await store.connection.updateChanConnection({ id: connection.id, role: ChannelRole.USER });
 			}
 			for (const connection of this.selectedAdmins) {
 				if (connection.role < ChannelRole.ADMIN)
-					await this.chat.chanConnection.updateChanConnection({ id: connection.id, role: ChannelRole.ADMIN });
+					await store.connection.updateChanConnection({ id: connection.id, role: ChannelRole.ADMIN });
 			}
 			this.selectedAdmins = [];
 			this.showEditAdmin = false;
@@ -199,12 +199,12 @@ export default Vue.extend({
 		async saveEditBanned() {
 			for (const connection of this.bannedConnections) {
 				if (!this.selectedBanned.includes(connection)) {
-					await this.chat.chanConnection.updateChanConnection({ id: connection.id, role: ChannelRole.USER });
+					await store.connection.updateChanConnection({ id: connection.id, role: ChannelRole.USER });
 				}
 			}
 			for (const connection of this.selectedBanned) {
 				if (connection.role < ChannelRole.OWNER)
-					await this.chat.chanConnection.updateChanConnection({
+					await store.connection.updateChanConnection({
 						id: connection.id,
 						role: ChannelRole.BANNED,
 					});

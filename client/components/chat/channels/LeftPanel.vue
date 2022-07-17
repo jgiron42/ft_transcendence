@@ -71,7 +71,7 @@ export default Vue.extend({
 			},
 			get invitations() {
 				return store.invitation.chanInvitations.filter((invitation) => {
-					return !store.chat.chanConnections.some((connection) => {
+					return !store.connection.chanConnections.some((connection) => {
 						return connection.channel.id === invitation.channel.id;
 					});
 				});

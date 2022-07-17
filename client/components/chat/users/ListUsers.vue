@@ -176,7 +176,7 @@ export default Vue.extend({
 			return relation.owner.id === this.me.id ? relation.target : relation.owner;
 		},
 		isAlreadyOnCurrentChannel(user: User) {
-			if (store.chat.chanConnections.find((c) => c.user.id === user.id)) {
+			if (store.connection.chanConnections.find((c) => c.user.id === user.id)) {
 				return true;
 			}
 			return false;

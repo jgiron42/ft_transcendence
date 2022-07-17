@@ -29,6 +29,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { store } from "@/store";
+import { ChanConnection } from "@/models/ChanConnection";
 
 export default Vue.extend({
 	name: "MutePanel",
@@ -63,13 +64,19 @@ export default Vue.extend({
 				default:
 					return;
 			}
-			if (
-				await this.chat.chanConnection.updateChanConnection({
-					id: this.connection.id,
-					mute_end: new Date(Date.now() + seconds * 1000),
-				})
-			)
-				this.$modal.hide("mute_pannel");
+			const newConnection = {
+				id: this.connection.id,
+				mute_end: new Date(Date.now() + seconds * 1000),
+			};
+			await this.api.put(
+				`/connections/${this.connection.id}`,
+				newConnection,
+				{},
+				async (r: { data: ChanConnection }) => {
+					await store.connection.pushChanConnection(r.data);
+					this.$modal.hide("mute_pannel");
+				},
+			);
 		},
 	},
 });

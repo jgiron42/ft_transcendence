@@ -30,7 +30,7 @@ export default Vue.extend({
 		return {
 			showUsers: true,
 			get chanConnections() {
-				return store.chat.chanConnections.filter((connection) => connection.role !== ChannelRole.BANNED);
+				return store.connection.chanConnections.filter((connection) => connection.role !== ChannelRole.BANNED);
 			},
 			get currentChannel() {
 				return store.chat.currentChannel;

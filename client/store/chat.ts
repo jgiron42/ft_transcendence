@@ -2,7 +2,7 @@ import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 import { User } from "@/models/User";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Channel, ChannelType } from "@/models/Channel";
-import { Relation } from "@/models/Relation";
+import { store } from "@/store";
 
 export interface ChatInterface {
 	me: User;
@@ -10,9 +10,7 @@ export interface ChatInterface {
 	myChannels: Array<Channel>;
 	visibleChannels: Array<Channel>;
 	currentChannel: Channel;
-	chanConnections: Array<ChanConnection>;
 	joiningChannel: Channel | undefined;
-	blockedUsers: Array<Relation>;
 }
 
 @Module({ stateFactory: true, namespaced: true, name: "chat" })
@@ -22,23 +20,12 @@ export default class Chat extends VuexModule implements ChatInterface {
 	visibleChannels: Channel[] = [];
 	myChannels: Channel[] = [];
 	currentChannel: Channel = new Channel();
-	chanConnections: Array<ChanConnection> = [] as ChanConnection[];
 	joiningChannel: Channel | undefined = new Channel();
 	mutePopup: ChanConnection = new ChanConnection();
-	blockedUsers: Relation[] = [];
 
 	@Mutation
 	updateMutePopup(connection: ChanConnection) {
 		this.mutePopup = connection;
-	}
-
-	@Mutation
-	resetAll() {
-		this.me = new User();
-		this.visibleChannels = [];
-		this.myChannels = [];
-		this.currentChannel = new Channel();
-		this.chanConnections = [] as ChanConnection[];
 	}
 
 	@Mutation
@@ -49,7 +36,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 
 	@Mutation
 	leaveChannel(chanId: number) {
-		this.chanConnections = this.chanConnections.filter((c: ChanConnection) => c.channel.id !== chanId);
 		this.visibleChannels = this.visibleChannels.filter(
 			(c: Channel) => !(c.id === chanId && c.type === ChannelType.PRIVATE),
 		);
@@ -64,29 +50,6 @@ export default class Chat extends VuexModule implements ChatInterface {
 	@Mutation
 	updateMyRole(role: ChannelRole) {
 		this.roleOnCurrentChannel = role;
-	}
-
-	@Mutation
-	updateChanConnections(connections: ChanConnection[]) {
-		this.chanConnections = connections;
-	}
-
-	@Mutation
-	removeChanConnection(connection: ChanConnection) {
-		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
-		if (id !== -1) this.chanConnections.splice(id, 1);
-	}
-
-	@Mutation
-	pushChanConnection(connection: ChanConnection) {
-		const id = this.chanConnections.findIndex((c: ChanConnection) => c.id === connection.id);
-		if (id !== -1) this.chanConnections.splice(id, 1);
-		this.chanConnections.push(connection);
-	}
-
-	@Mutation
-	pushUser(connection: ChanConnection) {
-		this.chanConnections.push(connection);
 	}
 
 	@Mutation
@@ -116,14 +79,12 @@ export default class Chat extends VuexModule implements ChatInterface {
 
 	@Mutation
 	updateChannel(chan: Channel) {
-		const id = this.chanConnections.findIndex((c: ChanConnection) => c.channel.id === chan.id);
+		const id = store.connection.chanConnections.findIndex((c: ChanConnection) => c.channel.id === chan.id);
 		const vid = this.visibleChannels.findIndex((c: Channel) => c.id === chan.id);
 		if (id !== -1) {
 			const _id = this.myChannels.findIndex((c: Channel) => c.id === chan.id);
-			this.myChannels.splice(_id, 1);
-			this.myChannels.push(chan);
-			this.visibleChannels.splice(vid, 1);
-			this.visibleChannels.push(chan);
+			this.myChannels.splice(_id, 1, chan);
+			this.visibleChannels.splice(vid, 1, chan);
 		} else {
 			if (vid !== -1) {
 				this.visibleChannels.splice(vid, 1);
@@ -149,25 +110,5 @@ export default class Chat extends VuexModule implements ChatInterface {
 			this.myChannels.splice(id, 1);
 		}
 		this.myChannels.push(chan);
-	}
-
-	@Mutation
-	updateBlockedUsers(rel: Relation[]) {
-		this.blockedUsers = rel;
-	}
-
-	@Mutation
-	pushBlockedUsers(rel: Relation) {
-		const id = this.blockedUsers.findIndex((r: Relation) => r.id === rel.id);
-		if (id === -1) {
-			this.blockedUsers.push(rel);
-		} else {
-			this.blockedUsers[id] = rel;
-		}
-	}
-
-	@Mutation
-	spliceBlockedUsers(id: number) {
-		this.blockedUsers.splice(id, 1);
 	}
 }
