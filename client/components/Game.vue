@@ -3,6 +3,7 @@
 <!-- 1 = local standard							   -->
 <!-- 2 = online flappypong						   -->
 <!-- 3 = local flappypong						   -->
+<!-- 4 = demo mode								   -->
 <template>
 	<div class="flex w-full h-full">
 		<div class="game_bis top-1/3">
@@ -256,7 +257,7 @@ export default Vue.extend({
 	props: {
 		menuid: {
 			type: Number,
-			default: 1,
+			default: 4,
 		},
 	},
 	data: () => ({
@@ -348,18 +349,32 @@ export default Vue.extend({
 				this.scorePoint();
 
 				// If in menu, p1 follow ball else move on input
-				this.players[0].update(
-					this.p1Down,
-					this.p1Up,
-					this.res,
-					this.menuid === 2 || this.menuid === 3,
-					this.p1Pressed,
-				);
-				// 	player 2 inputs
-				if (this.menuid === 1 || this.menuid === 3) {
-					this.players[1].update(this.vkUp, this.vkDown, this.res, this.menuid === 3, this.justPressed);
+				if (this.menuid !== 4) {
+					this.players[0].update(
+						this.p1Down,
+						this.p1Up,
+						this.res,
+						this.menuid === 2 || this.menuid === 3,
+						this.p1Pressed,
+					);
 				} else {
-					// get p2 inputs from server
+					if (this.ball.pos.y < this.players[0].pos.y)
+						this.players[0].update (true, false, this.res, false, false);
+					else
+						this.players[0].update (false, true, this.res, false, false);
+				}
+				// 	player 2 inputs
+				if (this.menuid !== 4) {
+					if (this.menuid === 1 || this.menuid === 3) {
+						this.players[1].update(this.vkUp, this.vkDown, this.res, this.menuid === 3, this.justPressed);
+					} else {
+						// get p2 inputs from server
+					}
+				} else {
+					if (this.ball.pos.y < this.players[1].pos.y)
+						this.players[1].update (true, false, this.res, false, false);
+					else
+						this.players[1].update (false, true, this.res, false, false);
 				}
 				// Update ball
 				this.ball.update(this.res, this.players);
