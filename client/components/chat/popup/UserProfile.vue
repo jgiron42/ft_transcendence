@@ -50,10 +50,10 @@ export default Vue.extend({
 	data() {
 		return {
 			get user() {
-				return store.popupUser.user;
+				return store.popup.user;
 			},
 			get me() {
-				return store.chat.me;
+				return store.user.me;
 			},
 			get relation() {
 				return store.relation.relations.find(

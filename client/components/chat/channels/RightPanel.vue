@@ -47,7 +47,7 @@ export default Vue.extend({
 			selection: 0,
 			showInvitations: true,
 			get me() {
-				return store.chat.me;
+				return store.user.me;
 			},
 			get isAdmin(): boolean {
 				return store.channel.currentChannel.role >= ChannelRole.ADMIN;
@@ -60,7 +60,7 @@ export default Vue.extend({
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
 			if (
-				store.chat.me.id === connection.user.id &&
+				store.user.me.id === connection.user.id &&
 				connection.role < ChannelRole.ADMIN &&
 				this.selection === 1
 			) {

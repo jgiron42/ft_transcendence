@@ -23,7 +23,7 @@ export default Vue.extend({
 		if (redirect) {
 			this.path += redirect;
 		}
-		if (store.chat.me.id !== null) {
+		if (store.user.me.id !== null) {
 			this.$router.push(this.path);
 		}
 	},

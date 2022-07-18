@@ -32,11 +32,11 @@
 			<LeftPanel v-if="showChannels" :socket="socket" />
 			<Chatbox v-if="isOnChannel" :socket="socket" />
 			<RightPanel v-if="showUsers && isOnChannel" />
-			<Popup name="user_profile" component="chat/users/UserProfile" />
-			<Popup name="create_channel" component="chat/channels/popup/ChannelCreation" />
-			<Popup name="edit_channel" component="chat/channels/popup/ChannelEdition" />
-			<Popup name="join_protected_chan" component="chat/channels/JoinProtectedChan" />
-			<Popup name="mute_pannel" component="chat/MutePanel" />
+			<Popup name="user_profile" component="chat/popup/UserProfile" />
+			<Popup name="create_channel" component="chat/popup/ChannelCreation" />
+			<Popup name="edit_channel" component="chat/popup/ChannelEdition" />
+			<Popup name="join_protected_chan" component="chat/popup/JoinProtectedChan" />
+			<Popup name="mute_pannel" component="chat/popup/MutePanel" />
 		</div>
 	</div>
 </template>
@@ -115,7 +115,7 @@ export default Vue.extend({
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
 			store.connection.pushChanConnection(connection);
 			if (
-				store.chat.me.id === connection.user.id &&
+				store.user.me.id === connection.user.id &&
 				this.isOnChannel &&
 				connection.channel.id === this.currentChannel.id
 			) {

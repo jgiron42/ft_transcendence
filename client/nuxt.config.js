@@ -25,9 +25,6 @@ export default {
 	plugins: [
 		{ src: "@/plugins/vue-js-modal", mode: "client" },
 		{ src: "@/plugins/api.plugin", mode: "client" },
-		{ src: "@/plugins/chat.plugin", mode: "client" },
-		{ src: "@/plugins/channel.plugin", mode: "client" },
-		{ src: "@/plugins/chan_connection.plugin", mode: "client" },
 		{ src: "@/plugins/socketManager", mode: "client" },
 	],
 

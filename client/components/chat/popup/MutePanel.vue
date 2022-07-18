@@ -38,7 +38,7 @@ export default Vue.extend({
 			selected: "0",
 			value: 0,
 			get connection() {
-				return store.chat.mutePopup;
+				return store.popup.connection;
 			},
 		};
 	},

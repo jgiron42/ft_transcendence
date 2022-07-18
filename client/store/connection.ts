@@ -42,7 +42,7 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 			(r: { data: ChanConnection[] }) => {
 				const connections = [] as ChanConnection[];
 				r.data.forEach((connection: ChanConnection) => {
-					if (connection.user.id === store.chat.me.id) {
+					if (connection.user.id === store.user.me.id) {
 						store.channel.setCurrentRole(connection.role);
 					}
 					connections.push(connection);
@@ -55,7 +55,7 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 	@Action
 	async retrieveMyConnections() {
 		await Vue.prototype.api.get(
-			"/users/" + (await store.chat.me.id) + "/chan_connections",
+			"/users/" + (await store.user.me.id) + "/chan_connections",
 			{ page: 1, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
 				store.channel.setMyChannels([] as Channel[]);

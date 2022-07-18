@@ -117,7 +117,7 @@ export default Vue.extend({
 	data() {
 		return {
 			get me() {
-				return store.chat.me;
+				return store.user.me;
 			},
 			rel: this.relations,
 			selected: [] as ChanConnection[],
@@ -140,11 +140,11 @@ export default Vue.extend({
 			let user;
 			if (relation.owner.id === this.me.id || relation.owner.id === relation.target.id) user = relation.target;
 			else if (relation.target.id === this.me.id) user = relation.owner;
-			if (user) store.popupUser.setUser(user);
+			if (user) store.popup.setUser(user);
 			this.$modal.show("user_profile");
 		},
 		showUserConnection(connection: ChanConnection) {
-			store.popupUser.setUser(connection.user);
+			store.popup.setUser(connection.user);
 			this.$modal.show("user_profile");
 		},
 		unblock(rel: Relation) {

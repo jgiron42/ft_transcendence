@@ -27,7 +27,7 @@ export default Vue.extend({
 				return store.message.messages;
 			},
 			get me() {
-				return store.chat.me;
+				return store.user.me;
 			},
 		};
 	},

@@ -37,7 +37,7 @@ export default class InvitationStore extends VuexModule implements IInvitationSt
 		await Vue.prototype.api.get("/invitations", { page: 1, per_page: 100 }, (r: { data: ChanInvitation[] }) => {
 			const invitations = [] as ChanInvitation[];
 			r.data.forEach(async (invitation: ChanInvitation) => {
-				if (invitation.invited_by.id !== store.chat.me.id) {
+				if (invitation.invited_by.id !== store.user.me.id) {
 					await invitations.push(invitation);
 				}
 			});

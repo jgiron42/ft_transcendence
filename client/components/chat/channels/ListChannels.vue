@@ -102,7 +102,7 @@ export default Vue.extend({
 			if (chan.type === ChannelType.PASSWORD) {
 				if (this.checkPrivateChannel(chan.id)) store.channel.joinChannel(chan);
 				else {
-					store.chat.updateJoiningChannel(chan);
+					store.popup.setChannel(chan);
 					this.$modal.show("join_protected_chan");
 				}
 			} else {

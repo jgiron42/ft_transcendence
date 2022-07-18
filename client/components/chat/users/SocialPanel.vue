@@ -48,7 +48,7 @@ export default Vue.extend({
 		return {
 			get invitations() {
 				return store.relation.relations
-					.filter((r) => r.type === RelationType.FRIEND_REQUEST && r.owner.id !== store.chat.me.id)
+					.filter((r) => r.type === RelationType.FRIEND_REQUEST && r.owner.id !== store.user.me.id)
 					.filter(
 						(r) =>
 							!store.relation.relations.find(

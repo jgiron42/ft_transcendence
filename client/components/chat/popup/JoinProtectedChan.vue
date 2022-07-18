@@ -29,7 +29,7 @@ export default Vue.extend({
 		return {
 			password: "",
 			get joiningChannel() {
-				return store.chat.joiningChannel;
+				return store.popup.channel;
 			},
 		};
 	},

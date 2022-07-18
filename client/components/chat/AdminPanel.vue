@@ -216,7 +216,7 @@ export default Vue.extend({
 			this.showEditMuted = true;
 		},
 		selectMuted(connection: ChanConnection) {
-			store.chat.updateMutePopup(connection);
+			store.popup.setConnection(connection);
 			this.$modal.show("mute_pannel");
 		},
 	},
