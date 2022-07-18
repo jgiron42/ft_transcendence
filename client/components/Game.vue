@@ -395,10 +395,11 @@ export default Vue.extend({
 				this.justPressed = true;
 			} else if (event.key === "Down" || event.key === "ArrowDown") {
 				this.vkDown = true;
-			} else if (event.keyCode === 83) {
-				this.p1Up = true;
 			} else if (event.keyCode === 87) {
 				this.p1Down = true;
+				this.p1Pressed = true;
+			} else if (event.keyCode === 83) {
+				this.p1Up = true;
 			}
 		},
 		handleKeyRelease(event: KeyboardEvent) {
