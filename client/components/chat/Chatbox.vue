@@ -28,7 +28,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Message } from "@/models/Message";
 import { store } from "@/store/";
 
 export default Vue.extend({
@@ -43,9 +42,6 @@ export default Vue.extend({
 		return {
 			title: "ChatBox",
 			msgContent: "",
-			get currentChannel() {
-				return store.chat.currentChannel;
-			},
 		};
 	},
 	methods: {
@@ -56,10 +52,10 @@ export default Vue.extend({
 		},
 		sendMessage() {
 			if (!(this.msgContent.length > 0)) return;
-			const msg = new Message();
-			msg.content = this.msgContent;
-			msg.created_at = new Date();
-			this.api.post("/channels/" + this.currentChannel.id + "/messages", msg);
+			store.message.sendMessage({
+				content: this.msgContent,
+				created_at: new Date(),
+			});
 			this.msgContent = "";
 		},
 	},

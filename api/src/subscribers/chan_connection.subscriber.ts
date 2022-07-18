@@ -18,10 +18,9 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 	}
 
 	afterInsert(event: InsertEvent<ChanConnection>) {
-		if (event.entity.channel.type !== ChannelType.DM) {
-			this.socketService.sendMessage("newConnection", event.entity, event.entity.channel.name);
-		} else {
-			this.socketService.sendMessageToClient("newConnection", event.entity, event.entity.user);
+		this.socketService.sendMessage("newConnection", event.entity, event.entity.channel.name);
+		if (event.entity.channel.type === ChannelType.DM) {
+			this.socketService.sendMessageToClient("newDm", event.entity, event.entity.user);
 		}
 	}
 

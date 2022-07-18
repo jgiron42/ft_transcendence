@@ -12,6 +12,7 @@ export class ChanConnection {
 	constructor() {
 		this.role = 0;
 		this.created_at = new Date();
+		this.channel = new Channel();
 	}
 
 	id: number;

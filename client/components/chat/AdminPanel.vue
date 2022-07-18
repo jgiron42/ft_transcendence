@@ -106,9 +106,6 @@ export default Vue.extend({
 			get ChannelRole() {
 				return ChannelRole;
 			},
-			get currentChannel() {
-				return store.chat.currentChannel;
-			},
 			get adminConnections() {
 				return store.connection.chanConnections.filter((connection) =>
 					[ChannelRole.OWNER, ChannelRole.ADMIN].includes(connection.role),
@@ -124,10 +121,10 @@ export default Vue.extend({
 				return store.connection.chanConnections;
 			},
 			get isOwner(): boolean {
-				return store.chat.roleOnCurrentChannel === ChannelRole.OWNER;
+				return store.channel.currentChannel.role === ChannelRole.OWNER;
 			},
 			get isAdmin(): boolean {
-				return store.chat.roleOnCurrentChannel >= ChannelRole.ADMIN;
+				return store.channel.currentChannel.role >= ChannelRole.ADMIN;
 			},
 			selectedAdmins: [] as ChanConnection[],
 			selectedBanned: [] as ChanConnection[],

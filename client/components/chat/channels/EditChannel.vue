@@ -3,13 +3,13 @@
 		<div class="flex flex-col">
 			<div id="chan-name">
 				<b>Name:</b>
-				<p>{{ currentChannel.name }}</p>
+				<p>{{ currentChannel.channel.name }}</p>
 			</div>
 			<div id="chan-type">
 				<b>Type:</b>
-				<p v-if="currentChannel.type === ChannelType.PUBLIC">Public</p>
-				<p v-if="currentChannel.type === ChannelType.PRIVATE">Private</p>
-				<p v-if="currentChannel.type === ChannelType.PASSWORD">Protected</p>
+				<p v-if="currentChannel.channel.type === ChannelType.PUBLIC">Public</p>
+				<p v-if="currentChannel.channel.type === ChannelType.PRIVATE">Private</p>
+				<p v-if="currentChannel.channel.type === ChannelType.PASSWORD">Protected</p>
 			</div>
 		</div>
 		<button v-if="isAdmin" id="edit-button" @click="editChan">edit</button>
@@ -27,13 +27,13 @@ export default Vue.extend({
 	data() {
 		return {
 			get currentChannel() {
-				return store.chat.currentChannel;
+				return store.channel.currentChannel;
 			},
 			get ChannelType() {
 				return ChannelType;
 			},
 			get isAdmin(): boolean {
-				return store.chat.roleOnCurrentChannel === ChannelRole.OWNER;
+				return this.currentChannel.role === ChannelRole.OWNER;
 			},
 		};
 	},

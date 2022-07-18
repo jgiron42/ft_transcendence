@@ -57,12 +57,12 @@ export default Vue.extend({
 	data() {
 		return {
 			channel: {
-				id: store.chat.currentChannel.id,
-				name: store.chat.currentChannel.name,
-				type: store.chat.currentChannel.type,
+				id: store.channel.currentChannel.channel.id,
+				name: store.channel.currentChannel.channel.name,
+				type: store.channel.currentChannel.channel.type,
 				password: "",
 			},
-			selectedType: store.chat.currentChannel.type,
+			selectedType: store.channel.currentChannel.channel.type,
 			get selectedTypeName() {
 				switch (this.selectedType) {
 					case ChannelType.PUBLIC:
@@ -74,7 +74,7 @@ export default Vue.extend({
 				}
 			},
 			get currentChannel() {
-				return store.chat.currentChannel;
+				return store.channel.currentChannel.channel;
 			},
 		};
 	},
@@ -85,9 +85,8 @@ export default Vue.extend({
 			if (this.selectedType !== ChannelType.PASSWORD) this.channel.password = "";
 		},
 		async updateChannel() {
-			if (await this.chat.channel.updateChannel(this.channel)) {
-				this.$modal.hide("edit_channel");
-			}
+			await store.channel.updateChannel(this.channel);
+			this.$modal.hide("edit_channel");
 		},
 	},
 });

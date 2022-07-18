@@ -41,6 +41,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Channel, ChannelType } from "@/models/Channel";
+import { store } from "@/store";
 
 export default Vue.extend({
 	name: "ChannelCreation",
@@ -58,7 +59,9 @@ export default Vue.extend({
 		},
 		createChannel() {
 			this.api.post("/channels", this.channel, undefined, (r: { data: Channel }) => {
-				this.$nuxt.$emit("createChannel", r.data);
+				store.channel.joinChannel(r.data);
+				store.channel.pushMyChannels(r.data);
+				store.channel.pushChannel(r.data);
 				this.$modal.hide("create_channel");
 			});
 		},

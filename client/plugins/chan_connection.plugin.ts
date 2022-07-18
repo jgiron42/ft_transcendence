@@ -9,9 +9,9 @@ export class ChanConnectionPlugin extends Vue {
 			"/users/" + (await store.chat.me.id) + "/chan_connections",
 			{ page: 1, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
-				store.chat.updateMyChannels([] as Channel[]);
+				store.channel.setMyChannels([] as Channel[]);
 				for (const connection of r.data) {
-					store.chat.pushMyChannels(connection.channel);
+					store.channel.pushMyChannels(connection.channel);
 				}
 			},
 		);

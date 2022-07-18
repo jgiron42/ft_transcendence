@@ -70,9 +70,6 @@ export default Vue.extend({
 			get ratio(): number {
 				return this.user.nb_win / this.user.nb_game;
 			},
-			get currentChannel() {
-				return store.chat.currentChannel;
-			},
 		};
 	},
 	methods: {
@@ -103,9 +100,8 @@ export default Vue.extend({
 			return relation?.type === RelationType.FRIEND_REQUEST && relation?.target.id === this.me.id;
 		},
 		sendDm() {
-			if (this.chat.channel.sendDm(this.user)) {
-				this.$modal.hide("user_profile");
-			}
+			store.channel.sendDm(this.user);
+			this.$modal.hide("user_profile");
 		},
 	},
 });

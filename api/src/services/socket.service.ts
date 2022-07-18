@@ -32,7 +32,6 @@ export class SocketService {
 	}
 
 	async leaveRoom(uid: string, room: string): Promise<void> {
-		console.log(`User ${uid} leaving room ${room}`);
 		for (const [_socket, _user] of this.clientMap) {
 			if (_user.id === uid) {
 				await _socket.leave(room);

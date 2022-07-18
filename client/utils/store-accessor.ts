@@ -6,6 +6,7 @@ import PopupUser from "@/store/popupUser";
 import RelationStore from "@/store/relation";
 import InvitationStore from "@/store/invitation";
 import ConnectionStore from "@/store/connection";
+import ChannelStore from "@/store/channel";
 
 export class StoreAccessor {
 	chat: Chat;
@@ -14,6 +15,7 @@ export class StoreAccessor {
 	popupUser: PopupUser;
 	invitation: InvitationStore;
 	connection: ConnectionStore;
+	channel: ChannelStore;
 }
 
 const store = new StoreAccessor();
@@ -25,6 +27,7 @@ function initialiseStores(_store: Store<any>): void {
 	store.relation = getModule(RelationStore, _store);
 	store.invitation = getModule(InvitationStore, _store);
 	store.connection = getModule(ConnectionStore, _store);
+	store.channel = getModule(ChannelStore, _store);
 }
 
 export { initialiseStores, store };

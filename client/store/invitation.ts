@@ -59,7 +59,7 @@ export default class InvitationStore extends VuexModule implements IInvitationSt
 			{},
 			{},
 			async (r: { data: ChanConnection }) => {
-				Vue.prototype.chat.channel.joinChannel(r.data.channel);
+				store.channel.joinChannel(r.data.channel);
 				await this.removeInvitation(invitation);
 			},
 		);

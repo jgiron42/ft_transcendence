@@ -87,10 +87,10 @@ export default Vue.extend({
 				return store.connection.chanConnections;
 			},
 			get myChannels() {
-				return store.chat.myChannels;
+				return store.channel.myChannels;
 			},
 			get currentChannel() {
-				return store.chat.currentChannel;
+				return store.channel.currentChannel.channel;
 			},
 		};
 	},
@@ -100,22 +100,17 @@ export default Vue.extend({
 		},
 		joinChannel(chan: Channel) {
 			if (chan.type === ChannelType.PASSWORD) {
-				if (this.checkPrivateChannel(chan.id)) this.chat.channel.joinChannel(chan);
+				if (this.checkPrivateChannel(chan.id)) store.channel.joinChannel(chan);
 				else {
 					store.chat.updateJoiningChannel(chan);
 					this.$modal.show("join_protected_chan");
 				}
 			} else {
-				this.chat.channel.joinChannel(chan);
+				store.channel.joinChannel(chan);
 			}
 		},
 		leaveChannel(chanId: number) {
-			this.api.post("/channels/" + chanId + "/leave", undefined, undefined, () => {
-				if (chanId === store.chat.currentChannel.id) {
-					store.chat.resetCurrentChannel();
-				}
-				store.chat.leaveChannel(chanId);
-			});
+			store.channel.leaveChannel(chanId);
 		},
 	},
 });

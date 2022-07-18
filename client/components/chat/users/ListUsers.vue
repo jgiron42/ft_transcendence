@@ -7,7 +7,7 @@
 				class="user-button cut-text btn text-left"
 				@click="select(connection)"
 			>
-				<b>{{ connection.user.username }}</b>
+				<b>{{ connection.user.usernae }}</b>
 			</button>
 			<button
 				v-else
@@ -151,7 +151,6 @@ export default Vue.extend({
 			store.relation.unblockUser(rel.target);
 		},
 		select(connection: ChanConnection) {
-			console.log("select: " + JSON.stringify(connection));
 			if (this.type === "muted-selection") {
 				this.$emit("select", connection);
 			} else {
@@ -170,7 +169,10 @@ export default Vue.extend({
 			return this.selected.includes(connection);
 		},
 		inviteInCurrentChannel(user: User) {
-			this.chat.channel.invite(store.chat.currentChannel, user);
+			store.channel.invite({
+				channel: store.channel.currentChannel.channel,
+				user,
+			});
 		},
 		other(relation: Relation) {
 			return relation.owner.id === this.me.id ? relation.target : relation.owner;

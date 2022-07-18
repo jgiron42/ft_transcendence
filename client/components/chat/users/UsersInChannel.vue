@@ -33,7 +33,7 @@ export default Vue.extend({
 				return store.connection.chanConnections.filter((connection) => connection.role !== ChannelRole.BANNED);
 			},
 			get currentChannel() {
-				return store.chat.currentChannel;
+				return store.channel.currentChannel.channel;
 			},
 		};
 	},

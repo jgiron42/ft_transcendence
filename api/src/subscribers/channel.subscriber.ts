@@ -17,7 +17,7 @@ export class ChannelSubscriber implements EntitySubscriberInterface<Channel> {
 
 	afterInsert(event: InsertEvent<Channel>) {
 		if (event.entity.type !== ChannelType.DM) {
-			this.socketService.sendMessage("updateChannel", event.entity, "realm");
+			this.socketService.sendMessage("newChannel", event.entity, "realm");
 		}
 	}
 

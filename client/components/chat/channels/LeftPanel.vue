@@ -64,10 +64,10 @@ export default Vue.extend({
 	data() {
 		return {
 			get visibleChannels() {
-				return store.chat.visibleChannels.filter((channel) => channel.type !== ChannelType.DM);
+				return store.channel.channels.filter((channel) => channel.type !== ChannelType.DM);
 			},
 			get myChannels() {
-				return store.chat.myChannels;
+				return store.channel.myChannels;
 			},
 			get invitations() {
 				return store.invitation.chanInvitations.filter((invitation) => {
@@ -77,7 +77,7 @@ export default Vue.extend({
 				});
 			},
 			get isOnChannel() {
-				return store.chat.currentChannel.name;
+				return store.channel.currentChannel.channel?.name;
 			},
 			selection: 0,
 			showInvitations: true,

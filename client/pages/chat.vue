@@ -43,7 +43,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Channel, ChannelType } from "@/models/Channel";
+import { Channel } from "@/models/Channel";
 import { Message } from "@/models/Message";
 import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
@@ -59,10 +59,10 @@ export default Vue.extend({
 			showChannels: !this.$device.isMobile,
 			showUsers: !this.$device.isMobile,
 			get currentChannel() {
-				return store.chat.currentChannel;
+				return store.channel.currentChannel.channel;
 			},
 			get isOnChannel() {
-				return this.currentChannel.name;
+				return this.currentChannel?.name;
 			},
 		};
 	},
@@ -70,7 +70,7 @@ export default Vue.extend({
 		initialiseStores(this.$store);
 	},
 	mounted() {
-		if (this.currentChannel.id !== undefined) {
+		if (this.currentChannel !== undefined) {
 			this.socket.emit("JC", this.currentChannel.id);
 		}
 		if (this.socket.connected) {
@@ -82,16 +82,19 @@ export default Vue.extend({
 		this.socket.emit("HC", {
 			token: this.$cookies.get("connect.sid"),
 		});
+		this.socket.on("newChannel", (chan: Channel) => {
+			store.channel.pushChannel(chan);
+		});
 		this.socket.on("updateChannel", (chan: Channel) => {
-			store.chat.updateChannel(chan);
+			store.channel.pushChannel(chan);
 		});
 		this.socket.on("updateChannels", () => {
 			this.updateChannels();
 		});
 		this.socket.on("addRelation", (rel: Relation) => {
 			store.relation.retrieveRelation(rel.id);
-			if (rel.type === RelationType.BLOCK) {
-				this.socket.emit("JC", store.chat.currentChannel.id);
+			if (rel.type === RelationType.BLOCK && this.isOnChannel) {
+				this.socket.emit("JC", this.currentChannel.id);
 			}
 		});
 		this.socket.on("updateRelation", (rel: Relation) => {
@@ -99,23 +102,27 @@ export default Vue.extend({
 		});
 		this.socket.on("removeRelation", (rel: Relation) => {
 			store.relation.removeRelation(rel);
-			if (rel.type === RelationType.BLOCK) {
-				this.socket.emit("JC", store.chat.currentChannel.id);
+			if (rel.type === RelationType.BLOCK && this.isOnChannel) {
+				this.socket.emit("JC", this.currentChannel.id);
 			}
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
-			store.connection.pushChanConnection(connection);
-			if (connection.channel.type === ChannelType.DM) {
-				store.chat.pushMyChannels(connection.channel);
-			}
+			store.connection.retrieveChanConnection(connection.id);
+		});
+		this.socket.on("newDm", (connection: ChanConnection) => {
+			store.channel.pushMyChannels(connection.channel);
 		});
 		this.socket.on("updateConnection", (connection: ChanConnection) => {
 			store.connection.pushChanConnection(connection);
-			if (store.chat.me.id === connection.user.id && connection.channel.id === store.chat.currentChannel.id) {
-				store.chat.updateMyRole(connection.role);
+			if (
+				store.chat.me.id === connection.user.id &&
+				this.isOnChannel &&
+				connection.channel.id === this.currentChannel.id
+			) {
+				store.channel.setCurrentRole(connection.role);
 				if (connection.role === ChannelRole.BANNED) {
-					store.chat.resetCurrentChannel();
-					store.chat.leaveChannel(connection.channel.id);
+					store.channel.setCurrentConnection(new ChanConnection());
+					store.channel.leaveChannel(connection.channel.id);
 				}
 			}
 		});
@@ -138,18 +145,14 @@ export default Vue.extend({
 		this.$nuxt.$on("updateChannels", () => {
 			this.updateChannels();
 		});
-		this.$nuxt.$on("createChannel", async (chan: Channel) => {
-			const c = await this.chat.channel.joinChannel(chan);
-			if (c) this.socket.emit("JC", c.id);
-		});
 	},
 	destroyed() {
 		this.socket.removeAllListeners();
 	},
 	methods: {
 		async updateChannels() {
-			await this.chat.chanConnection.getUserChanConnections();
-			await this.chat.channel.getChannels();
+			await store.channel.retrieveChannels();
+			await store.connection.retrieveMyConnections();
 			await store.connection.retrieveChanConnections();
 			await store.relation.retrieveRelations();
 			await store.invitation.retrieveInvitations();

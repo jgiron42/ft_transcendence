@@ -4,9 +4,9 @@
 			mute:
 			<div class="flex">
 				<input
+					v-model="value"
 					type="number"
 					oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-					v-model="value"
 					@keydown.enter.prevent="validateInput"
 				/>
 				<select

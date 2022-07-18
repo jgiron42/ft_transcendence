@@ -46,14 +46,11 @@ export default Vue.extend({
 			socket: this.$socket.getSocket(),
 			selection: 0,
 			showInvitations: true,
-			get currentChannel() {
-				return store.chat.currentChannel;
-			},
 			get me() {
 				return store.chat.me;
 			},
 			get isAdmin(): boolean {
-				return store.chat.roleOnCurrentChannel >= ChannelRole.ADMIN;
+				return store.channel.currentChannel.role >= ChannelRole.ADMIN;
 			},
 		};
 	},

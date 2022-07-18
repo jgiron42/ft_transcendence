@@ -2,12 +2,8 @@ import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import { ChanConnection } from "@/models/ChanConnection";
 import { store } from "@/store";
-
-type PartialConnection<T> = T extends object
-	? {
-			[P in keyof T]?: PartialConnection<T[P]>;
-	  }
-	: T;
+import { DeepPartial } from "@/types/partial";
+import { Channel } from "@/models/Channel";
 
 export interface IConnectionStore {
 	chanConnections: Array<ChanConnection>;
@@ -39,15 +35,15 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 
 	@Action
 	async retrieveChanConnections() {
-		if (store.chat.currentChannel.id === undefined) return;
+		if (store.channel.currentChannel.channel?.name === undefined) return;
 		await Vue.prototype.api.get(
-			`/channels/${store.chat.currentChannel.id}/chan_connections`,
+			`/channels/${store.channel.currentChannel.channel.id}/chan_connections`,
 			{ page: 1, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
 				const connections = [] as ChanConnection[];
 				r.data.forEach((connection: ChanConnection) => {
 					if (connection.user.id === store.chat.me.id) {
-						store.chat.updateMyRole(connection.role);
+						store.channel.setCurrentRole(connection.role);
 					}
 					connections.push(connection);
 				});
@@ -57,14 +53,35 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 	}
 
 	@Action
+	async retrieveMyConnections() {
+		await Vue.prototype.api.get(
+			"/users/" + (await store.chat.me.id) + "/chan_connections",
+			{ page: 1, per_page: 100 },
+			(r: { data: ChanConnection[] }) => {
+				store.channel.setMyChannels([] as Channel[]);
+				for (const connection of r.data) {
+					store.channel.pushMyChannels(connection.channel);
+				}
+			},
+		);
+	}
+
+	@Action
 	async retrieveChanConnection(id: number) {
-		await Vue.prototype.api.get(`/chanConnections/${id}`, {}, async (r: { data: ChanConnection }) => {
+		await Vue.prototype.api.get(`/connections/${id}`, {}, async (r: { data: ChanConnection }) => {
 			await this.pushChanConnection(r.data);
 		});
 	}
 
 	@Action
-	async updateChanConnection(connection: PartialConnection<ChanConnection>) {
+	async retrieveMyConnection(id: number) {
+		await Vue.prototype.api.get(`/connections/${id}`, {}, async (r: { data: ChanConnection }) => {
+			await store.channel.pushMyChannels(r.data.channel);
+		});
+	}
+
+	@Action
+	async updateChanConnection(connection: DeepPartial<ChanConnection>) {
 		await Vue.prototype.api.put(`/connections/${connection.id}`, connection, {}, (r: { data: ChanConnection }) => {
 			this.pushChanConnection(r.data);
 		});
