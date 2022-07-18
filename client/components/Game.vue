@@ -103,8 +103,8 @@ class Player {
 				if (this.vel.x + this.acc <= this.minmaxVel.z) this.vel.x += this.acc;
 			}
 			if (!vkUp && !vkDown) {
-				this.vel.y = this.minmaxVel.y;
-				this.vel.x = this.minmaxVel.x;
+				this.vel.y = 0;
+				this.vel.x = 0;
 			} else {
 				this.speed = 7;
 			}
