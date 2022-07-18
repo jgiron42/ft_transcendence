@@ -184,7 +184,7 @@ class Ball {
 			part = 1;
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
 		if (part === 0) this.dir.y = -1 * this.speed;
-		else if (part === 1) this.dir.y = 0;
+		else if (part === 1) {this.dir.y = 0;this.dir.x = -this.minspd}
 		else this.dir.y = this.speed;
 	}
 
@@ -198,8 +198,8 @@ class Ball {
 		)
 			part = 1;
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
-		if (part === 0) this.dir.y = -1 * this.speed;
-		else if (part === 1) this.dir.y = 0;
+		if (part === 0) this.dir.y = -this.speed;
+		else if (part === 1) {this.dir.y = 0;this.dir.x = this.minspd;}
 		else this.dir.y = this.speed * pad.vel.y;
 	}
 
