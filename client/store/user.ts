@@ -12,9 +12,16 @@ export default class UserStore extends VuexModule implements IUserStore {
 
 	@Action
 	async getUser() {
-		await Vue.prototype.api.get("/me", undefined, (r: { data: User }) => {
-			this.updateMe(r.data);
-		});
+		await Vue.prototype.api.get(
+			"/me",
+			undefined,
+			(r: { data: User }) => {
+				this.updateMe(r.data);
+			},
+			() => {
+				this.updateMe(new User());
+			},
+		);
 	}
 
 	@Mutation

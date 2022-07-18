@@ -19,6 +19,7 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
+		this.api.get("/me");
 		const redirect = this.$route.query.redirect;
 		if (redirect) {
 			this.path += redirect;

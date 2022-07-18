@@ -26,6 +26,7 @@ export default {
 		{ src: "@/plugins/vue-js-modal", mode: "client" },
 		{ src: "@/plugins/api.plugin", mode: "client" },
 		{ src: "@/plugins/socketManager", mode: "client" },
+		{ src: "@/plugins/alert.plugin", mode: "client" },
 	],
 
 	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -42,7 +43,7 @@ export default {
 	css: ["~/layouts/global.css"],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
-	modules: ["cookie-universal-nuxt", "nuxt-socket-io"],
+	modules: ["cookie-universal-nuxt", "nuxt-socket-io", "@nuxtjs/axios"],
 
 	io: {
 		sockets: [
