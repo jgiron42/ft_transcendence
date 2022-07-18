@@ -327,15 +327,15 @@ export default Vue.extend({
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
 					this.ball.dir.y = 1;
-					if (this.ball.dir.x < 0) this.ball.dir.x = -5;
-					else this.ball.dir.x = 5;
+					if (this.ball.dir.x < 0) this.ball.dir.x = -this.ball.dir.x;
 					this.ball.dir.x = 5;
 					this.ball.speed = 5;
 				} else if (this.ball.pos.x + this.ball.dir.x >= this.res.x) {
 					this.score_p1 += 1;
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
-					if (this.ball.dir.x < 0) this.ball.dir.x = -5;
+					if (this.ball.dir.x > 0)
+						this.ball.dir.x = -this.ball.dir.x;
 					else this.ball.dir.x = 5;
 					this.ball.dir.y = -1;
 					this.ball.speed = 5;
