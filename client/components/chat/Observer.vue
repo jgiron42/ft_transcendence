@@ -6,6 +6,12 @@
 import Vue from "vue";
 
 export default Vue.extend({
+	props: {
+		name: {
+			type: String,
+			default: () => "",
+		},
+	},
 	data: () => ({
 		observer: new IntersectionObserver(() => {}),
 	}),
@@ -16,9 +22,11 @@ export default Vue.extend({
 			}
 		});
 		this.observer.observe(this.$el);
-		this.$nuxt.$on("refresh-observer", () => {
-			this.observer.unobserve(this.$el);
-			this.observer.observe(this.$el);
+		this.$nuxt.$on("refresh-observer", (s: String = "") => {
+			if (s === this.name) {
+				this.observer.unobserve(this.$el);
+				this.observer.observe(this.$el);
+			}
 		});
 	},
 	destroyed() {
