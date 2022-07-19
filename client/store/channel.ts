@@ -85,12 +85,13 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 			`/channels/${chan.id}/join`,
 			{},
 			{ password: chan.password },
-			(r = { data: new ChanConnection() }) => {
+			async (r = { data: new ChanConnection() }) => {
 				if (r.data.role === ChannelRole.BANNED) return;
 				this.setCurrentConnection(r.data);
 				Vue.prototype.$socket.getSocket()?.emit("JC", chan.id);
 				store.connection.retrieveChanConnections();
 				store.connection.pushChanConnection(r.data);
+				await store.message.setMessages([]);
 				this.pushMyChannels(chan);
 			},
 		);

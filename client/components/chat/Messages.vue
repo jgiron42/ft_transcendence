@@ -1,5 +1,6 @@
 <template>
 	<div id="messages">
+		<Observer @intersect="intersected" />
 		<div v-for="(message, index) of messages" :key="message.id" class="message-content">
 			<div v-if="index === 0 || messages[index - 1].user.id != message.user.id" class="message-header">
 				<span v-if="(message.user.id === me.id) != true && message.user.id.length > 0" class="message-author">
@@ -21,19 +22,34 @@ import { store } from "@/store";
 
 export default Vue.extend({
 	name: "Messages",
-	data() {
-		return {
-			get messages() {
-				return store.message.messages;
-			},
-			get me() {
-				return store.user.me;
-			},
-		};
+	data: () => ({
+		get currentChannel() {
+			return store.channel.currentChannel.channel;
+		},
+		get messages() {
+			return store.message.messages;
+		},
+		get me() {
+			return store.user.me;
+		},
+	}),
+	mounted() {
+		store.message.setMessages([]);
+		this.$nuxt.$on("JoinedChannel", () => this.$nuxt.$emit("refresh-observer"));
 	},
 	destroyed() {
-		this.$nuxt.$off("JC");
 		this.$nuxt.$off("MSG");
+		this.$nuxt.$off("JC");
+	},
+	methods: {
+		async intersected() {
+			const oldLength = this.messages.length;
+			await store.message.retrieveMessages(this.currentChannel.id);
+			const length = this.messages.length;
+			if (oldLength < length) {
+				this.$nuxt.$emit("refresh-observer");
+			}
+		},
 	},
 });
 </script>

@@ -16,8 +16,6 @@ import { SocketService } from "@services/socket.service";
 import { ChannelService } from "@services/channel.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
 import { Channel } from "@entities/channel.entity";
-import { MessageService } from "@services/message.service";
-import { Message } from "@entities/message.entity";
 
 @WebSocketGateway({
 	namespace: "chat",
@@ -30,7 +28,6 @@ import { Message } from "@entities/message.entity";
 export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 	constructor(
 		private readonly userService: UserService,
-		private messageService: MessageService,
 		private socketService: SocketService,
 		private channelService: ChannelService,
 		private chanConnectionService: ChanConnectionService,
@@ -88,13 +85,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 			await this.leaveChannel(client);
 			this.channelMap.set(client.id, chan);
 			await client.join(chan.name);
-			const messages = await this.messageService
-				.getQuery()
-				.see_message(client.session.sessionUser.id)
-				.channel(chan.id)
-				.getMany();
-			messages.sort((a: Message, b: Message): number => a.created_at.getTime() - b.created_at.getTime());
-			client.emit("JC", messages);
+			client.emit("JoinedChannel", chan_id);
 		}
 	}
 

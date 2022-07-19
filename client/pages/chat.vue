@@ -137,10 +137,7 @@ export default Vue.extend({
 				store.message.retrieveMessage(message.id);
 			}
 		});
-		this.socket.on("JC", (messages: Message[]) => {
-			store.message.setMessages(messages);
-		});
-
+		this.socket.on("JoinedChannel", (id: number) => this.$nuxt.$emit("JoinedChannel", id));
 		// Nuxt events
 		this.$nuxt.$on("updateChannels", () => {
 			this.updateChannels();
