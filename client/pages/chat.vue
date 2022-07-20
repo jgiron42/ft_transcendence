@@ -94,7 +94,9 @@ export default Vue.extend({
 		this.socket.on("addRelation", (rel: Relation) => {
 			store.relation.retrieveRelation(rel.id);
 			if (rel.type === RelationType.BLOCK && this.isOnChannel) {
-				this.socket.emit("JC", this.currentChannel.id);
+				store.message.setMessages([]);
+				store.message.retrieveMessages(this.currentChannel.id);
+				this.$nuxt.$emit("refresh-observer", "messages");
 			}
 		});
 		this.socket.on("updateRelation", (rel: Relation) => {
@@ -103,7 +105,9 @@ export default Vue.extend({
 		this.socket.on("removeRelation", (rel: Relation) => {
 			store.relation.removeRelation(rel);
 			if (rel.type === RelationType.BLOCK && this.isOnChannel) {
-				this.socket.emit("JC", this.currentChannel.id);
+				store.message.setMessages([]);
+				store.message.retrieveMessages(this.currentChannel.id);
+				this.$nuxt.$emit("refresh-observer", "messages");
 			}
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
