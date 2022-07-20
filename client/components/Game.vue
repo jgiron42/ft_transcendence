@@ -407,11 +407,11 @@ export default Vue.extend({
 				this.ctx.fillRect(10, 10, this.res.x - 20, this.res.y - 20);
 				this.ctx.fillStyle = "#ffffff";
 				this.ctx.font = "100px roboto";
-				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - this.res.x / 4 - 25, 200);
-				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + this.res.x / 4 - 25, 200);
+				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - this.res.x / 4 - 25, this.res.y / 2);
+				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + this.res.x / 4 - 25, this.res.y / 2);
 				for (let i = 0; i < this.res.y / 2; i++) {
 					if (i % 2) {
-						this.ctx.fillRect(this.res.x / 2, i * 20, 10, 20);
+						this.ctx.fillRect(this.res.x / 2, i * 20, this.res.y / 30, this.res.y / 16);
 					}
 				}
 			}
