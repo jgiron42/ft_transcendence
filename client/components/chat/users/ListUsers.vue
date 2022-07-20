@@ -7,7 +7,7 @@
 				class="user-button cut-text btn text-left"
 				@click="select(connection)"
 			>
-				<b>{{ connection.user.usernae }}</b>
+				<b>{{ connection.user.username }}</b>
 			</button>
 			<button
 				v-else
