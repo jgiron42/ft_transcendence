@@ -116,6 +116,10 @@ class Player {
 		}
 	}
 
+	updatedPos(x: number) {
+		this.pos.x = x;
+	}
+
 	draw(ctx: CanvasRenderingContext2D) {
 		ctx.beginPath();
 		ctx.rect(this.pos.x + 2, this.pos.y + 2, this.size.x, this.size.y);
@@ -313,7 +317,14 @@ export default Vue.extend({
 		},
 		redraw() {
 			// render
-			if (this.ctx && this.players) {
+			if (this.ctx && this.players && this.res && this.canvas) {
+				// Make canvas responsive
+				if (window.innerWidth < window.innerHeight) {
+					this.canvas.width = window.innerWidth * 0.8;
+    				this.canvas.height = window.innerWidth * 0.6;
+					this.res.x = this.canvas.width;
+					this.res.y = this.canvas.height;
+				}
 				this.clear();
 				this.ball.draw(this.ctx);
 				this.players[0].draw(this.ctx);
@@ -346,6 +357,8 @@ export default Vue.extend({
 		update() {
 			// update
 			if (this.res && this.players) {
+				this.players[0].updatedPos(this.res.x / 10 - this.players[0].size.x);
+				this.players[1].updatedPos(this.res.x - this.res.x / 10);
 				this.scorePoint();
 
 				// If in menu, p1 follow ball else move on input
@@ -422,7 +435,7 @@ export default Vue.extend({
 			else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = false;
 			else if (event.keyCode === 83) this.p1Up = false;
 			else if (event.keyCode === 87) this.p1Down = false;
-		},
+		}
 	},
 });
 </script>
