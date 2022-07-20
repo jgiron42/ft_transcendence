@@ -70,7 +70,7 @@ export default Vue.extend({
 		initialiseStores(this.$store);
 	},
 	mounted() {
-		if (this.currentChannel !== undefined) {
+		if (Object.keys(this.currentChannel).length !== 0) {
 			this.socket.emit("JC", this.currentChannel.id);
 		}
 		if (this.socket.connected) {
