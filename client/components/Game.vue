@@ -371,9 +371,9 @@ export default Vue.extend({
 						this.p1Pressed,
 					);
 				} else {
-					if (this.ball.pos.y < this.players[0].pos.y)
+					if (this.ball.pos.y + this.ball.dir.y < this.players[0].pos.y)
 						this.players[0].update (true, false, this.res, false, false);
-					else
+					else if (this.ball.pos.y + this.ball.dir.y > this.players[0].pos.y + this.players[0].size.y)
 						this.players[0].update (false, true, this.res, false, false);
 				}
 				// 	player 2 inputs
@@ -384,9 +384,9 @@ export default Vue.extend({
 						// get p2 inputs from server
 					}
 				} else {
-					if (this.ball.pos.y < this.players[1].pos.y)
+					if (this.ball.pos.y + this.ball.dir.y < this.players[1].pos.y)
 						this.players[1].update (true, false, this.res, false, false);
-					else
+					else if (this.ball.pos.y + this.ball.dir.y > this.players[1].pos.y + this.players[1].size.y)
 						this.players[1].update (false, true, this.res, false, false);
 				}
 				// Update ball
