@@ -189,8 +189,10 @@ class Ball {
 			part = 1;
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
 		if (part === 0) this.dir.y = -1 * this.speed;
-		else if (part === 1) {this.dir.y = 0;this.dir.x = -this.minspd}
-		else this.dir.y = this.speed;
+		else if (part === 1) {
+			this.dir.y = 0;
+			this.dir.x = -this.minspd;
+		} else this.dir.y = this.speed;
 	}
 
 	leftVerticalCol(pad: Player) {
@@ -204,8 +206,10 @@ class Ball {
 			part = 1;
 		else if (this.pos.y + this.dir.y + this.size.x >= pad.pos.y + (2 * pad.size.y) / 3) part = 2;
 		if (part === 0) this.dir.y = -this.speed;
-		else if (part === 1) {this.dir.y = 0;this.dir.x = this.minspd;}
-		else this.dir.y = this.speed * pad.vel.y;
+		else if (part === 1) {
+			this.dir.y = 0;
+			this.dir.x = this.minspd;
+		} else this.dir.y = this.speed * pad.vel.y;
 	}
 
 	topHorizontalCol(pad: Player) {
@@ -321,7 +325,7 @@ export default Vue.extend({
 				// Make canvas responsive
 				if (window.innerWidth < window.innerHeight) {
 					this.canvas.width = window.innerWidth * 0.8;
-    				this.canvas.height = window.innerWidth * 0.6;
+					this.canvas.height = window.innerWidth * 0.6;
 					this.res.x = this.canvas.width;
 					this.res.y = this.canvas.height;
 				}
@@ -346,8 +350,7 @@ export default Vue.extend({
 					this.score_p1 += 1;
 					this.ball.pos.x = this.res.x / 2;
 					this.ball.pos.y = this.res.y / 2;
-					if (this.ball.dir.x > 0)
-						this.ball.dir.x = -this.ball.dir.x;
+					if (this.ball.dir.x > 0) this.ball.dir.x = -this.ball.dir.x;
 					else this.ball.dir.x = 5;
 					this.ball.dir.y = -1;
 					this.ball.speed = 5;
@@ -370,12 +373,10 @@ export default Vue.extend({
 						this.menuid === 2 || this.menuid === 3,
 						this.p1Pressed,
 					);
-				} else {
-					if (this.ball.pos.y + this.ball.dir.y < this.players[0].pos.y)
-						this.players[0].update (true, false, this.res, false, false);
-					else if (this.ball.pos.y + this.ball.dir.y > this.players[0].pos.y + this.players[0].size.y)
-						this.players[0].update (false, true, this.res, false, false);
-				}
+				} else if (this.ball.pos.y + this.ball.dir.y < this.players[0].pos.y)
+					this.players[0].update(true, false, this.res, false, false);
+				else if (this.ball.pos.y + this.ball.dir.y > this.players[0].pos.y + this.players[0].size.y)
+					this.players[0].update(false, true, this.res, false, false);
 				// 	player 2 inputs
 				if (this.menuid !== 4) {
 					if (this.menuid === 1 || this.menuid === 3) {
@@ -383,12 +384,10 @@ export default Vue.extend({
 					} else {
 						// get p2 inputs from server
 					}
-				} else {
-					if (this.ball.pos.y + this.ball.dir.y < this.players[1].pos.y)
-						this.players[1].update (true, false, this.res, false, false);
-					else if (this.ball.pos.y + this.ball.dir.y > this.players[1].pos.y + this.players[1].size.y)
-						this.players[1].update (false, true, this.res, false, false);
-				}
+				} else if (this.ball.pos.y + this.ball.dir.y < this.players[1].pos.y)
+					this.players[1].update(true, false, this.res, false, false);
+				else if (this.ball.pos.y + this.ball.dir.y > this.players[1].pos.y + this.players[1].size.y)
+					this.players[1].update(false, true, this.res, false, false);
 				// Update ball
 				this.ball.update(this.res, this.players);
 			}
@@ -435,7 +434,7 @@ export default Vue.extend({
 			else if (event.key === "Down" || event.key === "ArrowDown") this.vkDown = false;
 			else if (event.keyCode === 83) this.p1Up = false;
 			else if (event.keyCode === 87) this.p1Down = false;
-		}
+		},
 	},
 });
 </script>
