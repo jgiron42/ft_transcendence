@@ -3,7 +3,6 @@ import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import { ChanConnection } from "@/models/ChanConnection";
 import { store } from "@/store";
 import { DeepPartial } from "@/types/partial";
-import { Channel } from "@/models/Channel";
 
 export interface IConnectionStore {
 	chanConnections: Array<ChanConnection>;
@@ -29,38 +28,46 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 	}
 
 	@Mutation
+	pushChanConnectionFront(connections: ChanConnection[]) {
+		this.chanConnections = connections.concat(this.chanConnections);
+	}
+
+	@Mutation
 	removeChanConnection(chanConnection: ChanConnection) {
 		this.chanConnections = this.chanConnections.filter((m) => m.id !== chanConnection.id);
 	}
 
 	@Action
-	async retrieveChanConnections() {
+	async retrieveChanConnections(page = 1) {
 		if (store.channel.currentChannel.channel?.name === undefined) return;
+		if (page === 1) this.setChanConnections([]);
 		await Vue.prototype.api.get(
 			`/channels/${store.channel.currentChannel.channel.id}/chan_connections`,
-			{ page: 1, per_page: 100 },
+			{ page, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
-				const connections = [] as ChanConnection[];
-				r.data.forEach((connection: ChanConnection) => {
-					if (connection.user.id === store.user.me.id) {
-						store.channel.setCurrentRole(connection.role);
-					}
-					connections.push(connection);
-				});
-				this.setChanConnections(connections);
+				const connections = r.data;
+				const myConnection = r.data.find((c) => c.user.id === store.user.me.id);
+				if (myConnection) {
+					store.channel.setCurrentRole(myConnection.role);
+				}
+				this.pushChanConnectionFront(connections);
+				if (connections.length === 100) {
+					this.retrieveChanConnections(page + 1);
+				}
 			},
 		);
 	}
 
 	@Action
-	async retrieveMyConnections() {
+	async retrieveMyConnections(page = 1) {
+		if (page === 1) store.channel.setMyChannels([]);
 		await Vue.prototype.api.get(
 			"/users/" + (await store.user.me.id) + "/chan_connections",
-			{ page: 1, per_page: 100 },
+			{ page, per_page: 100 },
 			(r: { data: ChanConnection[] }) => {
-				store.channel.setMyChannels([] as Channel[]);
-				for (const connection of r.data) {
-					store.channel.pushMyChannels(connection.channel);
+				store.channel.pushMyChannelsFront(r.data.map((c) => c.channel));
+				if (r.data.length === 100) {
+					this.retrieveMyConnections(page + 1);
 				}
 			},
 		);

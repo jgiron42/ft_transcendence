@@ -107,7 +107,9 @@ export default Vue.extend({
 			}
 		});
 		this.socket.on("newConnection", (connection: ChanConnection) => {
-			store.connection.retrieveChanConnection(connection.id);
+			if (connection.user.id !== store.user.me.id) {
+				store.connection.retrieveChanConnection(connection.id);
+			}
 		});
 		this.socket.on("newDm", (connection: ChanConnection) => {
 			store.channel.pushMyChannels(connection.channel);
@@ -150,9 +152,7 @@ export default Vue.extend({
 		async updateChannels() {
 			await store.channel.retrieveChannels();
 			await store.connection.retrieveMyConnections();
-			await store.connection.retrieveChanConnections();
 			await store.relation.retrieveRelations();
-			await store.invitation.retrieveInvitations();
 		},
 		onShowChannels() {
 			if (this.$device.isMobile) {

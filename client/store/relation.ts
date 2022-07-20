@@ -17,6 +17,11 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 	}
 
 	@Mutation
+	pushFront(relations: Relation[]) {
+		this.relations = relations.concat(this.relations);
+	}
+
+	@Mutation
 	async pushRelation(relation: Relation) {
 		const index = this.relations.findIndex((r) => r.id === relation.id);
 		if (index !== -1) {
@@ -32,13 +37,15 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 	}
 
 	@Action
-	async retrieveRelations() {
-		await Vue.prototype.api.get("/relations", { page: 1, per_page: 100 }, (r: { data: Relation[] }) => {
-			const relations = [] as Relation[];
-			r.data.forEach(async (relation: Relation) => {
-				await relations.push(relation);
-			});
-			this.setRelations(relations);
+	async retrieveRelations(page = 1) {
+		if (page === 1) {
+			this.setRelations([]);
+		}
+		await Vue.prototype.api.get("/relations", { page, per_page: 100 }, (r: { data: Relation[] }) => {
+			this.pushFront(r.data);
+			if (r.data.length === 100) {
+				this.retrieveRelations(page + 1);
+			}
 		});
 	}
 

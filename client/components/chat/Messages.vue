@@ -34,12 +34,11 @@ export default Vue.extend({
 		},
 	}),
 	mounted() {
-		store.message.setMessages([]);
-		this.$nuxt.$on("JoinedChannel", () => this.$nuxt.$emit("refresh-observer", "messages"));
+		this.$nuxt.$on("JoinedChannel", () => this.intersected());
 	},
 	destroyed() {
 		this.$nuxt.$off("MSG");
-		this.$nuxt.$off("JC");
+		this.$nuxt.$off("JoinedChannel");
 	},
 	methods: {
 		async intersected() {

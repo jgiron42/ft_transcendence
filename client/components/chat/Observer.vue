@@ -31,6 +31,7 @@ export default Vue.extend({
 	},
 	destroyed() {
 		this.observer.disconnect();
+		this.$nuxt.$off("refresh-observer");
 	},
 });
 </script>

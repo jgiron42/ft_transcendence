@@ -20,8 +20,8 @@ export default class MessageStore extends VuexModule implements IMessageStore {
 	}
 
 	@Mutation
-	pushFrontMessages(messages: Message[]) {
-		this.messages = [...messages, ...this.messages];
+	pushFront(messages: Message[]) {
+		this.messages = messages.concat(this.messages);
 	}
 
 	@Mutation
@@ -61,17 +61,17 @@ export default class MessageStore extends VuexModule implements IMessageStore {
 		this.updateLoadMessagePromise(
 			this.loadMessagePromise.then(async () => {
 				let date = new Date(Date.now());
-				if (store.message.messages.length > 0) {
-					date = store.message.messages[0].created_at;
+				if (this.messages.length > 0) {
+					date = this.messages[0].created_at;
 				}
 				await Vue.prototype.api.get(
 					`/channels/${chanId}/messages`,
-					{ date, per_page: 10 },
+					{ date, per_page: 5 },
 					(response: { data: Message[] }) => {
 						const messages = response.data.sort(
 							(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
 						);
-						store.message.pushFrontMessages(messages);
+						this.pushFront(messages);
 					},
 				);
 				return Promise.resolve();

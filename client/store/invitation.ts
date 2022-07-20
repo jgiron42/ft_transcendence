@@ -28,20 +28,23 @@ export default class InvitationStore extends VuexModule implements IInvitationSt
 	}
 
 	@Mutation
+	pushFront(invitations: ChanInvitation[]) {
+		this.chanInvitations = invitations.concat(this.chanInvitations);
+	}
+
+	@Mutation
 	removeInvitation(invitation: ChanInvitation) {
 		this.chanInvitations = this.chanInvitations.filter((m) => m.id !== invitation.id);
 	}
 
 	@Action
-	async retrieveInvitations() {
-		await Vue.prototype.api.get("/invitations", { page: 1, per_page: 100 }, (r: { data: ChanInvitation[] }) => {
-			const invitations = [] as ChanInvitation[];
-			r.data.forEach(async (invitation: ChanInvitation) => {
-				if (invitation.invited_by.id !== store.user.me.id) {
-					await invitations.push(invitation);
-				}
-			});
-			this.setInvitations(invitations);
+	async retrieveInvitations(page = 1) {
+		if (page === 1) this.setInvitations([]);
+		await Vue.prototype.api.get("/invitations", { page, per_page: 100 }, (r: { data: ChanInvitation[] }) => {
+			this.pushFront(r.data.filter((invitation) => invitation.invited_by.id !== store.user.me.id));
+			if (r.data.length === 100) {
+				this.retrieveInvitations(page + 1);
+			}
 		});
 	}
 

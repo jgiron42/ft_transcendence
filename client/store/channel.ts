@@ -25,6 +25,11 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 	}
 
 	@Mutation
+	pushFront(channels: Channel[]) {
+		this.channels = channels.concat(this.channels);
+	}
+
+	@Mutation
 	setMyChannels(channels: Channel[]) {
 		this.myChannels = channels;
 	}
@@ -61,14 +66,23 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 	}
 
 	@Mutation
+	pushMyChannelsFront(channel: Channel[]) {
+		this.myChannels = channel.concat(this.myChannels);
+	}
+
+	@Mutation
 	removeChannel(channel: Channel) {
 		this.channels = this.channels.filter((m) => m.id !== channel.id);
 	}
 
 	@Action
-	async retrieveChannels() {
-		await Vue.prototype.api.get("/channels", { page: 1, per_page: 100 }, (r: { data: Channel[] }) => {
-			if (r.data instanceof Array) this.setChannels(r.data);
+	async retrieveChannels(page = 1) {
+		if (page === 1) this.setChannels([]);
+		await Vue.prototype.api.get("/channels", { page, per_page: 100 }, (r: { data: Channel[] }) => {
+			if (r.data instanceof Array) {
+				this.pushFront(r.data);
+				if (r.data.length === 100) this.retrieveChannels(page + 1);
+			}
 		});
 	}
 
@@ -90,7 +104,6 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 				this.setCurrentConnection(r.data);
 				Vue.prototype.$socket.getSocket()?.emit("JC", chan.id);
 				store.connection.retrieveChanConnections();
-				store.connection.pushChanConnection(r.data);
 				await store.message.setMessages([]);
 				this.pushMyChannels(chan);
 			},
