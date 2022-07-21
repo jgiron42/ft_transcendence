@@ -458,6 +458,9 @@ canvas {
 	padding: 0;
 	margin: auto;
 	display: block;
+	width: 80%;
+	height: 60%;
+	z-index: -1;
 }
 
 .game_bis {
