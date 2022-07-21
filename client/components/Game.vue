@@ -120,14 +120,14 @@ class Player {
 		this.pos.x = x;
 	}
 
-	draw(ctx: CanvasRenderingContext2D) {
+	draw(ctx: CanvasRenderingContext2D, unitx: number, unity: number) {
 		ctx.beginPath();
-		ctx.rect(this.pos.x + 2, this.pos.y + 2, this.size.x, this.size.y);
-		ctx.fillStyle = "#0000FF";
+		ctx.rect(this.pos.x + 2 + unitx, this.pos.y + 2 + unity, this.size.x, this.size.y);
+		ctx.fillStyle = "#FF11FF";
 		ctx.fill();
 		ctx.closePath();
 		ctx.beginPath();
-		ctx.rect(this.pos.x, this.pos.y, this.size.x, this.size.y);
+		ctx.rect(this.pos.x + unitx, this.pos.y + unity, this.size.x, this.size.y);
 		ctx.fillStyle = "#FFFFFF";
 		ctx.fill();
 		ctx.closePath();
@@ -165,14 +165,14 @@ class Ball {
 		}
 	}
 
-	draw(ctx: CanvasRenderingContext2D) {
+	draw(ctx: CanvasRenderingContext2D, unitx: number, unity: number) {
 		ctx.beginPath();
-		ctx.rect(this.pos.x + 2, this.pos.y + 2, this.size.x, this.size.x);
+		ctx.rect(this.pos.x + 2 + unitx, this.pos.y + 2 + unity, this.size.x, this.size.x);
 		ctx.fillStyle = "#0000FF";
 		ctx.fill();
 		ctx.closePath();
 		ctx.beginPath();
-		ctx.rect(this.pos.x, this.pos.y, this.size.x, this.size.x);
+		ctx.rect(this.pos.x + unitx, this.pos.y + unity, this.size.x, this.size.x);
 		ctx.fillStyle = "#FFFFFF";
 		ctx.fill();
 		ctx.closePath();
@@ -270,6 +270,8 @@ export default Vue.extend({
 	},
 	data: () => ({
 		ingame: false,
+		unitx: 0,
+		unity: 0,
 		canvas: null as HTMLCanvasElement | null,
 		ctx: null as CanvasRenderingContext2D | null,
 		interval: 5,
@@ -289,7 +291,6 @@ export default Vue.extend({
 		// Init Canvas and apply ratio
 		this.canvas = document.getElementById("game") as HTMLCanvasElement;
 		this.res = new Vector2D(this.canvas.width, this.canvas.height);
-
 		// Setup player's array
 		const p2 = new Player(this.res, this.res.x - this.res.x / 10);
 		const p1 = new Player(this.res, this.res.x / 10 - p2.size.x);
@@ -323,16 +324,20 @@ export default Vue.extend({
 			// render
 			if (this.ctx && this.players && this.res && this.canvas) {
 				// Make canvas responsive
-				if (window.innerWidth < window.innerHeight) {
+				if (this.canvas.width !== window.innerWidth * 0.8) {
+					this.unitx = this.canvas.width - window.innerWidth * 0.8;
 					this.canvas.width = window.innerWidth * 0.8;
-					this.canvas.height = window.innerWidth * 0.6;
-					this.res.x = this.canvas.width;
-					this.res.y = this.canvas.height;
 				}
+				if (this.canvas.height !== window.innerWidth * 0.6) {
+					this.unity = this.canvas.height - window.innerWidth * 0.6;
+					this.canvas.height = window.innerWidth * 0.6;
+				}
+				this.res.x = this.canvas.width;
+				this.res.y = this.canvas.height;
 				this.clear();
-				this.ball.draw(this.ctx);
-				this.players[0].draw(this.ctx);
-				this.players[1].draw(this.ctx);
+				this.ball.draw(this.ctx, this.unitx, this.unity);
+				this.players[0].draw(this.ctx, this.unitx, this.unity);
+				this.players[1].draw(this.ctx, this.unitx, this.unity);
 			}
 		},
 		// Check if ball oob & update score
@@ -398,7 +403,7 @@ export default Vue.extend({
 		},
 		// display background, playground and scores
 		clear() {
-			if (this.ctx && this.res) {
+			if (this.ctx && this.res && this.unitx && this.unity && this.canvas) {
 				this.ctx.beginPath();
 				this.ctx.fillStyle = "#ffffff";
 				this.ctx.fillRect(0, 0, this.res.x, this.res.y);
@@ -406,13 +411,9 @@ export default Vue.extend({
 				this.ctx.fillRect(10, 10, this.res.x - 20, this.res.y - 20);
 				this.ctx.fillStyle = "#ffffff";
 				this.ctx.font = "100px roboto";
-				this.ctx.fillText(String(this.score_p1), this.res.x / 2 - this.res.x / 4 - 25, this.res.y / 2);
-				this.ctx.fillText(String(this.score_p2), this.res.x / 2 + this.res.x / 4 - 25, this.res.y / 2);
-				for (let i = 0; i < this.res.y / 2; i++) {
-					if (i % 2) {
-						this.ctx.fillRect(this.res.x / 2, i * 20, this.res.y / 30, this.res.y / 16);
-					}
-				}
+				this.ctx.fillText(String(this.score_p1), this.canvas.width * 0.4 + this.unitx - 75, 10 + this.unity + 100);
+				this.ctx.fillText(String(this.score_p2), this.canvas.width * 0.6 + this.unitx + 25, 10 + this.unity + 100);
+				this.ctx.fillRect(this.res.x / 2, 0, this.res.y / 60, this.res.y);
 			}
 		},
 		// Event Handling
