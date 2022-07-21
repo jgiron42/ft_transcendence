@@ -92,6 +92,7 @@ class Player {
 	}
 
 	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D, gameMode: boolean, justPressed: boolean) {
+		this.size = new Vector2D(0.025 * res.y, 0.1 * res.y);
 		if (!gameMode) {
 			// Standard controls
 			if (vkUp && this.pos.y - this.speed > 40) {
@@ -155,6 +156,7 @@ class Ball {
 	}
 
 	update(res: Vector2D, players: Array<Player>) {
+		this.size = new Vector2D(0.02 * res.y, 0.02 * res.y);
 		if (this.pos.y + this.dir.y < 10 || this.pos.y + this.dir.y > res.y - this.size.x - 10)
 			this.dir.y = -this.dir.y;
 
@@ -324,13 +326,24 @@ export default Vue.extend({
 			// render
 			if (this.ctx && this.players && this.res && this.canvas) {
 				// Make canvas responsive
-				if (this.canvas.width !== window.innerWidth * 0.8) {
-					this.unitx = this.canvas.width - window.innerWidth * 0.8;
-					this.canvas.width = window.innerWidth * 0.8;
-				}
-				if (this.canvas.height !== window.innerWidth * 0.6) {
-					this.unity = this.canvas.height - window.innerWidth * 0.6;
-					this.canvas.height = window.innerWidth * 0.6;
+				if (window.innerWidth < window.innerHeight) {
+					if (this.canvas.width !== window.innerWidth * 0.8) {
+						this.unitx = -(this.canvas.width - window.innerWidth * 0.8);
+						this.canvas.width = window.innerWidth * 0.8;
+					}
+					if (this.canvas.height !== window.innerWidth * 0.6) {
+						this.unity = -(this.canvas.height - window.innerWidth * 0.6);
+						this.canvas.height = window.innerWidth * 0.6;
+					}
+				} else {
+					if (this.canvas.width !== window.innerHeight * 0.8) {
+						this.unitx = -(this.canvas.width - window.innerHeight * 0.8);
+						this.canvas.width = window.innerHeight * 0.8;
+					}
+					if (this.canvas.height !== window.innerHeight * 0.6) {
+						this.unity = -(this.canvas.height - window.innerHeight * 0.6);
+						this.canvas.height = window.innerHeight * 0.6;
+					}
 				}
 				this.res.x = this.canvas.width;
 				this.res.y = this.canvas.height;
