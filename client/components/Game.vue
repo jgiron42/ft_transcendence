@@ -435,9 +435,8 @@ canvas {
 	padding: 0;
 	margin: auto;
 	display: block;
-	width: 80%;
-	height: 60%;
 	z-index: -1;
+	width: 80%;
 	top: 20%;
 }
 
@@ -447,5 +446,6 @@ canvas {
 	display: grid;
 	align-content: center;
 	justify-content: center;
+	width: 80%;
 }
 </style>
