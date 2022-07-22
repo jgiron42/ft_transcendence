@@ -83,7 +83,7 @@ class Player {
 	acc: number;
 
 	constructor(res: Vector2D, x: number) {
-		this.size = new Vector2D(0.02 * res.y, 0.1 * res.y);
+		this.size = new Vector2D(0.01 * res.y, 0.1 * res.y);
 		this.pos = new Vector2D(x, res.y / 2 - 100 / 2);
 		this.minmaxVel = new Vector4D(1.0, 1.0, 3.0, 3.0);
 		this.speed = 7;
@@ -92,7 +92,6 @@ class Player {
 	}
 
 	update(vkUp: Boolean, vkDown: Boolean, res: Vector2D, gameMode: boolean, justPressed: boolean) {
-		this.size = new Vector2D(0.025 * res.y, 0.1 * res.y);
 		if (!gameMode) {
 			// Standard controls
 			if (vkUp && this.pos.y - this.speed > 40) {
@@ -439,6 +438,7 @@ canvas {
 	width: 80%;
 	height: 60%;
 	z-index: -1;
+	top: 20%;
 }
 
 .game_bis {
