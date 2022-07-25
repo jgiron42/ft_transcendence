@@ -1,10 +1,10 @@
 <template>
-	<li class="arrow-button" @click="onClick">
+	<div class="arrow-button" @click="onClick">
 		<div class="flex w-full">
 			<img src="~/assets/arrow-dropdown.svg" class="arrow-panel w-3" :class="selected ? 'arrow-selected' : ''" />
 			<b class="pl-1">{{ name }}</b>
 		</div>
-	</li>
+	</div>
 </template>
 
 <script>
