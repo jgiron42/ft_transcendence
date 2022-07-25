@@ -8,7 +8,6 @@ import { SocketService } from "@services/socket.service";
 export class ChannelSubscriber implements EntitySubscriberInterface<Channel> {
 	constructor(private readonly connection: Connection, private socketService: SocketService) {
 		this.connection.subscribers.push(this);
-		void this.socketService;
 	}
 
 	listenTo() {

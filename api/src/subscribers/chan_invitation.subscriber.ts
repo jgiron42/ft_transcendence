@@ -9,7 +9,6 @@ import { User } from "@entities/user.entity";
 export class ChanInvitationSubscriber implements EntitySubscriberInterface<ChanInvitation> {
 	constructor(private readonly connection: Connection, private socketService: SocketService) {
 		this.connection.subscribers.push(this);
-		void this.socketService;
 	}
 
 	listenTo() {

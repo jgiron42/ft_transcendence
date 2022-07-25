@@ -10,7 +10,6 @@ import { Channel, ChannelType } from "@entities/channel.entity";
 export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanConnection> {
 	constructor(private readonly connection: Connection, private socketService: SocketService) {
 		this.connection.subscribers.push(this);
-		void this.socketService;
 	}
 
 	listenTo() {
