@@ -10,7 +10,7 @@ import {
 	UseInterceptors,
 	UsePipes,
 } from "@nestjs/common";
-import { GameService } from "@services/game.service";
+import { StoredGameService } from "@services/stored-game.service";
 import { Game } from "@entities/game.entity";
 import { getValidationPipe } from "@utils/getValidationPipe";
 import { getPostPipeline } from "@utils/getPostPipeline";
@@ -31,7 +31,7 @@ import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 @UseInterceptors(CrudFilterInterceptor, PaginationInterceptor)
 @UseFilters(TypeormErrorFilter)
 export class GamesController {
-	constructor(private gameService: GameService) {}
+	constructor(private gameService: StoredGameService) {}
 
 	/**
 	 * get all games

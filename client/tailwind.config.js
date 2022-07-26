@@ -12,6 +12,7 @@ module.exports = {
 				design_dgray: "#292929",
 				design_black: "#1b1b1b",
 				design_white: "#ffffff",
+				design_mgray: "#1B1B1B",
 			},
 		},
 	},

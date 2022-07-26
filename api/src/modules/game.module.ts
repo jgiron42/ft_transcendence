@@ -1,16 +1,14 @@
-import { forwardRef, Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { AppController } from "@src/controllers/app.controller";
-import { Game } from "@src/entities/game.entity";
-import { GameService } from "@services/game.service";
-import { User } from "@entities/user.entity";
-import { UserModule } from "@modules/user.module";
-import { AuthModule } from "./auth.module";
+import { Module } from "@nestjs/common";
+import { GameGateway } from "@gateways/game.gateway";
+import { MessageModule } from "@modules/message.module";
+import { AuthService } from "@services/auth.service";
+import { GameService } from "@src/services/game.service";
+import { UserModule } from "./user.module";
+import { StoredGameModule } from "./stored-game.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Game, User]), forwardRef(() => AuthModule), forwardRef(() => UserModule)],
-	providers: [GameService],
-	controllers: [AppController],
-	exports: [GameService],
+	imports: [MessageModule, UserModule, StoredGameModule],
+	controllers: [],
+	providers: [GameGateway, AuthService, GameService],
 })
 export class GameModule {}

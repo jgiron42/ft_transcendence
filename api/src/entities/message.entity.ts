@@ -32,6 +32,12 @@ export class Message {
 	@SetMode("cru")
 	content: string;
 
+	// user who send the message
+	// @ManyToOne(() => User, (send_by) => send_by.id)
+	// send_by: User;
+	@Column()
+	send_by: string;
+
 	// date of the message
 	@Column()
 	@SetMode("r")

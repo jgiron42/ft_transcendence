@@ -6,6 +6,7 @@ import { Container } from "typedi";
 import { resourceService } from "@src/types/resource-service";
 import { UserQuery } from "@src/queries/userQuery";
 import { PaginatedResponse } from "@src/types/paginated-response";
+import { DeepPartial } from "typeorm/common/DeepPartial";
 
 @Injectable()
 export class UserService implements resourceService<User> {
@@ -35,8 +36,8 @@ export class UserService implements resourceService<User> {
 		await this.getQuery().remove(id);
 	}
 
-	async create(user: User) {
-		user = this.usersRepository.create(user);
+	async create(userPartial: DeepPartial<User>): Promise<User> {
+		const user: User = this.usersRepository.create(userPartial);
 		await this.usersRepository.insert(user);
 		return user;
 	}
@@ -46,6 +47,6 @@ export class UserService implements resourceService<User> {
 	}
 
 	update(id: string, user: User) {
-		return this.getQuery().update(id, user);
+		return this.getQuery().update(user, id);
 	}
 }

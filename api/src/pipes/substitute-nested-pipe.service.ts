@@ -11,7 +11,6 @@ import { resourceService } from "@src/types/resource-service";
 @Injectable()
 export class SubstituteNestedPipe<T> implements PipeTransform {
 	async transform(req: Request<T>) {
-		// console.log('before', req.value)
 		for (const key of Object.keys(req.value)) {
 			if (Reflect.hasMetadata("ftTypeService", req.value, key)) {
 				(req.value as unknown as Record<string, T>)[key] = await Container.get<resourceService<T>>(
@@ -24,7 +23,6 @@ export class SubstituteNestedPipe<T> implements PipeTransform {
 					);
 			} else (req.value as Record<string, unknown>)[key] = (req.value as Record<string, unknown>)[key];
 		}
-		// console.log('after', req.value)
 		return req;
 	}
 }

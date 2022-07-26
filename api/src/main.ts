@@ -5,11 +5,15 @@ import { AppModule } from "@modules/app.module";
 import helmet from "helmet";
 import morgan from "morgan";
 import config from "@config/api.config";
-import session from "express-session";
+import session, { MemoryStore } from "express-session";
+import { Container } from "typedi";
 import { useContainer } from "class-validator";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
+	const store = new MemoryStore();
+	Container.set("SessionStore", store);
+
 	// create upload dir if it doesn't exist
 	if (!existsSync(config.uploadsPath)) mkdirSync(config.uploadsPath);
 
@@ -19,9 +23,13 @@ import { useContainer } from "class-validator";
 	// Enable session
 	app.use(
 		session({
-			secret: "my-secret", // TODO: voir la doc
-			resave: false,
-			saveUninitialized: false,
+			store,
+			secret: config.sessionSecret, // TODO: voir la doc
+			resave: true,
+			saveUninitialized: true,
+			cookie: {
+				httpOnly: false,
+			},
 		}),
 	);
 

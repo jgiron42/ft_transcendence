@@ -1,0 +1,5 @@
+{
+    "maxDisconnectDuration": 5,
+    "maxGameDuration": 30,
+    "gameModes": ["regular", "flappy", "hardcore"]
+}

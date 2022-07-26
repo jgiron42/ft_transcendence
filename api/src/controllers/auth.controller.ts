@@ -6,7 +6,6 @@ import {
 	Redirect,
 	Req,
 	Session,
-	UseFilters,
 	UseGuards,
 	Request as RequestDecorator,
 } from "@nestjs/common";
@@ -15,39 +14,20 @@ import { SessionGuard } from "@guards/session.guard";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "@src/types/request.d";
 import { SessionT } from "@src/types/session";
-import { LoggedGuard } from "@guards/logged.guard";
-import { antiAuthFilter } from "@filters/antiAuth.filter";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
 import { DevelopmentGuard } from "@guards/development.guard";
+import config from "@config/api.config";
 
 @Controller("auth")
-@UseGuards(LoggedGuard)
-@UseFilters(antiAuthFilter)
 export class AuthController {
 	constructor(private authService: AuthService) {}
-
-	// TODO: Move to client
-	@Get()
-	login(): string {
-		return (
-			'<form action="/auth/42" method="POST">' +
-			'<label for="submit1">42 auth</label>' +
-			'<input type="submit" id="submit1" value="submit">' +
-			" </form>" +
-			'<form action="/auth/totp" method="POST">' +
-			'<label for="totp">totp auth</label>' +
-			'<input type="text" name="code" id="totp">' +
-			'<input type="submit" id="submit2" value="submit">' +
-			" </form>"
-		);
-	}
 
 	/**
 	 * route to logout a session
 	 */
 	@Post("logout")
 	@UseGuards(...SessionGuard)
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	logout(@Session() ses: SessionT) {
 		this.authService.logout(ses);
 	}
@@ -57,7 +37,7 @@ export class AuthController {
 	 */
 	@Post("42")
 	@UseGuards(AuthGuard("42"))
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	ftAuth() {
 		return "not reached";
 	}
@@ -67,10 +47,11 @@ export class AuthController {
 	 */
 	@Get("42")
 	@UseGuards(AuthGuard("42"))
-	@Redirect("/auth")
+	@Redirect(config.webroot)
 	callback(@Session() ses: Record<string, any>, @Req() req: Request) {
-		ses.user = req.user;
-		ses.ftIdentified = Date.now();
+		ses.sessionUser = req.user;
+		ses.lastAuthDateFT = Date.now();
+		return req.session;
 	}
 
 	/**
@@ -78,10 +59,10 @@ export class AuthController {
 	 * @apiParam {String} code the totp token
 	 */
 	@Post("totp")
-	@Redirect("/auth")
 	@UseGuards(SessionGuardFt, AuthGuard("totp"))
 	totpAuth(@Session() ses: Record<string, any>) {
-		ses.totpIdentified = true;
+		ses.isTOTPIdentified = true;
+		return ses;
 	}
 
 	/**

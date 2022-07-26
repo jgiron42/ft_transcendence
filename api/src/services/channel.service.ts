@@ -49,6 +49,7 @@ export class ChannelService {
 	}
 
 	create(channel: Channel): Promise<Channel> {
+		// this.socketService.sendMessage("updateChannels", null, "realm");
 		return this.save(this.ChannelRepository.create(channel));
 	}
 
@@ -57,6 +58,6 @@ export class ChannelService {
 	}
 
 	update(id: number, channel: Channel) {
-		return this.getQuery().update(id, channel);
+		return this.getQuery().update(channel, id);
 	}
 }

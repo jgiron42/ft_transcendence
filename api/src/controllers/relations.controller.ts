@@ -5,7 +5,6 @@ import {
 	Param,
 	ParseIntPipe,
 	Post,
-	Req,
 	UseFilters,
 	UseGuards,
 	UseInterceptors,
@@ -21,12 +20,12 @@ import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
-import { Request } from "@src/types/request";
 import { User } from "@entities/user.entity";
 import { ValidationError } from "@src/exceptions/validationError.exception";
 import { PaginatedResponse } from "@src/types/paginated-response";
 import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 import { DevelopmentGuard } from "@src/guards/development.guard";
+import { GetUser } from "@utils/get-user";
 
 @Controller("relations")
 @UseGuards(...SessionGuard)
@@ -42,17 +41,17 @@ export class RelationsController {
 	async getAll(
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Req() req: Request,
+		@GetUser() user: User,
 	): Promise<PaginatedResponse<Relation>> {
-		return await this.relationService.getReq().see_relation(req.user.id).paginate(page, per_page).getManyAndCount();
+		return await this.relationService.getQuery().see_relation(user.id).paginate(page, per_page).getManyAndCount();
 	}
 
 	/**
 	 * get the relation designated by id
 	 */
 	@Get(":id")
-	getOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
-		return this.relationService.getReq().see_relation(req.user.id).getOne(id);
+	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
+		return this.relationService.getQuery().see_relation(user.id).getOne(id);
 	}
 
 	/**
@@ -61,9 +60,8 @@ export class RelationsController {
 	@Post()
 	@UsePipes(getValidationPipe(Relation))
 	@UseGuards(DevelopmentGuard)
-	create(@MyRequestPipe(...getPostPipeline(Relation)) relation: Relation, @Req() req: Request) {
-		if ((relation.owner as User)?.id !== req.user.id)
-			throw new ValidationError("user must be in relation creation");
+	create(@MyRequestPipe(...getPostPipeline(Relation)) relation: Relation, @GetUser() user: User) {
+		if ((relation.owner as User)?.id !== user.id) throw new ValidationError("user must be in relation creation");
 		return this.relationService.create(relation);
 	}
 
@@ -71,19 +69,19 @@ export class RelationsController {
 	 * create the relation designated by id
 	 */
 	@Post(":id/accept_friend")
-	async accept(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
+	async accept(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
 		await this.relationService
-			.getReq()
-			.target(req.user.id)
+			.getQuery()
+			.target(user.id)
 			.type(RelationType.FRIEND_REQUEST)
-			.update(id, { type: RelationType.FRIEND });
+			.updateWithSave({ type: RelationType.FRIEND }, id);
 	}
 
 	/**
 	 * delete the relation designated by id
 	 */
 	@Delete(":id")
-	remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
-		return this.relationService.getReq().see_relation(req.user.id).remove(id);
+	async remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
+		return await this.relationService.getQuery().see_relation(user.id).remove(id);
 	}
 }

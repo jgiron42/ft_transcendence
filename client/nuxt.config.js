@@ -4,7 +4,7 @@ export default {
 		host: "0.0.0.0",
 	},
 	// Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-	ssr: false,
+	ssr: true,
 
 	// Global page headers: https://go.nuxtjs.dev/config-head
 	head: {
@@ -22,7 +22,11 @@ export default {
 	},
 
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-	plugins: [],
+	plugins: [
+		{ src: "@/plugins/vue-js-modal", mode: "client" },
+		{ src: "@/plugins/game-socket-manager", mode: "client" },
+		{ src: "@/plugins/axios", mode: "all" },
+	],
 
 	// Auto import components: https://go.nuxtjs.dev/config-components
 	components: true,
@@ -35,15 +39,39 @@ export default {
 		"@nuxtjs/stylelint-module",
 		// https://go.nuxtjs.dev/tailwindcss
 		"@nuxtjs/tailwindcss",
+		"@nuxtjs/device",
 	],
 
 	css: ["~/layouts/global.css"],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
-	modules: [],
+	modules: ["cookie-universal-nuxt", "nuxt-socket-io", "@nuxtjs/axios"],
 
-	io: {},
+	io: {
+		sockets: [
+			{
+				name: "matchmaking",
+				url: process.env.WSS_BASE_URL || "ws://localhost:3000",
+				default: true,
+			},
+		],
+	},
+
+	axios: {
+		withCredentials: true,
+	},
+	publicRuntimeConfig: {
+		ft_api: {
+			url:
+				process.env.API_URL ||
+				(process.browser ? `http://${window.location.hostname}:3000` : "http://localhost:3000"),
+		},
+	},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
 	build: {},
+
+	env: {
+		apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
+	},
 };
