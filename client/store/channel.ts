@@ -36,7 +36,7 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 
 	@Mutation
 	pushChannel(chan: Channel) {
-		const id = store.connection.chanConnections.findIndex((c: ChanConnection) => c.channel.id === chan.id);
+		const id = store.connection.chanConnections.findIndex((c: ChanConnection) => c.channel?.id === chan.id);
 		const vid = this.channels.findIndex((c: Channel) => c.id === chan.id);
 		if (id !== -1) {
 			const _id = this.myChannels.findIndex((c: Channel) => c.id === chan.id);
@@ -46,9 +46,13 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 			if (vid !== -1) {
 				this.channels.splice(vid, 1);
 			}
-			if (chan.type !== ChannelType.PRIVATE) {
+			if (
+				chan.type !== ChannelType.PRIVATE ||
+				store.connection.chanConnections.find(
+					(c: ChanConnection) => c.channel?.id === chan.id && c.user.id === store.user.me.id,
+				)
+			)
 				this.channels.push(chan);
-			}
 		}
 		if (chan.id === this.currentChannel.id) {
 			this.currentChannel.channel = chan;
