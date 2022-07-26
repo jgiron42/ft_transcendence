@@ -15,7 +15,7 @@ import {
 } from "@nestjs/common";
 import { UserService } from "@services/user.service";
 import { DevelopmentGuard } from "@src/guards/development.guard";
-import { GameService } from "@services/game.service";
+import { StoredGameService } from "@services/stored-game.service";
 import { RelationService } from "@services/relation.service";
 import { MessageService } from "@services/message.service";
 import { ChanConnectionService } from "@services/chan_connection.service";
@@ -25,7 +25,7 @@ import { getPutPipeline } from "@utils/getPutPipeline";
 import { getPostPipeline } from "@utils/getPostPipeline";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { SessionGuard } from "@guards/session.guard";
-import { Request, Request as MyRequest } from "@src/types/request";
+import { Request as MyRequest, Request } from "@src/types/request";
 import { SetGroupMappers } from "@utils/setGroupMappers";
 import { PerPage } from "@utils/PerPage";
 import { Page } from "@utils/Page";
@@ -38,6 +38,7 @@ import { Message } from "@entities/message.entity";
 import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
 import { Channel, ChannelType } from "@src/entities/channel.entity";
 import { ChannelService } from "@services/channel.service";
+import { GetUser } from "@utils/get-user";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import multer from "multer";
 import config from "@config/api.config";
@@ -48,14 +49,14 @@ import { Magic, MAGIC_MIME_TYPE } from "mmmagic";
 @UseGuards(...SessionGuard)
 @UseInterceptors(CrudFilterInterceptor, PaginationInterceptor)
 @SetGroupMappers({
-	own_user: (req: MyRequest<User>) => req.params?.id && req.user?.id === req.params?.id,
+	own_user: (req: MyRequest<User>) => req.params?.id && req.session.user?.id === req.params?.id,
 })
 @UseFilters(TypeormErrorFilter)
 export class UsersController {
 	constructor(
 		private channelService: ChannelService,
 		private userService: UserService,
-		private gameService: GameService,
+		private gameService: StoredGameService,
 		private relationService: RelationService,
 		private messageService: MessageService,
 		private chanConnectionService: ChanConnectionService,
@@ -82,8 +83,12 @@ export class UsersController {
 	 * edit the user designated by id
 	 */
 	@Put(":id")
-	async update(@Param("id") id: string, @MyRequestPipe(...getPutPipeline(User)) user: User, @Req() req: Request) {
-		await this.userService.getQuery().is(req.user.id).update(id, user);
+	async update(
+		@Param("id") id: string,
+		@MyRequestPipe(...getPutPipeline(User)) user: User,
+		@GetUser() requestUser: User,
+	) {
+		await this.userService.getQuery().is(requestUser.id).update(user, id);
 	}
 
 	/**
@@ -98,32 +103,43 @@ export class UsersController {
 	}
 
 	@Post(":id/invite_friend")
-	inviteFriend(@Param("id") id: string, @Req() req: Request): Promise<object> {
-		return this.relationService.create({ type: RelationType.FRIEND_REQUEST, owner: req.user, target: { id } });
+	async inviteFriend(@Param("id") id: string, @GetUser() user: User): Promise<object> {
+		if (
+			await this.relationService
+				.getQuery()
+				.in_relation(id)
+				.in_relation(user.id)
+				.type(RelationType.FRIEND)
+				.getOne()
+		)
+			throw new BadRequestException("Friendship already exists");
+		return this.relationService
+			.getQuery()
+			.findOrCreate({ type: RelationType.FRIEND_REQUEST, owner: { id: user.id }, target: { id } });
 	}
 
 	@Post(":id/block")
-	block(@Param("id") id: string, @Req() req: Request): Promise<object> {
-		return this.relationService.create({ type: RelationType.BLOCK, owner: req.user, target: { id } });
+	block(@Param("id") id: string, @GetUser() user: User): Promise<object> {
+		return this.relationService
+			.getQuery()
+			.findOrCreate({ type: RelationType.BLOCK, owner: { id: user.id }, target: { id } });
 	}
 
 	/**
 	 * get all games of an user
 	 */
 	@Get(":id/dm")
-	async dm(@Param("id") id: string, @Req() req: MyRequest): Promise<Channel> {
+	async dm(@Param("id") id: string, @GetUser() user: User): Promise<Channel> {
 		let chan = await this.channelService
 			.getQuery()
 			.on_channel(id)
-			.on_channel(req.user.id)
+			.on_channel(user.id)
 			.type(ChannelType.DM)
 			.getOne();
 		// if the chan does not exist yet, create it and put the users in it
 		if (!chan) {
-			chan = await this.channelService
-				.getQuery()
-				.create({ type: ChannelType.DM, name: `${req.user.id} - ${id}` });
-			await this.chanConnectionService.getQuery().create({ channel: chan, user: req.user });
+			chan = await this.channelService.getQuery().create({ type: ChannelType.DM, name: `${user.id} - ${id}` });
+			await this.chanConnectionService.getQuery().create({ channel: chan, user: { id: user.id } });
 			await this.chanConnectionService.getQuery().create({ channel: chan, user: { id } });
 		}
 		return chan;
@@ -147,13 +163,13 @@ export class UsersController {
 	@Get(":id/relations")
 	getRelations(
 		@Param("id") id: string,
-		@Req() req: Request,
+		@GetUser() user: User,
 		@Page() page: number,
 		@PerPage() per_page: number,
 	): Promise<PaginatedResponse<Relation>> {
 		return this.relationService
-			.getReq()
-			.in_relation(req.user.id)
+			.getQuery()
+			.in_relation(user.id)
 			.in_relation(id)
 			.paginate(page, per_page)
 			.getManyAndCount();
@@ -165,13 +181,13 @@ export class UsersController {
 	@Get(":id/chan_connections")
 	getChanConnections(
 		@Param("id") id: string,
-		@Req() req: Request,
+		@GetUser() user: User,
 		@Page() page: number,
 		@PerPage() per_page: number,
 	): Promise<PaginatedResponse<ChanConnection>> {
 		return this.chanConnectionService
 			.getQuery()
-			.see_connection(req.user.id)
+			.see_connection(user.id)
 			.user(id)
 			.paginate(page, per_page)
 			.getManyAndCount();
@@ -183,16 +199,11 @@ export class UsersController {
 	@Get(":id/messages")
 	getMessages(
 		@Param("id") id: string,
-		@Req() req: Request,
+		@GetUser() user: User,
 		@Page() page: number,
 		@PerPage() per_page: number,
 	): Promise<PaginatedResponse<Message>> {
-		return this.messageService
-			.getQuery()
-			.see_message(req.user.id)
-			.user(id)
-			.paginate(page, per_page)
-			.getManyAndCount();
+		return this.messageService.getQuery().see_message(user.id).user(id).paginate(page, per_page).getManyAndCount();
 	}
 
 	/**

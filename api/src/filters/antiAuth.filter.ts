@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, UnauthorizedException } from "@nestjs/common";
 import { Response } from "express";
 import config from "@config/api.config";
+
 /**
  * Redirects a client to the root page when it is authenticated and try accessing the login page
  */
@@ -11,6 +12,6 @@ export class antiAuthFilter implements ExceptionFilter {
 		const ctx = host.switchToHttp();
 		const response: Response = ctx.getResponse<Response>();
 		// Redirect user to the app root
-		response.redirect(config.baseUrl);
+		response.redirect(config.webroot);
 	}
 }

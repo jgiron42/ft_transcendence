@@ -1,20 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Channel } from "@entities/channel.entity";
 import { Expose } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
 //    This entity is use in order to know who have access to which channel
 
+export enum ChannelRole {
+	BANNED,
+	USER,
+	ADMIN,
+	OWNER,
+}
+
 @Entity()
 @Expose() // class-transformer
 @Unique("unique_connection", ["channel", "user"])
 export class ChanConnection {
-	constructor() {
-		this.role = 0;
-		this.muted = false;
-		this.created_at = new Date();
-	}
-
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -29,22 +30,22 @@ export class ChanConnection {
 	@SetMode("cru")
 	user: User;
 
-	// role of the user in the channel
-	@Column()
+	//  role of the user in the channel
+	@Column({
+		type: "enum",
+		enum: ChannelRole,
+		default: ChannelRole.USER,
+	})
 	@SetMode("cru")
-	role: number;
-
-	// use to know if the user is mute in the channel
-	@Column()
-	@SetMode("cru")
-	muted: boolean;
+	role: ChannelRole;
 
 	// date to know the end of the mute
-	@Column({ nullable: true })
+	@Column({ nullable: true, default: null })
 	@SetMode("cru")
 	mute_end: Date;
 
 	// date of the message
-	@Column()
+	@CreateDateColumn()
+	@SetMode("r")
 	created_at: Date;
 }

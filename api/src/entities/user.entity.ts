@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
 
@@ -11,6 +11,7 @@ export class User {
 		this.id = undefined;
 		this.nb_game = 0;
 		this.nb_win = 0;
+		this.nb_loss = 0;
 		this.totp_enabled = false;
 		this.totp_key = "";
 		this.status = 0;
@@ -25,33 +26,43 @@ export class User {
 	@SetMode("cru")
 	username: string;
 
+	// path to the avatar of the user
+	@Column({ default: "" })
+	@SetMode("cru")
+	image_url: string;
+
 	// number of game played by the user
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("r")
 	nb_game: number;
 
-	//  number of game played by the user
-	@Column()
+	//  number of game won by the user
+	@Column({ default: 0 })
 	@SetMode("r")
 	nb_win: number;
 
+	//  number of game loss by the user
+	@Column({ default: 0 })
+	@SetMode("r")
+	nb_loss: number;
+
 	// say if the user use OAuth or not
-	@Column()
+	@Column({ default: false })
 	@SetMode([["own_user", "r"], "cu"]) // class-transformer
 	totp_enabled: boolean;
 
 	// status of the user
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("cru")
 	status: number;
 
-	// totp key of the user
-	@Column({ length: 20 })
+	// totp key of the user in hexadecimal
+	@Column({ length: 40, default: "" })
 	@SetMode("cu")
 	totp_key: string;
 
 	// date of registration of the user
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }

@@ -20,9 +20,10 @@ module.exports = {
 				],
 			},
 		],
+		"block-no-empty": null,
+		"selector-id-pattern": null,
+		"selector-class-pattern": null,
 		"declaration-block-trailing-semicolon": null,
 		"no-descending-specificity": null,
-		"block-no-empty": null,
-		"selector-class-pattern": null, // Turned off CSS class nomenclature
 	},
 };

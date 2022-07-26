@@ -17,6 +17,6 @@ export class LoggedGuard implements CanActivate {
 			return true;
 		}
 		// Throw an HTTP 401 error
-		throw new UnauthorizedException({ statusCode: 401, error: "Unauthorized", reason: "already authenticated" });
+		throw new UnauthorizedException({ statusCode: 401, error: "Unauthorized1", reason: "already authenticated" });
 	}
 }

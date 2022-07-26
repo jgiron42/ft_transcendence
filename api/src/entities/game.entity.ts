@@ -16,7 +16,7 @@ export class Game {
 		this.user_one = new User();
 		this.user_two = new User();
 		this.finished = false;
-		this.type = 0;
+		this.type = "none";
 		this.created_at = new Date();
 	}
 
@@ -51,7 +51,7 @@ export class Game {
 	// type of game
 	@Column()
 	@SetMode("cr")
-	type: number;
+	type: string;
 
 	// status of the game
 	@Column()

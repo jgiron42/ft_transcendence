@@ -6,20 +6,22 @@ import { User } from "@entities/user.entity";
 import { UserModule } from "@modules/user.module";
 import { Relation } from "@entities/relation.entity";
 import { RelationModule } from "@modules/relation.module";
-import { GameModule } from "@modules/game.module";
+import { StoredGameModule } from "@modules/stored-game.module";
 import { Game } from "@entities/game.entity";
 import { Channel } from "@entities/channel.entity";
 import { ChannelModule } from "@modules/channel.module";
 import { Message } from "@entities/message.entity";
-import { MessageModule } from "@modules/message.module";
 import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
+import { GameModule } from "@modules/game.module";
+import { ScheduleModule } from "@nestjs/schedule";
 import { RelationsController } from "@controllers/relations.controller";
 import { MessagesController } from "@controllers/messages.controller";
 import { ChannelsController } from "@controllers/channels.controller";
 import { GamesController } from "@controllers/games.controller";
+import { MessageModule } from "./message.module";
 
 @Module({
 	imports: [
@@ -36,12 +38,14 @@ import { GamesController } from "@controllers/games.controller";
 		}),
 		UserModule,
 		RelationModule,
-		GameModule,
+		StoredGameModule,
 		ChannelModule,
-		MessageModule,
 		ChanConnectionModule,
 		ChanInvitationModule,
 		AuthModule,
+		GameModule,
+		ScheduleModule.forRoot(),
+		MessageModule,
 	],
 	controllers: [AppController, RelationsController, MessagesController, ChannelsController, GamesController],
 })

@@ -3,6 +3,12 @@ import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity
 import { EntityInterface } from "@src/types/entityInterface";
 import { PaginatedResponse } from "@src/types/paginated-response";
 import { DeepPartial } from "typeorm/common/DeepPartial";
+import { UpdateResult } from "typeorm/query-builder/result/UpdateResult";
+
+function* idGen(prefix = "id"): Generator<string, string, boolean> {
+	let i = 0;
+	while (true) if (!(yield `${prefix}${i}`)) i++;
+}
 
 /**
  * wrapper of Repository and SelectQueryBuilder Used to provide a better interface to typeorm. this class is specially
@@ -10,12 +16,39 @@ import { DeepPartial } from "typeorm/common/DeepPartial";
  */
 export class QueryCooker<Entity extends EntityInterface> {
 	private per_page: number;
+	private getid: Generator<string, string, boolean>;
 
-	constructor(private entityRepository: Repository<Entity>, public query: SelectQueryBuilder<Entity>) {}
+	protected get newId(): string {
+		return this.getid.next().value;
+	}
 
-	paginate(page = 1, itemByPage = 10) {
-		this.per_page = itemByPage;
-		this.query = this.query.skip((page - 1) * itemByPage).limit(itemByPage);
+	protected get currentId(): string {
+		// tell getid to reuse the same id
+		return this.getid.next(true).value;
+	}
+
+	constructor(
+		private entityRepository: Repository<Entity>,
+		public query: SelectQueryBuilder<Entity>,
+		private alias = "entity",
+	) {
+		this.getid = idGen("generatedId");
+	}
+
+	sort(sort: string, order?: "ASC" | "DESC", nulls?: "NULLS FIRST" | "NULLS LAST") {
+		this.query = this.query.orderBy(sort, order, nulls);
+	}
+
+	paginate(page: number | Date = 1, itemByPage = 10) {
+		if (page instanceof Date) {
+			this.per_page = itemByPage;
+			this.query = this.query
+				.andWhere(`${this.alias}.created_at < :cursor_date`, { cursor_date: page })
+				.take(itemByPage);
+		} else {
+			this.per_page = itemByPage;
+			this.query = this.query.skip((page - 1) * itemByPage).take(itemByPage);
+		}
 		return this;
 	}
 
@@ -39,15 +72,29 @@ export class QueryCooker<Entity extends EntityInterface> {
 		return this.query.getOneOrFail();
 	}
 
-	async update(id: Entity["id"], value: QueryDeepPartialEntity<Entity>) {
-		return this.entityRepository.update(await this.getOneOrFail(id), value);
+	async update(value: QueryDeepPartialEntity<Entity>, id?: Entity["id"]): Promise<UpdateResult> {
+		return this.entityRepository.update({ id: (await this.getOneOrFail(id)).id as Entity["id"] }, value);
+	}
+
+	async updateWithSave(value: QueryDeepPartialEntity<Entity>, id?: Entity["id"]): Promise<Entity> {
+		const val: Entity = await this.getOneOrFail(id);
+		Object.assign(val, value);
+		return this.entityRepository.save(val);
 	}
 
 	async create(value: DeepPartial<Entity>) {
 		return await this.entityRepository.save(this.entityRepository.create(value));
 	}
 
-	async remove(id: Entity["id"]) {
-		return this.entityRepository.remove(await this.getOneOrFail(id));
+	async findOrCreate(value: DeepPartial<Entity>) {
+		// TODO: redo this method
+		return (
+			(await this.entityRepository.findOneBy(value)) ??
+			(await this.entityRepository.save(this.entityRepository.create(value)))
+		);
+	}
+
+	async remove(id?: Entity["id"]) {
+		return await this.entityRepository.remove(await this.getOneOrFail(id));
 	}
 }

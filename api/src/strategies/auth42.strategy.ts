@@ -1,7 +1,7 @@
 import { Strategy } from "passport-42";
 import { PassportStrategy } from "@nestjs/passport";
 import { Injectable } from "@nestjs/common";
-import { sessionUser } from "@src/types/sessionuser";
+import { SessionUser } from "@src/types/sessionuser";
 import { ftProfile } from "@src/types/42Profile";
 import intraConfig from "@config/intra.config";
 import config from "@config/api.config";
@@ -24,9 +24,9 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 		accessToken: string,
 		refreshToken: string,
 		profile: ftProfile,
-		done: (error: string, user: sessionUser) => any,
+		done: (error: string, user: SessionUser) => any,
 	): any {
-		const user: sessionUser = {
+		const user: SessionUser = {
 			accessToken,
 			refreshToken,
 			id: profile.username,
