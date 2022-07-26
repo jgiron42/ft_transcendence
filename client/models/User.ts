@@ -3,7 +3,7 @@ import { Context } from "@nuxt/types";
 // User type declaration identical to API's one.
 export class User {
 	constructor() {
-		this.id = null;
+		this.id = "";
 		this.username = "";
 		this.image_url = "";
 		this.nb_game = 0;
@@ -15,7 +15,7 @@ export class User {
 		this.created_at = new Date();
 	}
 
-	id: number | string | null;
+	id: string;
 	username: string;
 	image_url: string;
 	nb_game: number;
@@ -86,7 +86,7 @@ export class UserSingleton {
 		const storedUser = this.user;
 
 		// Ensure stored user is valid, else fetch and return one from API
-		if (storedUser.id === null) return await this.fetch();
+		if (!storedUser.id) return await this.fetch();
 
 		// Return stored user
 		return this.user;
