@@ -25,7 +25,7 @@ class SocketHub extends Vue implements socketHubInterface {
 const SocketManager: Plugin = (context) => {
 	const socket = context.app.$nuxtSocket({
 		name: "chat",
-		channel: "/chat",
+		channel: "chat",
 		reconnection: true,
 		reconnectionAttempts: Infinity,
 		reconnectionDelay: 1000,
