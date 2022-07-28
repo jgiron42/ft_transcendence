@@ -19,19 +19,17 @@ server {
 		proxy_pass http://${CLIENT_HOST}:${CLIENT_PORT}/;
 	}
 
+	location /socket.io/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+		set $target  ${API_HOST}:${API_PORT};
+        proxy_pass http://$target/socket.io/$1$is_args$args;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+	}
+
 	location /api/ {
-		proxy_read_timeout     300s;
-		proxy_connect_timeout  300s;
-		proxy_set_header Host $host;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-F $remote_addr;
-
-		proxy_http_version 1.1;
-		proxy_set_header Upgrade "websocket";
-		proxy_set_header Connection "Upgrade";
-		proxy_set_header Sec-Websocket-Version 13;
-		proxy_set_header Connection "";
-
 		proxy_pass http://${API_HOST}:${API_PORT}/;
 	}
 
@@ -69,6 +67,16 @@ server {
 
 	location / {
 		proxy_pass http://${CLIENT_HOST}:${CLIENT_PORT}/;
+	}
+
+	location /socket.io/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+		set $target  ${API_HOST}:${API_PORT};
+        proxy_pass http://$target/socket.io/$1$is_args$args;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
 	}
 
 	location /api/ {

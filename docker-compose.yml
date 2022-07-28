@@ -57,11 +57,10 @@ services:
     pgadmin:
         image: dpage/pgadmin4
         environment:
-            - PGADMIN_DEFAULT_EMAIL=smaccary@student.42.fr
-            - PGADMIN_DEFAULT_PASSWORD=sonic
-        #     - PGADMIN_CONFIG_SERVER_MODE='False'
+            - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-smaccary@student.42.fr}
+            - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-sonic}
         volumes:
-            - ./pgadmin:/var/lib/pgadmin:rw
+            - ${PGADMIN_VOLUME_PATH:-./pgadmin}:/var/lib/pgadmin:rw
         expose:
             - 80
         depends_on: [db]

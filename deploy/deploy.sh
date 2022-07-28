@@ -1,39 +1,15 @@
 #!/bin/bash
 
-# This scripts run on your server to deploy your project with bare docker/docker-compose.
-# It is designed to run as root with a sudo rule.
 
 ####### ENV SANITIZATION #######
 
-# Sanitize binaries used to clean env
 env=/usr/bin/env
 grep=/bin/grep
 cat=/bin/cat
 
-# Unset all env variables
 unset $($env | $grep -o '^[^=]*')
 
-# Export sane supplied env variables
-export $($cat "$DEPLOY_PATH/.env")
-
-########### CONFIG #############
-DEPLOY_PATH="/root/deploy"
-REPOSITORY_URL="git@gitlab.com:ft_transcendance/ft_transcendance.git"
-REPOSITORY_BRANCH="main"
-
-# If no PATH is set, set a default value
-if [ -z "$PATH" ]; then
-        export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-fi
-
-###########   INIT  ############
-
-# If DEPLOY_PATH directory doesnt exist, create it and clone the project in it
-if [ ! -d "$DEPLOY_PATH" ]; then
-        mkdir -p "$DEPLOY_PATH"
-        cd "$DEPLOY_PATH"
-        git clone -b "$REPOSITORY_BRANCH" "$REPOSITORY_URL" .
-fi
+export $($cat /root/deploy/.env)
 
 ###### REPOSITORY UPDATE #######
 
@@ -42,7 +18,7 @@ echo "  DEPLOYING $@"
 echo "    AS $(id)"
 echo "-----------------"
 
-cd "$DEPLOY_PATH/ft_transcendance"
+cd /root/deploy/ft_transcendance
 
 echo "--- FECTHING FROM ---"
 echo "   $(git remote get-url origin)"
@@ -57,7 +33,7 @@ echo
 #######
 
 
-whitelisted_services="client api ft_proxy db"
+whitelisted_services="client api proxy db pgadmin"
 
 echo "--- WHITELISTED SERVICES ---"
 echo "    $whitelisted_services"
@@ -84,7 +60,10 @@ if [ -z "$allowed_services" ];then
 fi
 echo "------------------"
 
-docker-compose up -d --build $allowed_services
+export DUMMY_MOUNT="/dummy:/dummy"
+export PGADMIN_VOLUME_PATH="/pgadmin"
+
+docker-compose up -d --build --remove-orphans  $allowed_services
 
 echo
 echo "--- DEPLOYMENT DONE ---"
