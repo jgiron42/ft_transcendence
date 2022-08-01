@@ -63,7 +63,7 @@ export default {
 	publicRuntimeConfig: {
 		ft_api: {
 			url:
-				process.env.API_URL ||
+				process.env.API_BASE_URL ||
 				(process.browser ? `http://${window.location.hostname}:3000` : "http://localhost:3000"),
 		},
 	},
