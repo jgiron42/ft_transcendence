@@ -1,6 +1,7 @@
-import { Controller, Get, Query, Req, Session, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Req, Session, UseGuards } from "@nestjs/common";
 import config from "@config/api.config";
 import { SessionGuard } from "@guards/session.guard";
+import { DevelopmentGuard } from "@guards/development.guard";
 import { UserService } from "@src/services/user.service";
 import { User } from "@entities/user.entity";
 import { Request } from "@src/types/request";
@@ -29,12 +30,13 @@ export class AppController {
 		return req.user;
 	}
 
-	@Get("/newUserExample")
-	async testDB(@Query() data: { pseudo: string }, @Session() ses: SessionT): Promise<User[]> {
+	@UseGuards(new DevelopmentGuard())
+	@Get("/newUserExample/:pseudo")
+	async testDB(@Param("pseudo") pseudo: string, @Session() ses: SessionT): Promise<User[]> {
 		const usr = {
-			id: data.pseudo,
-			username: data.pseudo,
-			image_url: data.pseudo,
+			id: pseudo,
+			username: pseudo,
+			image_url: pseudo,
 			nb_game: 1,
 			nb_win: 0,
 			totp_enabled: false,
@@ -45,7 +47,7 @@ export class AppController {
 		await this.userService.create(usr);
 		ses.lastAuthDateFT = 9999999999999;
 		ses.isTOTPIdentified = true;
-		ses.sessionUser = { id: data.pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
+		ses.sessionUser = { id: pseudo, accessToken: "", refreshToken: "", firstName: "", lastName: "" };
 		return this.userService.findAll();
 	}
 }

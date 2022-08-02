@@ -24,12 +24,11 @@ export default {
 	// Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
 	plugins: [
 		{ src: "@/plugins/vue-js-modal", mode: "client" },
-		{ src: "@/plugins/game-socket-manager", mode: "client" },
+		{ src: "@/plugins/alert.plugin", mode: "client" },
+		{ src: "@/plugins/user.plugin", mode: "client" },
+		{ src: "@/plugins/socket-manager", mode: "client" },
 		{ src: "@/plugins/axios", mode: "all" },
 	],
-
-	// Auto import components: https://go.nuxtjs.dev/config-components
-	components: true,
 
 	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
 	buildModules: [
@@ -50,9 +49,13 @@ export default {
 	io: {
 		sockets: [
 			{
-				name: "matchmaking",
+				name: "game",
 				url: process.env.WSS_BASE_URL || "ws://localhost:3000",
 				default: true,
+			},
+			{
+				name: "chat",
+				url: process.env.WSS_BASE_URL || "http://localhost:3000",
 			},
 		],
 	},
@@ -60,6 +63,7 @@ export default {
 	axios: {
 		withCredentials: true,
 	},
+
 	publicRuntimeConfig: {
 		ft_api: {
 			url:
@@ -74,4 +78,25 @@ export default {
 	env: {
 		apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
 	},
+
+	components: {
+		dirs: [
+			"~/components",
+			"~/components/chat",
+			"~/components/chat/channels",
+			"~/components/chat/users",
+			"~/components/chat/popup",
+			"~/components/svg",
+		],
+	},
+	// Disable broken SSR on chat
+	serverMiddleware: [
+		{
+			path: "/chat",
+			handler: (_, res, next) => {
+				res.spa = true;
+				next();
+			},
+		},
+	],
 };

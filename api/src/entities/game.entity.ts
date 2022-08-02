@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Check } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Validate } from "class-validator";
 import { UserExistsRule } from "@src/validators/userExist.validator";
@@ -9,6 +9,7 @@ import { SetMode } from "@utils/set-mode";
 // this entity is use to stock all the game
 
 @Entity()
+@Check('"userOneId" <> "userTwoId"')
 export class Game {
 	constructor() {
 		this.score_second_player = 0;
@@ -39,27 +40,27 @@ export class Game {
 	user_two: User | string;
 
 	// score of the first player
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("r")
 	score_first_player: number;
 
 	// score of the second player
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("r")
 	score_second_player: number;
 
 	// type of game
-	@Column()
+	@Column({ default: 0 })
 	@SetMode("cr")
 	type: string;
 
 	// status of the game
-	@Column()
+	@Column({ default: false })
 	@SetMode("r")
 	finished: boolean;
 
 	// date begin of game
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }

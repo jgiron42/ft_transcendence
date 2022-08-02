@@ -1,11 +1,11 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AppController } from "@src/controllers/app.controller";
 import { User } from "@entities/user.entity";
 import { Channel } from "@entities/channel.entity";
 import { Message } from "@entities/message.entity";
 import { MessageService } from "@services/message.service";
 import { UserModule } from "@modules/user.module";
+import { MessagesController } from "@controllers/messages.controller";
 import { AuthModule } from "./auth.module";
 
 @Module({
@@ -15,7 +15,7 @@ import { AuthModule } from "./auth.module";
 		forwardRef(() => UserModule),
 	],
 	providers: [MessageService],
-	controllers: [AppController],
+	controllers: [MessagesController],
 	exports: [MessageService],
 })
 export class MessageModule {}

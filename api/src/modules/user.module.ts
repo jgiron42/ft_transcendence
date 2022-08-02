@@ -1,6 +1,5 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AppController } from "@src/controllers/app.controller";
 import { User } from "@entities/user.entity";
 import { UserService } from "@services/user.service";
 import { UserExistsRule } from "@src/validators/userExist.validator";
@@ -23,7 +22,7 @@ import { AuthModule } from "./auth.module";
 		MessageModule,
 	],
 	providers: [UserService, UserExistsRule],
-	controllers: [AppController, UsersController],
+	controllers: [UsersController],
 	exports: [UserService],
 })
 export class UserModule {}

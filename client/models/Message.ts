@@ -1,9 +1,15 @@
 import { Channel } from "@/models/Channel";
+import { User } from "@/models/User";
 
 export class Message {
+	constructor() {
+		this.created_at = new Date();
+	}
+
 	id: number;
+	user: User | string;
+	channel: Channel | number;
 	content: string;
-	send_by: string;
-	date: Date;
-	dest_channel: Channel;
+	created_at: Date;
+	blocked: boolean;
 }

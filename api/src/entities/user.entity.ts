@@ -17,6 +17,7 @@ export class User {
 		this.status = 0;
 		this.created_at = new Date();
 	}
+
 	@PrimaryColumn()
 	@SetMode("cr")
 	id: string;

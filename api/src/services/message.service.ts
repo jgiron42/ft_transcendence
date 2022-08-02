@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { Message } from "@src/entities/message.entity";
 import { Container } from "typedi";
 import { MessageQuery } from "@src/queries/messageQuery";
+import { PaginatedResponse } from "@src/types/paginated-response";
 
 @Injectable()
 export class MessageService {
@@ -20,6 +21,10 @@ export class MessageService {
 
 	findAll(userId: string, page = 1, itemByPage = 10): Promise<Message[]> {
 		return this.getQuery().see_message(userId).paginate(page, itemByPage).getMany();
+	}
+
+	async findAllAndCount(userId: string, page = 1, itemByPage = 10): Promise<PaginatedResponse<Message>> {
+		return this.getQuery().see_message(userId).paginate(page, itemByPage).getManyAndCount();
 	}
 
 	findOne(id: number): Promise<Message> {

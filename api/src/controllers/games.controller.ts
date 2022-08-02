@@ -4,7 +4,6 @@ import {
 	Param,
 	ParseIntPipe,
 	Post,
-	Req,
 	UseFilters,
 	UseGuards,
 	UseInterceptors,
@@ -20,11 +19,11 @@ import { SessionGuard } from "@guards/session.guard";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
-import { Request } from "@src/types/request";
 import { User } from "@src/entities/user.entity";
 import { ValidationError } from "@src/exceptions/validationError.exception";
 import { PaginatedResponse } from "@src/types/paginated-response";
 import { PaginationInterceptor } from "@interceptors/pagination.interceptor";
+import { GetUser } from "@utils/get-user";
 
 @Controller("games")
 @UseGuards(...SessionGuard)
@@ -55,8 +54,8 @@ export class GamesController {
 	 */
 	@Post()
 	@UsePipes(getValidationPipe(Game))
-	create(@MyRequestPipe(...getPostPipeline(Game)) game: Game, @Req() req: Request) {
-		if ((game.user_one as User)?.id !== req.user.id && (game.user_two as User)?.id !== req.user.id)
+	create(@MyRequestPipe(...getPostPipeline(Game)) game: Game, @GetUser() user: User) {
+		if ((game.user_one as User)?.id !== user.id && (game.user_two as User)?.id !== user.id)
 			throw new ValidationError("user must be in game creation");
 		return this.gameService.create(game);
 	}

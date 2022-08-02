@@ -17,26 +17,17 @@
 </template>
 
 <script lang="ts">
-import { Context } from "@nuxt/types";
 import Vue from "vue";
-import { UserSingleton } from "~/models/User";
+import { store } from "@/store";
+
 export default Vue.extend({
 	data: () => ({
 		isActive: true,
 		connected: true,
-		userID: "",
+		get userID() {
+			return store.user.me.id;
+		},
 	}),
-	mounted() {
-		const singleton = new UserSingleton({
-			$axios: this.$axios,
-			store: this.$store,
-			redirect: (url: string) => {
-				this.$router.push(url);
-			},
-			$config: this.$config,
-		} as Context);
-		singleton.getUser().then((user) => (this.userID = user.id));
-	},
 });
 </script>
 

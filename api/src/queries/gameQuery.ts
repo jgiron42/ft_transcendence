@@ -11,6 +11,7 @@ export class GameQuery extends QueryCooker<Game> {
 				.leftJoinAndSelect("game.user_one", "user_one")
 				.leftJoinAndSelect("game.user_two", "user_two"),
 		);
+		this.sort("game.created_at", "DESC");
 	}
 
 	/**

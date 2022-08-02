@@ -24,7 +24,7 @@ import { useContainer } from "class-validator";
 	app.use(
 		session({
 			store,
-			secret: config.sessionSecret, // TODO: voir la doc
+			secret: config.sessionSecret,
 			resave: true,
 			saveUninitialized: true,
 			cookie: {

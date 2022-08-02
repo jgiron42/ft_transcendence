@@ -20,6 +20,7 @@
 <script lang="ts">
 export default {
 	name: "Index",
+	middleware: ["getUser"],
 	methods: {},
 };
 </script>
