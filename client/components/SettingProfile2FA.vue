@@ -35,9 +35,8 @@
 <script lang="ts">
 import Vue from "vue";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
-import { Context } from "@nuxt/types";
 import { base32Encode } from "@/utils/base32";
-import { User, UserSingleton } from "~/models/User";
+import { User } from "@/models/User";
 import randomKey from "@/utils/randomKey";
 
 Vue.component(VueQrcode.name, VueQrcode); // Component used to generate a QR code
@@ -46,24 +45,13 @@ export default Vue.extend({
 	data: () => ({
 		is2FAEnabled: false, // user's 2FA status (enabled/disabled)
 		generating2FA: false, // Flag determining if we're displaying the credentials page
-		userSingleton: new UserSingleton({} as Context), // UserStore wrapper
 		user: new User(), // Self's user
 		username: "none", // Displayed username
 		secret: randomKey(10), // Generated 2FA secret key
 	}),
 	async mounted() {
-		// Get UserStore wrapper to get or fetch it conviniently
-		this.userSingleton = new UserSingleton({
-			$axios: this.$axios,
-			store: this.$store,
-			redirect: (url: string) => {
-				this.$router.push(url);
-			},
-			$config: this.$config,
-		} as Context);
-
 		//  Get user
-		this.user = await this.userSingleton.getUser();
+		this.user = await this.$user.getUser();
 
 		// Set displayed username
 		this.username = this.user.id as string;
@@ -82,13 +70,13 @@ export default Vue.extend({
 			this.user = { ...this.user, totp_enabled: true, totp_key: this.secret };
 
 			// Update user in store
-			this.userSingleton.setUser(this.user);
+			this.$user.setUser(this.user);
 
 			// Update user in database.
-			await this.userSingleton.save();
+			await this.$user.save();
 
 			// Fetch updated user
-			this.user = await this.userSingleton.fetch();
+			this.user = await this.$user.fetch();
 
 			// Update 2FA flag
 			this.is2FAEnabled = this.user.totp_enabled;

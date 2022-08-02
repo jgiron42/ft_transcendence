@@ -1,9 +1,13 @@
-import { User } from "@/models/User";
+export enum ChannelType {
+	PUBLIC,
+	PASSWORD,
+	PRIVATE,
+	DM,
+}
 
 export class Channel {
 	id: number;
 	name: string;
-	chat_type: number;
-	mdp: string;
-	owner: User;
+	type: ChannelType;
+	password: string;
 }

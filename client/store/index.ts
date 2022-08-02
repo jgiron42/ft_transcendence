@@ -1,23 +1,6 @@
-import { User } from "@/models/User";
+import { Store } from "vuex";
+import { initialiseStores } from "~/utils/store-accessor";
 
-// Centralized user
-
-export interface UserStoreInterface {
-	user: User;
-}
-
-export const state = () => ({
-	user: new User(),
-});
-
-export const mutations = {
-	setUser(state: UserStoreInterface, user: User) {
-		state.user = user;
-	},
-};
-
-export const getters = {
-	getUser(state: UserStoreInterface): User {
-		return state.user;
-	},
-};
+const initializer = (store: Store<any>) => initialiseStores(store);
+export const plugins = [initializer];
+export * from "~/utils/store-accessor";

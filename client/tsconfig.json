@@ -23,6 +23,7 @@
 			"@types/node",
 			"cookie-universal-nuxt",
 			"nuxt-socket-io",
+			"@/types",
 			"@nuxtjs/device",
 			"@nuxtjs/axios"
 		]

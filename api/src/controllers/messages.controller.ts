@@ -1,14 +1,16 @@
-import { Controller, Get, Param, ParseIntPipe, Req, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
 import { MessageExistGuard } from "@src/guards/message-exist.guard";
 import { SessionGuard } from "@guards/session.guard";
 import { MessageService } from "@services/message.service";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { Page } from "@utils/Page";
+import { Date as myDate } from "@utils/Date";
 import { PerPage } from "@utils/PerPage";
 import { TypeormErrorFilter } from "@filters/typeorm-error.filter";
-import { Request } from "@src/types/request";
 import { PaginatedResponse } from "@src/types/paginated-response";
 import { Message } from "@entities/message.entity";
+import { User } from "@entities/user.entity";
+import { GetUser } from "@utils/get-user";
 
 @Controller("messages")
 @UseGuards(...SessionGuard)
@@ -22,11 +24,16 @@ export class MessagesController {
 	 */
 	@Get()
 	async getAll(
+		@myDate() date: Date,
 		@Page() page: number,
 		@PerPage() per_page: number,
-		@Req() req: Request,
+		@GetUser() user: User,
 	): Promise<PaginatedResponse<Message>> {
-		return this.messageService.getQuery().see_message(req.user.id).paginate(page, per_page).getManyAndCount();
+		return this.messageService
+			.getQuery()
+			.see_message(user.id)
+			.paginate(date ?? page, per_page)
+			.getManyAndCount();
 	}
 
 	/**
@@ -34,7 +41,7 @@ export class MessagesController {
 	 */
 	@Get(":id")
 	@UseGuards(MessageExistGuard)
-	getOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request): Promise<object> {
-		return this.messageService.getQuery().see_message(req.user.id).getOne(id);
+	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
+		return this.messageService.getQuery().see_message(user.id).getOne(id);
 	}
 }

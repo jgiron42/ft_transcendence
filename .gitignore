@@ -1,3 +1,6 @@
 *.pem
 id_rsa
 .idea
+.env
+db.env
+api.env

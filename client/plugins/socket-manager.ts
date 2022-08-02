@@ -1,11 +1,12 @@
 import Vue from "vue";
-import { Plugin } from "@nuxt/types";
+import { Plugin, Context } from "@nuxt/types";
 import { NuxtSocket } from "nuxt-socket-io";
 import SocketHubInterface from "~/types/socker-hub";
 
 declare module "vue/types/vue" {
 	interface Vue {
 		$gameSocket: SocketHubInterface;
+		$chatSocket: SocketHubInterface;
 	}
 }
 
@@ -50,7 +51,7 @@ class SocketHub extends Vue implements SocketHubInterface {
 		let count: number = 0;
 		this.events.forEach((event: string) => {
 			if (reg.test(event)) {
-				this.socket.removeAllListeners("event");
+				this.socket.removeAllListeners(event);
 				this.events.delete(event);
 				count++;
 			}
@@ -59,10 +60,10 @@ class SocketHub extends Vue implements SocketHubInterface {
 	}
 }
 
-const SocketManager: Plugin = (context) => {
+function initSocket(name: string, context: Context): SocketHubInterface {
 	const socket = context.app.$nuxtSocket({
-		name: "game",
-		channel: "game",
+		name,
+		channel: name,
 		reconnection: true,
 		reconnectionAttempts: Infinity,
 		reconnectionDelay: 1000,
@@ -71,7 +72,7 @@ const SocketManager: Plugin = (context) => {
 		autoConnect: true,
 		transports: ["websocket"],
 		teardown: false,
-		forceNew: false,
+		forceNew: true,
 	});
 
 	socket.on("connect", () => {
@@ -113,8 +114,13 @@ const SocketManager: Plugin = (context) => {
 		console.log("[WEBSOCKET][WS ANY]:", event, args);
 	});
 
+	return new SocketHub(socket);
+}
+
+const SocketManager: Plugin = (context) => {
 	// Inject socket hub in Nuxt instance
-	Vue.prototype.$gameSocket = new SocketHub(socket);
+	Vue.prototype.$gameSocket = initSocket("game", context);
+	Vue.prototype.$chatSocket = initSocket("chat", context);
 };
 
 export default SocketManager;

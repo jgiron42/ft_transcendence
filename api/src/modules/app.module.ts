@@ -15,6 +15,7 @@ import { ChanConnection } from "@entities/chan_connection.entity";
 import { ChanConnectionModule } from "@modules/chan_connection.module";
 import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { ChanInvitationModule } from "@modules/chan_invitation.module";
+import { ChatModule } from "@modules/chat.module";
 import { GameModule } from "@modules/game.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { RelationsController } from "@controllers/relations.controller";
@@ -43,6 +44,7 @@ import { MessageModule } from "./message.module";
 		ChanConnectionModule,
 		ChanInvitationModule,
 		AuthModule,
+		ChatModule,
 		GameModule,
 		ScheduleModule.forRoot(),
 		MessageModule,

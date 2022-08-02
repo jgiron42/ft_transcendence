@@ -11,6 +11,7 @@ export class RelationQuery extends QueryCooker<Relation> {
 				.leftJoinAndSelect("relation.owner", "owner")
 				.leftJoinAndSelect("relation.target", "target"),
 		);
+		this.sort("relation.created_at", "DESC");
 	}
 
 	/**
@@ -20,8 +21,8 @@ export class RelationQuery extends QueryCooker<Relation> {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
 				qb
-					.where("owner.id = :userId1", { userId1: userId })
-					.orWhere("target.id = :userId2", { userId2: userId }),
+					.where(`owner.id = :${this.newId}`, { [this.currentId]: userId })
+					.orWhere(`target.id = :${this.newId}`, { [this.currentId]: userId }),
 			),
 		);
 		return this;
@@ -33,9 +34,14 @@ export class RelationQuery extends QueryCooker<Relation> {
 	see_relation(userId: string) {
 		this.query = this.query.andWhere(
 			new Brackets((qb) =>
-				qb
-					.where("owner.id = :userId3", { userId3: userId })
-					.orWhere("relation.type <> :type2", { type2: RelationType.BLOCK }),
+				qb.where(`owner.id = :${this.newId}`, { [this.currentId]: userId }).orWhere(
+					new Brackets((qb1) => {
+						qb1.where(`target.id = :${this.newId}`, { [this.currentId]: userId }).andWhere(
+							"relation.type <> :type2",
+							{ type2: RelationType.BLOCK },
+						);
+					}),
+				),
 			),
 		);
 		return this;
@@ -45,7 +51,7 @@ export class RelationQuery extends QueryCooker<Relation> {
 	 * select only the relations where the targert is userId
 	 */
 	target(userId: string) {
-		this.query = this.query.andWhere("target.id = :userId4", { userId4: userId });
+		this.query = this.query.andWhere(`target.id = :${this.newId}`, { [this.currentId]: userId });
 		return this;
 	}
 
@@ -53,7 +59,7 @@ export class RelationQuery extends QueryCooker<Relation> {
 	 * select only the relations owned by userId
 	 */
 	owner(userId: string) {
-		this.query = this.query.andWhere("owner.id = :userId5", { userId5: userId });
+		this.query = this.query.andWhere(`owner.id = :${this.newId}`, { [this.currentId]: userId });
 		return this;
 	}
 

@@ -13,6 +13,7 @@ import { User } from "@/models/User";
 import { ClientMatch } from "~/types/game-status";
 
 export default Vue.extend({
+	middleware: ["getUser"],
 	data: () => ({
 		status: "creating" as "creating" | "ongoing" | "finished" | "aborted",
 		self: {} as User,

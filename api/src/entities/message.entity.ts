@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from "typeorm";
 import { Channel } from "@entities/channel.entity";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
@@ -9,9 +9,6 @@ import { User } from "./user.entity";
 
 @Entity()
 export class Message {
-	constructor() {
-		this.created_at = new Date();
-	}
 	@PrimaryGeneratedColumn()
 	@SetMode("r")
 	id: number;
@@ -24,7 +21,7 @@ export class Message {
 
 	// destination of the message
 	@ManyToOne(() => Channel, (dest_channel) => dest_channel.id, { eager: true, onDelete: "CASCADE" })
-	@SetMode("cru")
+	@SetMode("ru")
 	channel: Channel | number;
 
 	// content of the messsage
@@ -32,14 +29,8 @@ export class Message {
 	@SetMode("cru")
 	content: string;
 
-	// user who send the message
-	// @ManyToOne(() => User, (send_by) => send_by.id)
-	// send_by: User;
-	@Column()
-	send_by: string;
-
 	// date of the message
-	@Column()
+	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
 }
