@@ -1,16 +1,45 @@
 <template>
-	<div>
-		<div v-if="authenticated">
-			<ObjectDebug :object="user" />
-			<div class="flex flex-row justify-center">
-				<ObjectDebug title="connected:" :array="connectedPool" />
-				<ObjectDebug :title="`${selectedPool}:`" :array="matchmakingPools[selectedPool]" />
-			</div>
+	<div
+		class="min-w-max w-full h-full flex flex-col items-center border-4 border-design_white bg-design_black overflow-hidden rounded-md"
+	>
+		<!-- Title -->
+		<div
+			id="title"
+			class="text-design_white h-8 justify-center top-1/2 flex w-full border-b-2 border-design_white text-center bg-design_blue"
+		>
+			<div class="inline-block align-center">MATCHMAKING</div>
 		</div>
-		<div class="flex flex-row justify-center">
-			<SelectMenu id-prop="matchmaking-select" :options="gameModes" />
-			<div @click="handleClick"><BoxButton type="button" :content="buttonContent" /></div>
-			<div @click="matchBot"><BoxButton type="button" :content="['BOT']" /></div>
+		<!-- Content -->
+		<div id="content" class="text-design_white w-full h-full">
+			<!-- Display stats of the player-->
+			<br />
+			<div class="flex flex-col w-full items-center justify-around">
+				<!-- User profile picture -->
+				<div id="profile-picture" class="flex h-1/3 w-1/3 items-center justify-center">
+					<img v-if="user.image_url" :src="user.image_url" class="rounded-full w-24 h-24" />
+					<img v-else src="~/assets/profile.png" class="rounded-full w-24 h-24" />
+				</div>
+			</div>
+			<h3>{{ user.id }}</h3>
+			<br />
+			<p>Total played games : {{ user.nb_game }}</p>
+			<p>Total victory : {{ user.nb_win }}</p>
+		</div>
+		<!-- Launch game buttons button -->
+		<div id="inputs" class="text-design_white flex flex-row h-12 w-full bg-design_blue border-t-4 border-white">
+			<SelectMenu
+				id-prop="matchmaking-select"
+				:options="gameModes"
+				class="w-full text-center hover:text-gray-300"
+			/>
+		</div>
+		<div id="inputs" class="text-design_white flex flex-row h-12 w-full bg-design_blue border-t-4 border-white">
+			<button class="w-full text-center hover:text-gray-300" @click="handleClick">
+				{{ buttonContent[0] }} {{ buttonContent[1] }}
+			</button>
+		</div>
+		<div id="inputs" class="text-design_white flex flex-row h-12 w-full bg-design_blue border-t-4 border-white">
+			<button class="w-full text-center hover:text-gray-300" @click="matchBot">BOT</button>
 		</div>
 	</div>
 </template>
