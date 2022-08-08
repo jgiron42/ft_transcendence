@@ -100,8 +100,12 @@ export default class MessageStore extends VuexModule implements IMessageStore {
 
 	@Action
 	async retrieveMessages(chanId: number) {
-		// first, wait for the previous promise to be resolved
-		await this.loadMessagePromise;
+		// ensure leadMessagePromise is a promise by checking if it's an object and if .then is a function
+		if (!(typeof this.loadMessagePromise === "object" && typeof this.loadMessagePromise.then === "function"))
+			// if not, initialize it with a new promise resolved
+			this.updateLoadMessagePromise(Promise.resolve());
+		// else, simply wait for the previous promise to be resolved
+		else await this.loadMessagePromise;
 
 		this.updateLoadMessagePromise(
 			this.loadMessagePromise.then(async () => {
