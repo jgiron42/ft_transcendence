@@ -30,13 +30,13 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 	}
 
 	async afterUpdate(event: UpdateEvent<ChanConnection>) {
+		if (event.entity.role === ChannelRole.BANNED)
+			await this.chatService.removeChanConnection(event.entity as ChanConnection, false);
 		this.chatService.sendMessage(
 			"chat:updateConnection",
 			event.entity,
 			`channel:${(event.entity.channel as Channel).id}`,
 		);
 		this.chatService.sendMessageToClient("chat:updateConnection", event.entity, (event.entity.user as User).id);
-		if (event.entity.role === ChannelRole.BANNED)
-			await this.chatService.removeChanConnection(event.entity as ChanConnection);
 	}
 }

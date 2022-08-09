@@ -117,25 +117,23 @@ export default Vue.extend({
 		this.$chatSocket.on("chat:updateConnection", (connection: ChanConnection) => {
 			store.connection.pushChanConnection([connection]);
 			// if the updated connection is mine and is a connection to the current channel
-			if (
-				store.user.me.id === connection.user.id &&
-				this.isOnChannel &&
-				connection.channel.id === this.currentChannel.id
-			) {
-				// update the current role on the channel
-				store.channel.setCurrentRole(connection.role);
+			if (store.user.me.id === connection.user.id) {
+				if (this.isOnChannel && connection.channel.id === this.currentChannel.id) {
+					// update the current role on the channel
+					store.channel.setCurrentRole(connection.role);
 
-				// if the role is "BANNED"
-				if (connection.role === ChannelRole.BANNED) {
-					// reset the currentConnection
-					store.channel.setCurrentConnection(new ChanConnection());
-
-					// emit an alert to the user
+					// if the role is "BANNED"
+					if (connection.role === ChannelRole.BANNED)
+						// reset the currentConnection
+						store.channel.setCurrentConnection(new ChanConnection());
+				}
+				store.user.pushConnections([connection]);
+				// emit an alert to the user if the user is banned
+				if (connection.role === ChannelRole.BANNED)
 					this.$nuxt.$emit("addAlert", {
 						title: "Banned",
 						message: `You have been banned from the channel ${connection.channel.name}`,
 					});
-				}
 			}
 			this.$nuxt.$emit("updateConnection", connection);
 		});
