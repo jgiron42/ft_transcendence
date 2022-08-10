@@ -52,7 +52,7 @@ export default Vue.extend({
 				"riblavnc",
 				"riolavit",
 			],
-			input: HTMLElement | null,
+			input:null as HTMLInputElement | null,
 			id: 0,
 			value: "",
 			min_input: 3,
@@ -60,8 +60,8 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.input = document.getElementById("searchuser");
-		if (this.input) {
+		this.input = document.getElementById("searchuser") as HTMLInputElement;
+		if (this.input && this.input.parentElement) {
 			this.input.parentElement.addEventListener("submit", this.simpleEntry);
 		}
 		this.autocomplete();
@@ -70,7 +70,8 @@ export default Vue.extend({
 		closeLists() {
 			const x = document.getElementsByClassName("autocomplete-items");
 			for (let i = 0; i < x.length; i++) {
-				x[i].parentNode.removeChild(x[i]);
+				if (x[i].parentNode)
+					x[i]?.parentNode?.removeChild(x[i]);
 			}
 		},
 		autocomplete() {
@@ -81,14 +82,15 @@ export default Vue.extend({
 			// remove previous predictions
 			this.closeLists();
 			// get current inputed value
-			this.value = this.input.value;
+			this.value = this?.input?.value;
 			if (!this.value) return false;
 			let predcount = 0;
 			// Create and add the container for suggestions
 			const container = document.createElement("DIV");
 			container.setAttribute("id", "autocomplete-list");
 			container.setAttribute("class", "autocomplete-items");
-			this.input.parentNode.appendChild(container);
+			if (this.input.parentNode)
+				this.input.parentNode.appendChild(container);
 			// Search for mathching values and add them to the prediction container
 			if (this.value.length >= this.min_input) {
 				for (let i = 0; i < this.players.length && predcount < this.max_pred; i++) {
@@ -101,9 +103,13 @@ export default Vue.extend({
 						// fill the input once a predition is clicked
 						sug.addEventListener("click", function (){
 							const inputval = (<HTMLInputElement>document.getElementById("searchuser"));
-							if (inputval) inputval.value = this.querySelector("input").value;
+							const hiddenVal = this.querySelector("input");
+							if (inputval && hiddenVal) inputval.value = hiddenVal.value;
 							const x = document.getElementsByClassName("autocomplete-items");
-							if (x) x.innerHTML = '';
+							for (let i = 0; i < x.length; i++) {
+								if (x[i].parentNode)
+									x[i]?.parentNode?.removeChild(x[i]);
+							}
 						});
 						container.appendChild(sug);
 						predcount++;

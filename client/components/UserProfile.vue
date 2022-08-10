@@ -58,7 +58,9 @@ export default Vue.extend({
 	mounted() {
 		// set PieChart value
 		this.ratio = Math.floor((this.nb_win / this.nb_game) * 100);
-		document.getElementById("pie").style.setProperty("--p", this.ratio + 1);
+		const pieProp = document.getElementById("pie");
+		const pieRatio = this.ratio + 1;
+		if (pieProp) pieProp.style.setProperty("--p", pieRatio.toString());
 	},
 	methods: {
 		addFriend() {
