@@ -43,8 +43,8 @@ export class ChatService {
 		}
 	}
 
-	// remove a channel connection
-	async removeChanConnection(connection: ChanConnection): Promise<void> {
+	// remove a channel connection, and notify the client if notify is true
+	async removeChanConnection(connection: ChanConnection, notify = true): Promise<void> {
 		// iterate through client Map
 		for (const [_client, _user] of this.clientMap) {
 			// if the user.id retrieve from map correspond to the uid parameter
@@ -52,8 +52,9 @@ export class ChatService {
 				// leaves the `channel:$id` room
 				await _client.leave(`channel:${connection.channel.id}`);
 
-				// Tell the client the connection has been removed
-				_client.emit("chat:removeConnection", connection);
+				if (notify)
+					// Tell the client the connection has been removed
+					_client.emit("chat:removeConnection", connection);
 			}
 		}
 	}

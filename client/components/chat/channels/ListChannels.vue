@@ -7,10 +7,11 @@
 				<div class="flex gap-3 items-center chan-name" :class="chan.id == currentChannel.id ? 'selected' : ''">
 					<!-- declare button to call joinChannel method when clicked -->
 					<button class="cut-text btn text-left" @click="joinChannel(chan)">
-						<div class="flex">
+						<!-- if the user is banned from the channel, then dynamically add the class 'banned' -->
+						<div class="flex" :class="checkIfBanned(chan) ? 'banned' : ''">
 							<!-- add a logo depending on type of channel -->
 							<!-- if it's a public channel display a # -->
-							<div v-if="chan.type === ChannelType.PUBLIC" class="w-5">#</div>
+							<div v-if="chan.type === ChannelType.PUBLIC" class="w-5" style="color: #aaa">#</div>
 
 							<!-- if it's a protected channel, display a padlock -->
 							<div v-if="chan.type === ChannelType.PASSWORD" class="w-5 h-5">
@@ -79,6 +80,16 @@ export default Vue.extend({
 			);
 		},
 
+		// return all channels where the current user is banned
+		get bannedChannels(): Channel[] {
+			return (
+				store.user.connectionsTracker &&
+				Array.from(store.user.connections.values())
+					.filter((c) => c.role === ChannelRole.BANNED)
+					.map((c) => c.channel)
+			);
+		},
+
 		// return the current channel
 		get currentChannel(): Channel {
 			return store.channel.currentConnection.channel;
@@ -106,6 +117,11 @@ export default Vue.extend({
 			else store.channel.joinChannel(chan);
 		},
 
+		// check if the user is banned from a channel
+		checkIfBanned(chan: Channel): boolean {
+			return this.bannedChannels.find((c) => c.id === chan.id) !== undefined;
+		},
+
 		// function called when leaving a channel
 		leaveChannel(chanId: number) {
 			store.channel.leaveChannel(chanId);
@@ -113,3 +129,9 @@ export default Vue.extend({
 	},
 });
 </script>
+
+<style scoped>
+.banned {
+	color: #d66363;
+}
+</style>
