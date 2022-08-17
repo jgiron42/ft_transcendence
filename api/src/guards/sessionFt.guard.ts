@@ -25,7 +25,7 @@ export class SessionGuardFt implements CanActivate {
 					return true;
 				}
 				// Reset totp verification
-				req.session.isTOTPIdentified = false;
+				if (req.session.isTOTPIdentified) req.session.isTOTPIdentified = false;
 				// Throw an HTTP 401 error
 				throw new UnauthorizedException({
 					statusCode: 401,
@@ -43,7 +43,7 @@ export class SessionGuardFt implements CanActivate {
 						return true;
 					}
 					// reset totp verification
-					socket.session.isTOTPIdentified = false;
+					if (socket.session.isTOTPIdentified) socket.session.isTOTPIdentified = false;
 				}
 				throw new WsException({
 					error: "Unauthorized3",

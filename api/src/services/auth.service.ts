@@ -63,7 +63,7 @@ export class AuthService {
 	 */
 	isFtLogged(ses: SessionT): boolean {
 		// Return true if the time since last authentication is inferior to the timeout
-		return ses.lastAuthDateFT && ses.lastAuthDateFT / 1000 + this.getTimeout() * 1000 > Date.now() / 1000;
+		return ses.lastAuthDateFT && ses.lastAuthDateFT / 1000 + this.getTimeout() > Date.now() / 1000;
 	}
 
 	/**

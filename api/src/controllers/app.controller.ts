@@ -19,6 +19,7 @@ export class AppController {
 
 	// Route testing session guard
 	@UseGuards(...SessionGuard)
+	@UseGuards(DevelopmentGuard)
 	@Get("authTest")
 	test() {
 		return "user is correctly authenticated";
@@ -30,13 +31,12 @@ export class AppController {
 		return req.user;
 	}
 
-	@UseGuards(new DevelopmentGuard())
+	@UseGuards(DevelopmentGuard)
 	@Get("/newUserExample/:pseudo")
 	async testDB(@Param("pseudo") pseudo: string, @Session() ses: SessionT): Promise<User[]> {
 		const usr = {
 			id: pseudo,
 			username: pseudo,
-			image_url: pseudo,
 			nb_game: 1,
 			nb_win: 0,
 			totp_enabled: false,
