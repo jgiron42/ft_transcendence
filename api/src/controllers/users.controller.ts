@@ -98,7 +98,7 @@ export class UsersController {
 	 */
 	@Post()
 	@UseGuards(DevelopmentGuard)
-	create(@MyRequestPipe(...getPostPipeline(User)) user: User) {
+	create(@MyRequestPipe(...getPostPipeline(User)) user: User): Promise<User> {
 		return this.userService.create(user);
 	}
 

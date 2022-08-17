@@ -168,7 +168,6 @@ export class GameService {
 			(await this.userService.create({
 				id: "CrocuBot",
 				username: "Kronku",
-				image_url: "/",
 				nb_game: 0,
 				nb_win: 0,
 				totp_enabled: false,

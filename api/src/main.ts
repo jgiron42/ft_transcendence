@@ -8,10 +8,25 @@ import config from "@config/api.config";
 import session, { MemoryStore } from "express-session";
 import { Container } from "typedi";
 import { useContainer } from "class-validator";
+import connect_pg_simple from "connect-pg-simple";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
-	const store = new MemoryStore();
+	const store =
+		config.env === "development"
+			? new MemoryStore()
+			: new (connect_pg_simple(session))({
+					conObject: {
+						host: "db",
+						port: 5432,
+						user: process.env.POSTGRES_USER,
+						password: process.env.POSTGRES_PASSWORD,
+						database: process.env.POSTGRES_DB,
+					},
+					createTableIfMissing: true,
+					pruneSessionInterval: 60,
+			  });
+
 	Container.set("SessionStore", store);
 
 	// create upload dir if it doesn't exist
@@ -26,10 +41,14 @@ import { useContainer } from "class-validator";
 			store,
 			secret: config.sessionSecret,
 			resave: true,
-			saveUninitialized: true,
+			saveUninitialized: false,
 			cookie: {
+				sameSite: "strict",
 				httpOnly: false,
+				maxAge: 1000 * config.sessionTimeout,
 			},
+			rolling: true,
+			unset: "destroy",
 		}),
 	);
 
