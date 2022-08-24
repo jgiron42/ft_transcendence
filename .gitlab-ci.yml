@@ -17,7 +17,7 @@ ensure_gamemodes_are_identical:
   variables:
     APP_NAME: ./
   script:
-  - hash() {  tar -C "$1" -cf - --group=0 --owner=0 --numeric-owner  --sort=name --mtime='UTC 2019-01-01' ./ | sha256sum | awk '{print $1}'; }
+  - hash() { tar -C "$1" -cf - --group=0 --owner=0 --numeric-owner --sort=name --mtime='UTC 2019-01-01' ./ | sha256sum | awk '{print $1}'; }
   - test $(hash ./api/src/gamemodes) = $(hash ./client/gamemodes)
 
 build_api_dev:
@@ -223,7 +223,7 @@ deploy_proxy:
   script:
     - chmod 600 "$ID_RSA"
     - echo '' >> "$ID_RSA"
-    - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh ft_proxy"
+    - ssh -i "$ID_RSA" -p 4242 -o "StrictHostKeyChecking no" app@transcendance.nollium.com "sudo /root/deploy/deploy.sh proxy"
   environment:
     name: production
   only:
