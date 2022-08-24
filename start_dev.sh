@@ -41,8 +41,9 @@ curl "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" \
   --compressed
 
 response=$(curl "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" -H "cookie: _intra_42_session_production=$INTRA_SESSION" --compressed)
-INTRA_UID=$(grep -A1 UID <<< "$response" | tail -n1 | sed -e 's/<pre>//g' -e 's/<\/pre>//g')
-INTRA_SECRET=$(grep -A1 Secret <<< "$response" | tail -n1 | sed -e 's/<pre>//g' -e 's/<\/pre>//g')
+
+INTRA_UID=$(grep -A10  UID <<< "$response" | grep data-app-uid | awk -F "'" '{print $4}')
+INTRA_SECRET=$(grep -A10 Secret <<< "$response" | grep data-app-secret| awk -F "'" '{print $4}')
 echo INTRA42_UID="$INTRA_UID" >> api.env
 echo INTRA42_SECRET="$INTRA_SECRET" >> api.env
 

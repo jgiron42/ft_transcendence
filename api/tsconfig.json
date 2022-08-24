@@ -110,6 +110,11 @@
 			"@utils/*": ["src/utils/*"],
 			"@test/*": ["test/*"],
 			"@subscribers/*": ["src/subscribers/*"],
+			"@gamemodes/*": ["src/gamemodes/*"],
+			"~/*": ["./*"],
+			"@/*": ["./*"],
+			"~~/*": ["./*"],
+			"@@/*": ["./*"]
 		}
 	},
 }

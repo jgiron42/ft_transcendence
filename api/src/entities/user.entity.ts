@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
+import config from "@src/config/game.config";
 
 // this entity is use to describe the users
 
@@ -16,6 +17,7 @@ export class User {
 		this.totp_key = "";
 		this.status = 0;
 		this.created_at = new Date();
+		this.elo = config.baseELO;
 	}
 
 	@PrimaryColumn()
@@ -26,6 +28,11 @@ export class User {
 	@Column({ unique: true })
 	@SetMode("cru")
 	username: string;
+
+	// path to the avatar of the user
+	@Column({ default: "" })
+	@SetMode("cru")
+	image_url: string;
 
 	// number of game played by the user
 	@Column({ default: 0 })
@@ -44,7 +51,7 @@ export class User {
 
 	// say if the user use OAuth or not
 	@Column({ default: false })
-	@SetMode([["own_user", "r"], "cu"])
+	@SetMode([["own_user", "r"], "cu"]) // class-transformer
 	totp_enabled: boolean;
 
 	// status of the user
@@ -61,4 +68,9 @@ export class User {
 	@CreateDateColumn()
 	@SetMode("r")
 	created_at: Date;
+
+	// elo rating of the user
+	@Column({ default: config.baseELO })
+	@SetMode("cru")
+	elo: number;
 }

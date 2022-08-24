@@ -1,5 +1,7 @@
 import { User } from "@src/entities/user.entity";
 import { AllowedGameMode } from "@src/config/game.config";
+import { Game } from "@src/gamemodes/default";
+import { Socket } from "socket.io";
 
 // Type: Pool storing all matches, regardless of their modes
 export type MatchPool = Map<string, Match>;
@@ -14,8 +16,8 @@ export type GameUserPool = Map<string, GameUser>;
 export type MatchmakingPool = Map<AllowedGameMode, GameUserSet>;
 
 export interface GameScore {
-	user1: number;
-	user2: number;
+	p1: number;
+	p2: number;
 }
 
 export interface PongBar {
@@ -36,29 +38,19 @@ export interface UserEvents {
 	keys: string[];
 }
 
-export interface GameData {
-	score: GameScore;
-	objects: {
-		barLeft: PongBar;
-		barRight: PongBar;
-		ball: PongBall;
-	};
-	events: {
-		user1: UserEvents;
-		user2: UserEvents;
-	};
-}
+type GameData = ReturnType<typeof Game.prototype.cloneData>;
 
 export interface Match {
-	user1: GameUser;
-	user2: GameUser;
+	p1: GameUser;
+	p2: GameUser;
 	status: "creating" | "ongoing" | "aborted" | "finished";
 	type: "ManVsMachine" | "ManVsMan" | "MachineVsMachine";
 	mode: AllowedGameMode;
 	id: string;
 	created_at: number;
 	lastStatusUpdate: number;
-	data: GameData;
+	game: Game;
+	sockets: Set<Socket>;
 }
 
 export interface GameUser {
@@ -69,21 +61,25 @@ export interface GameUser {
 	searchStartDate: number;
 	gameMode: AllowedGameMode;
 	match: Match | null;
+	gameEvents: { up: boolean; down: boolean };
 	sockets: Set<Socket>;
 }
+
+type SerializedMatch = { id: string; p1: string; p2: string; mode: string };
 export interface UserMatchmakingStatus {
 	user: User;
 	status: "connected" | "matchmaking" | "game";
 	searchDate: number;
 	connectedPool: string[];
 	matchMakingPools: Record<AllowedGameMode, string[]>;
-	match: { id: string; self: string; oppponent: string };
+	match: SerializedMatch;
 	availableGameModes: string[];
+	matchList: SerializedMatch[];
 }
 
 export interface ClientMatch {
-	self: User;
-	opponent: User;
+	p1: User;
+	p2: User;
 	status: "creating" | "ongoing" | "aborted" | "finished";
 	type: "ManVsMachine" | "ManVsMan" | "MachineVsMachine";
 	mode: AllowedGameMode;

@@ -1,5 +1,15 @@
 {
     "maxDisconnectDuration": 5,
-    "maxGameDuration": 30,
-    "gameModes": ["regular", "flappy", "hardcore"]
+    "maxGameDuration": 6000,
+    "timeBeforeGameStart": 3000,
+    "gameModes": ["default", "horizontal", "big", "inverse"],
+    "baseELO": 1000,
+    "botBaseELO": 3000,
+
+    "logInterval": 6000,
+    "matchingJobInterval": 2000,
+    "matchmakingSendUpdatesInterval": 2000,
+    "cleanDisconnetedUsersInterval": 5000,
+    "gameUpdatesInterval": 0,
+    "timeBeforeCleaningEndedGame": 6
 }

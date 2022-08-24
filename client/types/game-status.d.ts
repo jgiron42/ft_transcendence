@@ -1,11 +1,13 @@
+import { User } from "~/models/User";
+import { Game } from "~/gamemodes/default";
 export interface ClientMatch {
-	self: User;
-	opponent: User;
+	p1: User;
+	p2: User;
 	status: "creating" | "ongoing" | "aborted" | "finished";
 	type: "ManVsMachine" | "ManVsMan" | "MachineVsMachine";
-	mode: AllowedGameMode;
+	mode: string;
 	id: string;
 	created_at: number;
 	lastStatusUpdate: number;
-	data: GameData;
+	data: ReturnType<typeof Game.prototype.cloneData>;
 }

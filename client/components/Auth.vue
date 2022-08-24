@@ -17,7 +17,7 @@ export default Vue.extend({
 	}),
 	mounted() {
 		// Get user from API
-		this.$axios.get(this.$config.ft_api.url + "/me").then((ret) => {
+		this.$axios.get("/me").then((ret) => {
 			// Update local user
 			this.user = ret.data as User;
 
