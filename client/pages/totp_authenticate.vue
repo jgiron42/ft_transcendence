@@ -35,7 +35,7 @@ export default Vue.extend({
 		},
 		async connect() {
 			try {
-				const response = await this.$axios.$post(this.$config.ft_api.url + "/auth/totp", "code=" + this.input);
+				const response = await this.$axios.$post("/auth/totp", "code=" + this.input);
 				if (response.isTOTPIdentified) this.$router.push("/");
 			} catch (err) {
 				this.$nuxt.$emit("addAlert", { title: "TOTP", message: err });

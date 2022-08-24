@@ -28,6 +28,7 @@ export default {
 		{ src: "@/plugins/user.plugin", mode: "client" },
 		{ src: "@/plugins/socket-manager", mode: "client" },
 		{ src: "@/plugins/axios", mode: "all" },
+		{ src: "@/plugins/game.plugin", mode: "all" },
 	],
 
 	// Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -41,7 +42,7 @@ export default {
 		"@nuxtjs/device",
 	],
 
-	css: ["~/layouts/global.css"],
+	css: ["@/layouts/global.css"],
 
 	// Modules: https://go.nuxtjs.dev/config-modules
 	modules: ["cookie-universal-nuxt", "nuxt-socket-io", "@nuxtjs/axios"],
@@ -61,10 +62,19 @@ export default {
 	},
 
 	axios: {
+		baseURL: process.env.API_BASE_URL,
 		withCredentials: true,
 	},
 
 	publicRuntimeConfig: {
+		ft_api: {
+			url:
+				process.env.API_BASE_URL ||
+				(process.browser ? `http://${window.location.hostname}:3000` : "http://localhost:3000"),
+		},
+	},
+
+	privateRuntimeConfig: {
 		ft_api: {
 			url:
 				process.env.API_BASE_URL ||

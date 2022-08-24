@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # Set useful env values
 export NODE_PATH=$PWD

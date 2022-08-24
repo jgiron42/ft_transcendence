@@ -1,7 +1,21 @@
 // User type declaration identical to API's one.
-export class User {
+interface UserInterface {
+	id: string;
+	username: string;
+	image_url: string;
+	nb_game: number;
+	nb_loss: number;
+	nb_win: number;
+	totp_enabled: boolean;
+	totp_key: string;
+	status: number;
+	created_at: Date;
+	elo: number;
+}
+
+export class User implements UserInterface {
 	constructor() {
-		this.id = null;
+		this.id = "";
 		this.username = "";
 		this.image_url = "";
 		this.nb_game = 0;
@@ -11,9 +25,10 @@ export class User {
 		this.totp_key = "";
 		this.status = 0;
 		this.created_at = new Date();
+		this.elo = 0;
 	}
 
-	id: string | null;
+	id: string;
 	username: string;
 	image_url: string;
 	nb_game: number;
@@ -23,4 +38,5 @@ export class User {
 	status: number;
 	totp_key: string;
 	created_at: Date;
+	elo: number;
 }

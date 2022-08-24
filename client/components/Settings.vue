@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="min-w-max w-full h-full flex flex-col items-center border-4 border-design_white bg-design_black overflow-hidden rounded-md"
+		class="w-full h-full flex flex-col items-center border-4 border-design_white bg-design_black overflow-hidden rounded-md"
 	>
 		<!-- Title -->
 		<div
@@ -39,7 +39,7 @@
 		<!-- Content -->
 		<div id="content" class="text-design_white w-full h-full">
 			<!-- Component to generate a TOTP QR code and plain secret -->
-			<SettingProfile2FA v-if="selection == '2FA'" />
+			<SettingProfile2FA v-if="selection === '2FA'" />
 			<!-- Profile component with picture upload -->
 			<SettingProfile v-else />
 		</div>

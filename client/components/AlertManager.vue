@@ -21,12 +21,12 @@ export default Vue.extend({
 	mounted() {
 		this.$nuxt.$on("addAlert", (alert: Alert) => {
 			if (!this) return;
+
 			console.error("[ALERT]", alert.title, ":", alert.message);
 
 			// Reset clear timer.
 			window.clearTimeout(this.nextClear);
 
-			alert.title = Date.now().toString();
 			// Add the new alert.
 			this.alerts = [...this.alerts, alert];
 

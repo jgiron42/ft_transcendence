@@ -36,11 +36,14 @@ services:
             - "api.env"
             - "db.env"
             - ".env"
+        environment:
+            - TZ=Europe/Paris
         volumes:
             # Mount code to avoid rebuild container to refresh code
             - ./api/src:/app/src
             - ./api/tsconfig.json:/app/tsconfig.json
             - ./api/tsconfig.build.json:/app/tsconfig.build.json
+            - ./api/config.json:/app/config.json
         restart: unless-stopped
         depends_on: [db]
 

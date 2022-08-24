@@ -1,56 +1,104 @@
 <template>
-	<div class="versus_display diagonal w-full h-full overflow-hidden">
+	<div v-if="p1User && p2User" class="versus_display diagonal w-full h-full overflow-hidden">
+		<!-- Player 1 -->
 		<div class="flex top_left flex-row flex-wrap m-2">
-			<div class="player_name flex">{{ self }}</div>
+			<!-- Player name -->
+			<div class="player_name flex">{{ p1 }}</div>
+
+			<!-- Player picture -->
 			<figure class="w-full">
-				<img v-if="selfImg" :src="selfImg" class="player_image" />
+				<img v-if="p1Img" :src="p1Img" class="player_image" />
 				<img v-else src="~/assets/profile.png" class="player_image" />
 			</figure>
+
+			<!-- Player stats -->
 			<div class="player_stat flex flex-col">
-				<div class="win" data-win-count="300"></div>
-				<div class="lose" data-lose-count="0"></div>
+				<div class="win" :data-win-count="p1User.nb_win"></div>
+				<div class="lose" :data-lose-count="p1User.nb_loss"></div>
 			</div>
 		</div>
-		<p style="margin: 48vh auto 0; transform: translateY(-50%)" class="versus_text">VS</p>
+
+		<!-- VERSUS middle text -->
+		<p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)" class="versus_text">VS</p>
+
+		<!-- Player 2 -->
 		<div class="flex bottom_right flex-row flex-wrap m-2">
-			<div class="player_name flex">{{ opponent }}</div>
+			<!-- Player name -->
+			<div class="player_name flex">{{ p2 }}</div>
+
+			<!-- Player picture  -->
 			<figure class="w-full">
-				<img v-if="opponentImg" :src="opponentImg" class="player_image float-right" />
+				<img v-if="p2Img" :src="p2Img" class="player_image float-right" />
 				<img v-else src="~/assets/profile.png" class="player_image float-right" />
 			</figure>
+
+			<!-- Player stats -->
 			<div class="player_stat flex flex-col">
-				<div class="win" data-win-count="0"></div>
-				<div class="lose" data-lose-count="300"></div>
+				<div class="win" :data-win-count="p2User.nb_win"></div>
+				<div class="lose" :data-lose-count="p2User.nb_loss"></div>
 			</div>
 		</div>
 	</div>
+
+	<!-- Spinny loader displayed while data isn't received yet -->
+	<Loader v-else class="mx-auto animate-spin h-full" />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { User } from "~/models/User";
 import getUserPictureSrc from "~/utils/getUserPictureSrc";
 export default Vue.extend({
 	props: {
-		self: {
+		p1: {
 			type: String,
 			required: true,
 		},
-		opponent: {
+		p2: {
 			type: String,
 			required: true,
 		},
 	},
 	data: () => ({
-		selfImg: "",
-		opponentImg: "",
+		p1User: {} as User,
+		p2User: {} as User,
+		p1Img: "",
+		p2Img: "",
 	}),
-	mounted() {
-		getUserPictureSrc(this.$axios, this.self)
-			.catch()
-			.then((img) => (this.selfImg = img));
-		getUserPictureSrc(this.$axios, this.opponent)
-			.catch()
-			.then((img) => (this.opponentImg = img));
+	async mounted() {
+		// Set the screen to fullscreen landscape when rendered on mobile devices.
+		if (this.$device.isMobileOrTablet) {
+			try {
+				// Set fullscreen.
+				await document.documentElement.requestFullscreen();
+
+				// Set screen orientation to landscape.
+				await screen.orientation.lock("landscape");
+			} catch (_) {}
+		}
+
+		// Get the function to get user informations from database.
+		const getUser = async (id: string): Promise<User> => (await this.$axios.get(`/users/${id}`)).data;
+
+		// Get player 1's user.
+		getUser(this.p1).then((user: User) => {
+			this.p1User = user;
+		});
+
+		// Get player 2's user.
+		getUser(this.p2).then((user: User) => {
+			this.p2User = user;
+		});
+
+		// Get player 1's profile picture data.
+		getUserPictureSrc(this.$axios, this.p1)
+			.then((img) => (this.p1Img = img))
+			.catch(() => {});
+
+		// Get player 2's profile picture data.
+		getUserPictureSrc(this.$axios, this.p2)
+			.then((img) => (this.p2Img = img))
+			.catch((_) => {});
 	},
 });
 </script>

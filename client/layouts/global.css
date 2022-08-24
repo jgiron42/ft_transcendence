@@ -3,6 +3,16 @@
 	src: local("BMjapan"), url("~assets/BMjapan.TTF") format("truetype");
 }
 
+.no-scrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
 /* You need this, trust me */
 html, body, #__nuxt, #__layout {
 	font-family: BMjapan, sans-serif;

@@ -8,6 +8,7 @@ import {
 	ConnectedSocket,
 	MessageBody,
 	WsException,
+	WsResponse,
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { Socket } from "@src/types/socket";
@@ -16,6 +17,9 @@ import { WebsocketSaveSession } from "@interceptors/websocket-save-session";
 import { UserService } from "@services/user.service";
 import { GameModeDTO } from "@dtos/GameModeDTO";
 import { GameService } from "@src/services/game.service";
+import { GameUserInputDTO } from "@src/types/dtos/GameUserInput.dto";
+import { SpectateMatchDTO } from "@src/types/dtos/SpectateMatch.dto";
+import { SerializedMatch } from "@src/types/game";
 
 const exceptionOptions: ValidationPipeOptions = {
 	exceptionFactory: (errors) => {
@@ -28,6 +32,8 @@ const exceptionOptions: ValidationPipeOptions = {
 	cors: {
 		origin: "*",
 	},
+	pingInterval: 100,
+	pingTimeout: 100,
 })
 @UseInterceptors(WebsocketSaveSession)
 @UseGuards(...SessionGuard)
@@ -94,5 +100,21 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
 		@MessageBody("", new ValidationPipe(exceptionOptions)) gameMode: GameModeDTO,
 	) {
 		void this.gameService.matchUserToBot(client.session.user.id, gameMode.mode);
+	}
+
+	@SubscribeMessage("game:updateUserInput")
+	updateUserInput(
+		@ConnectedSocket() client: Socket,
+		@MessageBody("", new ValidationPipe(exceptionOptions)) events: GameUserInputDTO,
+	) {
+		void this.gameService.updateUserInput(client.session.user.id, events);
+	}
+
+	@SubscribeMessage("matchmaking:spectate")
+	handleSpectateRequest(
+		@ConnectedSocket() client: Socket,
+		@MessageBody("", new ValidationPipe(exceptionOptions)) data: SpectateMatchDTO,
+	): WsResponse<SerializedMatch> {
+		return { event: "matchmaking:spectateResponse", data: this.gameService.spectateMatch(client, data.id) };
 	}
 }

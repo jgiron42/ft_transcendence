@@ -5,5 +5,6 @@ export default interface SocketHubInterface {
 	on(event: string, listener: (...args: any[]) => void): NuxtSocket;
 	getMatchingEvents(prefix: string): string[];
 	emit(event: string, ...args: any[]): NuxtSocket;
+	volatile: { emit(event: string, ...args: any[]): NuxtSocket };
 	clearMatchingEvents(prefix: string): number;
 }

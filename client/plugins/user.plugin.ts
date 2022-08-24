@@ -10,6 +10,7 @@ class UserSingleton extends Vue {
 		// Nuxt context allowing you to access the store, runtimeConfig and configured axios.
 		// https://nuxtjs.org/docs/internals-glossary/context/
 		this.ctx = ctx;
+		this.fetch();
 		initialiseStores(this.ctx.store);
 	}
 
@@ -23,7 +24,7 @@ class UserSingleton extends Vue {
 	async fetch(): Promise<User> {
 		try {
 			// Get user from API.
-			const response = await this.ctx.$axios.get(this.ctx.$config.ft_api.url + "/me");
+			const response = await this.ctx.$axios.get("/me");
 
 			// Ensure returner user is valid.
 			if (response.data.id) {
@@ -62,8 +63,6 @@ class UserSingleton extends Vue {
 	async getUser(): Promise<User> {
 		// Get stored user
 		const storedUser = this.user;
-
-		console.log("storedUser", storedUser);
 
 		// Ensure stored user is valid, else fetch and return one from API
 		if (storedUser.id === null) return await this.fetch();

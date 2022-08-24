@@ -38,6 +38,12 @@ class SocketHub extends Vue implements SocketHubInterface {
 		return this.socket.emit(event, ...args);
 	}
 
+	volatile = {
+		emit: (event: string, ...args: any[]): NuxtSocket => {
+			return this.socket.volatile.emit(event, ...args);
+		},
+	};
+
 	// Get all events prefixed by argument ("<prefix>:<event>")
 	getMatchingEvents(prefix: string): string[] {
 		const reg = new RegExp(`^${prefix}:.*$`);
@@ -76,7 +82,7 @@ function initSocket(name: string, context: Context): SocketHubInterface {
 	});
 
 	socket.on("connect", () => {
-		console.log("[WEBSOCKET]: connected", socket.id);
+		console.debug("[WEBSOCKET]: connected", socket.id);
 	});
 
 	// Send session cookie to server in order to authenticate
@@ -84,14 +90,14 @@ function initSocket(name: string, context: Context): SocketHubInterface {
 
 	// Handle received websocket errors
 	socket.on("exception", (err: { authMethod: null | "42" | "totp" } | null) => {
-		console.log("[WEBSOCKET]: ERROR:", JSON.stringify(err));
+		console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
 
 		// Authenticate when server throws an authentication error
 		if (err && err.authMethod) {
 			switch (err.authMethod) {
 				case "42":
 					// Authenticate with 42 OAuth
-					window.location.href = `${context.app.$config.ft_api.url}/auth/42`;
+					window.location.href = `${context.$config.ft_api.url}/auth/42`;
 					return;
 				case "totp":
 					// Redirect to TOTP page
@@ -105,14 +111,14 @@ function initSocket(name: string, context: Context): SocketHubInterface {
 	});
 
 	socket.on("connect_error", (err: any) => {
-		console.log("[WEBSOCKET]: ERROR:", JSON.stringify(err));
+		console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
 		window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: err.toString() });
 	});
 
 	// Log all event
-	socket.onAny((event: any, ...args: any) => {
-		console.log("[WEBSOCKET][WS ANY]:", event, args);
-	});
+	// socket.onAny((event: any, ...args: any) => {
+	// 	console.debug("[WEBSOCKET][WS ANY]:", event, args);
+	// });
 
 	return new SocketHub(socket);
 }
