@@ -369,19 +369,35 @@ export default Vue.extend({
 			let modifier = (GameMode: any) => GameMode;
 
 			// If there is only one local player, set all events to player 1
-			if (type === "online" || type === "bot")
-				_.merge(keyMap, {
-					Up: { pressed: false, event: "upP1" },
-					ArrowUp: { pressed: false, event: "upP1" },
-					Down: { pressed: false, event: "downP1" },
-					ArrowDown: { pressed: false, event: "downP1" },
-					KeyW: { pressed: false, event: "upP1" },
-					KeyS: { pressed: false, event: "downP1" },
-					ClickLeftTop: { pressed: false, event: "upP1" },
-					ClickLeftBottom: { pressed: false, event: "downP1" },
-					ClickRightTop: { pressed: false, event: "upP1" },
-					ClickRightBottom: { pressed: false, event: "downP1" },
-				});
+			// Else, reset the keymap.
+			_.merge(
+				keyMap,
+				type === "online" || type === "bot"
+					? {
+							Up: { pressed: false, event: "upP1" },
+							ArrowUp: { pressed: false, event: "upP1" },
+							Down: { pressed: false, event: "downP1" },
+							ArrowDown: { pressed: false, event: "downP1" },
+							KeyW: { pressed: false, event: "upP1" },
+							KeyS: { pressed: false, event: "downP1" },
+							ClickLeftTop: { pressed: false, event: "upP1" },
+							ClickLeftBottom: { pressed: false, event: "downP1" },
+							ClickRightTop: { pressed: false, event: "upP1" },
+							ClickRightBottom: { pressed: false, event: "downP1" },
+					  }
+					: {
+							Up: { pressed: false, event: "upP2" },
+							ArrowUp: { pressed: false, event: "upP2" },
+							Down: { pressed: false, event: "downP2" },
+							ArrowDown: { pressed: false, event: "downP2" },
+							KeyW: { pressed: false, event: "upP1" },
+							KeyS: { pressed: false, event: "downP1" },
+							ClickLeftTop: { pressed: false, event: "upP1" },
+							ClickLeftBottom: { pressed: false, event: "downP1" },
+							ClickRightTop: { pressed: false, event: "upP2" },
+							ClickRightBottom: { pressed: false, event: "downP2" },
+					  },
+			);
 
 			switch (type) {
 				case "online":
