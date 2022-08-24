@@ -67,6 +67,9 @@ export default {
 	},
 
 	publicRuntimeConfig: {
+		axios: {
+			browserBaseURL: process.env.BROWSER_BASE_URL,
+		},
 		ft_api: {
 			url:
 				process.env.API_BASE_URL ||
@@ -75,6 +78,9 @@ export default {
 	},
 
 	privateRuntimeConfig: {
+		axios: {
+			baseURL: process.env.BASE_URL,
+		},
 		ft_api: {
 			url:
 				process.env.API_BASE_URL ||
