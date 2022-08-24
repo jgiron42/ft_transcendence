@@ -5,19 +5,6 @@
 # Setup pgadmin volume to work correctly with docker
 sudo chown -R 5050:5050 pgadmin/
 
-# Automatically set env values when in a gitpod workspace
-if [ -n "$GITPOD_WORKSPACE_ID" ];then
-    export API_PORT=80
-    export GITPOD_WORKSPACE_HOST="$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST"
-    echo "Running on a gitpod instance: $GITPOD_WORKSPACE_HOST"
-    export API_BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/api
-    export WSS_BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/
-    export NGINX_DEV_HOST="$API_PORT-$GITPOD_WORKSPACE_HOST"
-    export BASE_URL="$NGINX_DEV_HOST"
-    export BROWSER_BASE_URL="$BASE_URL"
-    source ~/.nvm/nvm-lazy.sh
-fi
-
 export NODE_ENV=development
 nvm install 17
 nvm use 17
@@ -27,6 +14,27 @@ cd client ; npm i ; cd ..
 cp .env.sample .env
 cp api.env.sample api.env
 cp db.env.sample db.env
+
+# Automatically set env values when in a gitpod workspace
+if [ -n "$GITPOD_WORKSPACE_ID" ];then
+    export API_PORT=80
+    export GITPOD_WORKSPACE_HOST="$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST"
+    echo "Running on a gitpod instance: $GITPOD_WORKSPACE_HOST"
+    export API_BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/api
+    export BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/
+    export NGINX_DEV_HOST="$API_PORT-$GITPOD_WORKSPACE_HOST"
+    export WSS_BASE_URL="$BASE_URL"
+    export BROWSER_BASE_URL="$BASE_URL/api/"
+
+    echo API_BASE_URL="$API_BASE_URL" >> .env
+    echo WSS_BASE_URL="$WSS_BASE_URL" >> .env
+    echo NGINX_DEV_HOST="$NGINX_DEV_HOST" >> .env
+    echo BASE_URL="$BASE_URL" >> .env
+    echo BROWSER_BASE_URL="$BROWSER_BASE_URL" >> .env
+
+    source ~/.nvm/nvm-lazy.sh
+fi
+
 echo API_BASE_URL="$API_BASE_URL" >> api.env
 
 INTRA_SESSION=""
