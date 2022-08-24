@@ -33,7 +33,7 @@ const exceptionOptions: ValidationPipeOptions = {
 		origin: "*",
 	},
 	pingInterval: 100,
-	pingTimeout: 100,
+	pingTimeout: 1000,
 })
 @UseInterceptors(WebsocketSaveSession)
 @UseGuards(...SessionGuard)
