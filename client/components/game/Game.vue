@@ -78,6 +78,7 @@ interface GameClientInterface {
 type GameData = ReturnType<typeof Game.prototype.cloneData>;
 
 export default Vue.extend({
+	name: "Game",
 	data: () => ({
 		canvas: {} as HTMLCanvasElement,
 		wrapper: {} as HTMLElement,

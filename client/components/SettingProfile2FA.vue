@@ -16,7 +16,7 @@
 				<BoxButton class="w-full" size="" :content="['ENABLE', 'TOTP']" />
 			</div>
 			<!-- QR code and plaintext secret -->
-			<div v-else>
+			<div v-else class="flex flex-col">
 				<!-- QR code usable with google authenticator -->
 				<qrcode
 					class="ml-2"
@@ -25,9 +25,12 @@
 				></qrcode>
 				<br />
 				<!-- TOTP secret key in plaintext -->
-				<p class="p-1 mt-5 bg-white text-black box-border">
-					{{ convertSecret() }}
-				</p>
+				<div class="p-1 mt-5 bg-white text-black box-border flex flex-row">
+					<p class="overflow-scroll no-scrollbar">{{ convertSecret() }}</p>
+					<button class="w-5 mx-1 cursor-pointer" @click="regenerate2FA()">
+						<RedoButton />
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -74,7 +77,16 @@ export default Vue.extend({
 			this.$user.setUser(this.user);
 
 			// Update user in database.
-			await this.$user.save();
+			await this.$user
+				.save()
+				.then(() =>
+					this.alert.emit({
+						title: "SETTINGS",
+						message: "PROFILE SUCCESSFULLY UPDATED",
+						isError: false,
+					}),
+				)
+				.catch((err) => this.alert.emit({ title: "SETTINGS", message: err.toString() }));
 
 			// Fetch updated user
 			this.user = await this.$user.fetch();
@@ -84,6 +96,11 @@ export default Vue.extend({
 		});
 	},
 	methods: {
+		regenerate2FA() {
+			this.generating2FA = false;
+			this.secret = randomKey(10);
+			this.$nuxt.$nextTick(() => (this.generating2FA = true));
+		},
 		convertSecret(): string {
 			// Get encoder to convert a string to a buffer
 			const encoder = new TextEncoder();

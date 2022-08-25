@@ -1,5 +1,6 @@
 import { Plugin, Context } from "@nuxt/types";
 import Vue from "vue";
+import _ from "lodash";
 import { User } from "@/models/User";
 import { store } from "@/store";
 import { initialiseStores } from "@/utils/store-accessor";
@@ -76,12 +77,12 @@ class UserSingleton extends Vue {
 		const user = this.user;
 
 		// Save stored user in database.
-		await this.ctx.$axios.$put(`/users/${user.id}`, user);
+		return await this.ctx.$axios.$put(`/users/${user.id}`, user);
 	}
 
 	setUser(user: User) {
 		// Replace stored user with parameter
-		store.user.setUser(user);
+		store.user.setUser(_.cloneDeep(user));
 	}
 }
 

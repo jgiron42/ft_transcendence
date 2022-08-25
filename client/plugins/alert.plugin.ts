@@ -1,10 +1,11 @@
 import Vue from "vue";
+import _ from "lodash";
 
-type Alert = { title: string; message: string };
+type Alert = Partial<{ title: string; message: string; isError: boolean }>;
 
 class AlertPlugin extends Vue {
-	async emit(alert: Alert) {
-		await this.$nuxt.$emit("addAlert", alert);
+	emit(alert: Alert) {
+		this.$nuxt.$emit("addAlert", _.cloneDeep(alert));
 	}
 }
 

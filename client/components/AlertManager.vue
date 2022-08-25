@@ -5,6 +5,7 @@
 			:key="index"
 			:id-prop="index"
 			:title="alert.title"
+			:is-error="alert.isError"
 			:message="alert.message"
 		/>
 	</div>
@@ -12,7 +13,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-type Alert = { title: string; message: string };
+import _ from "lodash";
+
+type Alert = Partial<{ title: string; message: string; isError: boolean }>;
 export default Vue.extend({
 	data: () => ({
 		alerts: [] as Alert[],
@@ -22,18 +25,26 @@ export default Vue.extend({
 		this.$nuxt.$on("addAlert", (alert: Alert) => {
 			if (!this) return;
 
-			console.error("[ALERT]", alert.title, ":", alert.message);
+			if (alert.isError === false) console.info("[ALERT]", alert.title, ":", alert.message);
+			else console.error("[ALERT]", alert.title, ":", alert.message);
 
 			// Reset clear timer.
 			window.clearTimeout(this.nextClear);
 
 			// Add the new alert.
-			this.alerts = [...this.alerts, alert];
+			this.alerts = [
+				...this.alerts,
+				{
+					..._.cloneDeep(alert),
+					title: alert.title ? alert.title : "ALERT",
+					isError: alert.isError === undefined || alert.isError,
+				},
+			];
 
 			// Set the alert list to be cleared in 3.5 seconds.
 			this.nextClear = window.setTimeout(() => {
 				this.alerts = [];
-			}, 100000);
+			}, 5000);
 		});
 
 		this.$nuxt.$on("delAlert", (id: number) => {
@@ -49,8 +60,10 @@ export default Vue.extend({
 			// Set the alert list to be cleared in 3.5 seconds.
 			this.nextClear = window.setTimeout(() => {
 				this.alerts = [];
-			}, 100000);
+			}, 5000);
 		});
+
+		this.$nuxt.$on("clearAlerts", () => (this.alerts = []));
 	},
 });
 </script>

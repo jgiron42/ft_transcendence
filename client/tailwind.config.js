@@ -13,6 +13,7 @@ module.exports = {
 				design_black: "#1b1b1b",
 				design_white: "#ffffff",
 				design_mgray: "#1B1B1B",
+				design_history_gray: "#3E3E3E",
 			},
 		},
 	},
