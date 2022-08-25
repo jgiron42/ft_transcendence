@@ -2,6 +2,8 @@
 
 # Script to easily launch the project in dev mode
 
+source ~/.nvm/nvm-lazy.sh
+
 # Setup pgadmin volume to work correctly with docker
 sudo chown -R 5050:5050 pgadmin/
 
@@ -21,9 +23,9 @@ if [ -n "$GITPOD_WORKSPACE_ID" ];then
     export GITPOD_WORKSPACE_HOST="$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST"
     echo "Running on a gitpod instance: $GITPOD_WORKSPACE_HOST"
     export API_BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/api
-    export BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/
+    export BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST
     export NGINX_DEV_HOST="$API_PORT-$GITPOD_WORKSPACE_HOST"
-    export WSS_BASE_URL="$BASE_URL"
+    export WSS_BASE_URL="$BASE_URL/"
     export BROWSER_BASE_URL="$BASE_URL/api/"
 
     echo API_BASE_URL="$API_BASE_URL" >> .env
@@ -31,8 +33,6 @@ if [ -n "$GITPOD_WORKSPACE_ID" ];then
     echo NGINX_DEV_HOST="$NGINX_DEV_HOST" >> .env
     echo BASE_URL="$BASE_URL" >> .env
     echo BROWSER_BASE_URL="$BROWSER_BASE_URL" >> .env
-
-    source ~/.nvm/nvm-lazy.sh
 fi
 
 echo API_BASE_URL="$API_BASE_URL" >> api.env
