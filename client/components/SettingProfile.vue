@@ -8,7 +8,12 @@
 				<img v-else src="~/assets/profile.png" class="rounded-full w-24 h-24" />
 			</div>
 		</div>
-		<p class="text-white">{{ user.id }}</p>
+		<input
+			id="id-input"
+			type="text"
+			class="text-black box-content text-center font-mono mt-2"
+			:value="user.username"
+		/>
 		<!-- Some space -->
 		<div id="spacer" class="h-1/5"></div>
 		<div class="flex justify-around w-10">
@@ -38,7 +43,7 @@ export default Vue.extend({
 	},
 	async mounted() {
 		// Send file to API when save button is clicked
-		this.$nuxt.$on("saveSettingsProfile", this.sendFile);
+		this.$nuxt.$on("saveSettingsProfile", this.saveSettings);
 
 		// Get user data from API
 		this.user = await (await this.$axios.get("/me")).data;
@@ -53,24 +58,34 @@ export default Vue.extend({
 			const file = e.target.files[0];
 			this.url = URL.createObjectURL(file);
 		},
-		sendFile() {
-			// Get file input HTML element
-			const input = document.getElementById("selectedFile") as HTMLFormElement;
+		saveSettings() {
+			const input = document.getElementById("id-input") as HTMLInputElement;
 
-			// Ensure the element exist and it has files
-			if (input && input.files) {
-				// Create a new form for storing picture file to be sent
-				const fd = new FormData();
+			if (input && input.value !== this.user.username) {
+				this.user.username = input.value;
+				this.$user.setUser(this.user);
+				this.$user.save();
+			}
 
-				// Add picture file to form data
-				fd.append("file", input.files[0]);
+			if (this.url) {
+				// Get file input HTML element
+				const input = document.getElementById("selectedFile") as HTMLFormElement;
 
-				// Post form data to API
-				this.$axios.$post("/users/picture", fd, {
-					headers: {
-						"content-type": "multipart/form-data", // do not forget this
-					},
-				});
+				// Ensure the element exist and it has files
+				if (input && input.files) {
+					// Create a new form for storing picture file to be sent
+					const fd = new FormData();
+
+					// Add picture file to form data
+					fd.append("file", input.files[0]);
+
+					// Post form data to API
+					this.$axios.$post("/users/picture", fd, {
+						headers: {
+							"content-type": "multipart/form-data", // do not forget this
+						},
+					});
+				}
 			}
 		},
 	},

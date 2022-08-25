@@ -23,8 +23,9 @@
 					:value="`otpauth://totp/ft_transcendance:${username}?secret=${convertSecret()}&issuer=ft_transcendance`"
 					:options="{ width: 200 }"
 				></qrcode>
+				<br />
 				<!-- TOTP secret key in plaintext -->
-				<p class="p-1 mt-8 bg-white text-black box-border">
+				<p class="p-1 mt-5 bg-white text-black box-border">
 					{{ convertSecret() }}
 				</p>
 			</div>
