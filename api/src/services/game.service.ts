@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { Injectable } from "@nestjs/common";
+import { Catch, Injectable } from "@nestjs/common";
 import { Logger } from "@nestjs/common";
 import config from "@src/config/game.config";
 import { AllowedGameMode } from "@src/config/game.config";
@@ -28,6 +28,7 @@ import _ from "lodash";
 import EloRank from "elo-rank";
 import { StoredGameService } from "./stored-game.service";
 
+@Catch()
 @Injectable()
 export class GameService {
 	private logger: Logger = new Logger("GameService");
@@ -59,45 +60,64 @@ export class GameService {
 		config.gameModes.forEach((mode: AllowedGameMode) => {
 			this.logger.log(`Initializing game mode: ${mode}`);
 			this.matchmakingPool.set(mode, new Set<GameUser>() as GameUserSet);
+			this.initBots();
 		});
+	}
 
-		// Create the first bot in DB.
-		this.userService
-			.create({
-				id: "CrocuBot",
-				username: "Kronku",
-				image_url: "/",
-				nb_game: 0,
-				nb_win: 0,
-				totp_enabled: false,
-				status: 0,
-				totp_key: "",
-				created_at: new Date(),
-				elo: config.botBaseELO,
-			})
-			.then((bot) => (this.bot = bot))
-			.catch(() => {
-				throw new Error("Could not create create Crocubot");
-			});
+	initBots() {
+		// Init callback to create the first bot when it doesn't already exists in DB.
+		const createFirstBot = () =>
+			this.userService
+				.create({
+					id: "CrocuBot",
+					username: "Crocu",
+					image_url: "/",
+					nb_game: 0,
+					nb_win: 0,
+					totp_enabled: false,
+					status: 0,
+					totp_key: "",
+					created_at: new Date(),
+					elo: config.botBaseELO,
+				})
+				.then((bot) => (this.bot = bot))
+				.catch(() => this.logger.error("Could not create create nor find CrocuBot"));
 
-		// Create the second bot in DB.
+		// Init callback to create the second bot when it doesn't already exists in DB.
+		const createSecondBot = () =>
+			this.userService
+				.create({
+					id: "RoBOTnix",
+					username: "Nix",
+					image_url: "/",
+					nb_game: 0,
+					nb_win: 0,
+					totp_enabled: false,
+					status: 0,
+					totp_key: "",
+					created_at: new Date(),
+					elo: config.botBaseELO,
+				})
+				.then((bot) => (this.bot2 = bot))
+				.catch(() => this.logger.error("Could not create create nor find RoBOTnix"));
+
+		// Find or create the first bot in DB.
 		this.userService
-			.create({
-				id: "RoBOTnix",
-				username: "Nix",
-				image_url: "/",
-				nb_game: 0,
-				nb_win: 0,
-				totp_enabled: false,
-				status: 0,
-				totp_key: "",
-				created_at: new Date(),
-				elo: config.botBaseELO,
+			.findOne("CrocuBot")
+			.then((bot) => {
+				if (bot) this.bot = bot;
+				else void createFirstBot();
 			})
-			.then((bot) => (this.bot2 = bot))
-			.catch(() => {
-				throw new Error("Could not create create RoBOTnix");
-			});
+			.catch(createFirstBot);
+
+		// Find or create the second bot in DB.
+		this.userService
+			.findOne("RoBOTnix")
+			.then((bot) => {
+				if (bot) this.bot2 = bot;
+				else void createSecondBot();
+			})
+			.catch(createSecondBot);
 	}
 
 	disconnectClient(client: Socket) {
@@ -209,6 +229,11 @@ export class GameService {
 	}
 
 	matchUserToBot(userID: string, mode: AllowedGameMode) {
+		if (!this.bot) {
+			this.logger.warn("Can't match user to bot because it hasn't been found nor created");
+			return;
+		}
+
 		// Get user from connected users pool.
 		const foundUser: GameUser = this.connectedPool.get(userID);
 
@@ -409,7 +434,7 @@ export class GameService {
 	async updateMatches() {
 		try {
 			// Ensure there's always games to spectate by creating a bot match when no games are ongoing.
-			if (this.matchPool.size === 0 && this.bot.created_at && this.bot2.created_at)
+			if (this.matchPool.size === 0 && this.bot && this.bot2 && this.bot.id && this.bot2.id)
 				this.matchUsers(
 					this.makeGameUserFromBot(this.bot, _.sample(config.gameModes)),
 					this.makeGameUserFromBot(this.bot2),
@@ -495,16 +520,18 @@ export class GameService {
 					});
 
 					// Save game in db
-					void this.storedGameService.create({
-						id: 0,
-						score_first_player: score.p1,
-						score_second_player: score.p2,
-						user_one: match.p1.user,
-						user_two: match.p2.user,
-						finished: true,
-						type: match.type,
-						created_at: new Date(match.created_at),
-					} as GameEntity);
+					void this.storedGameService
+						.create({
+							id: 0,
+							score_first_player: score.p1,
+							score_second_player: score.p2,
+							user_one: match.p1.user,
+							user_two: match.p2.user,
+							finished: true,
+							type: match.type,
+							created_at: new Date(match.created_at),
+						} as GameEntity)
+						.catch((err: Error) => this.logger.error(`Failed to save finished game: ${err.toString()}`));
 
 					// All done.
 					return;

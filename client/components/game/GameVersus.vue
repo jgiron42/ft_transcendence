@@ -49,6 +49,7 @@ import Vue from "vue";
 import { User } from "~/models/User";
 import getUserPictureSrc from "~/utils/getUserPictureSrc";
 export default Vue.extend({
+	name: "GameVersus",
 	props: {
 		p1: {
 			type: String,

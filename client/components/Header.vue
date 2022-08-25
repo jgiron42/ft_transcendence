@@ -9,6 +9,7 @@
 				<NuxtLink class="selection_menu" to="/matchmaking">Pong</NuxtLink>
 				<NuxtLink class="selection_menu" to="/chat">Social Network</NuxtLink>
 				<NuxtLink class="selection_menu" to="/profile">Profile</NuxtLink>
+				<NuxtLink class="selection_menu" to="/history">History</NuxtLink>
 				<p>{{ userID }}</p>
 			</div>
 		</div>

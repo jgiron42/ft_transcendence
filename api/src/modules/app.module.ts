@@ -28,14 +28,14 @@ import { MessageModule } from "./message.module";
 	imports: [
 		TypeOrmModule.forRoot({
 			type: "postgres",
-			host: "db",
-			port: 5432,
+			host: process.env.POSTGRES_HOST || "db",
+			port: Number(process.env.POSTGRES_PORT) || 5432,
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.POSTGRES_DB,
 			entities: [User, Relation, Game, Channel, Message, ChanConnection, ChanInvitation],
-			synchronize: true,
-			dropSchema: true,
+			synchronize: process.env.NODE_ENV !== "production",
+			dropSchema: process.env.NODE_ENV !== "production",
 		}),
 		UserModule,
 		RelationModule,

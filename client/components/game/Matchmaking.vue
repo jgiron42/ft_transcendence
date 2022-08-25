@@ -66,6 +66,7 @@
 				<SelectMenu
 					id-prop="matchmaking-mode-select"
 					:options="gameModes"
+					:uppercase="true"
 					class="text-center hover:text-gray-300"
 				/>
 			</div>
@@ -74,6 +75,7 @@
 				<SelectMenu
 					id-prop="matchmaking-type-select"
 					:options="Object.values(opponentTypes)"
+					:uppercase="true"
 					class="text-center hover:text-gray-300"
 				/>
 			</div>
@@ -100,6 +102,7 @@ import type SocketHubInterface from "~/types/socker-hub";
 import getUserPictureSrc from "~/utils/getUserPictureSrc";
 
 export default Vue.extend({
+	name: "Matchmaking",
 	data: () => ({
 		waiting: false,
 		buttonContent: "FIND A MATCH",
@@ -113,11 +116,11 @@ export default Vue.extend({
 		matchmakingPools: {} as Record<string, string[]>,
 		selectedType: "online",
 		opponentTypes: {
-			online: "online player",
-			local: "local player",
-			bot: "local bot",
-			onlineBot: "online bot",
-			demo: "no player (demo)",
+			online: "ONLINE PLAYER",
+			local: "LOCAL PLAYER",
+			bot: "LOCAL BOT",
+			onlineBot: "ONLINE BOT",
+			demo: "NO PLAYER (DEMO)",
 		},
 		gameModes: [] as string[],
 		matchList: [] as SerializedMatch[],
