@@ -11,6 +11,7 @@
 				<img v-else-if="image" :src="image" class="rounded-full w-24 h-24" />
 				<img v-else src="~/assets/profile.png" class="rounded-full w-24 h-24" />
 			</div>
+			<input id="selectedFile" class="box-border" type="file" style="display: none" @change="onFileChange" />
 			<input
 				id="id-input"
 				type="text"

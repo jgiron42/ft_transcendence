@@ -26,6 +26,7 @@ import { modifier as PVEModifier } from "@src/gamemodes/modifiers/bot";
 import { modifier as demoModifier } from "@src/gamemodes/modifiers/demo";
 import _ from "lodash";
 import EloRank from "elo-rank";
+import { Mutex } from "async-mutex";
 import { StoredGameService } from "./stored-game.service";
 
 @Catch()
@@ -54,6 +55,10 @@ export class GameService {
 	// ELO ratings calculator
 	// https://www.npmjs.com/package/elo-rank
 	private elo = new EloRank();
+
+	// Mutex to avoid race conditions in updateMatches()
+	// https://www.npmjs.com/package/async-mutex
+	private matchUpdateMutex = new Mutex();
 
 	constructor(private readonly userService: UserService, private readonly storedGameService: StoredGameService) {
 		// Initialize all game mode pools
@@ -392,6 +397,7 @@ export class GameService {
 			this.broadcast(localUser, "matchmaking:updateStatus", true, userStatus);
 		});
 	}
+
 	@Interval(config.cleanDisconnetedUsersInterval)
 	cleanDisconnectedUsers() {
 		this.logger.log("[CLEAN]: Cleaning up disconnected users.");
@@ -432,150 +438,164 @@ export class GameService {
 
 	@Interval(config.gameUpdatesInterval) // Should be 0
 	async updateMatches() {
-		try {
-			// Ensure there's always games to spectate by creating a bot match when no games are ongoing.
-			if (this.matchPool.size === 0 && this.bot && this.bot2 && this.bot.id && this.bot2.id)
-				this.matchUsers(
-					this.makeGameUserFromBot(this.bot, _.sample(config.gameModes)),
-					this.makeGameUserFromBot(this.bot2),
-				);
+		// Ensure updates cannot run concurrently. (avoid race conditions)
+		await this.matchUpdateMutex.runExclusive(async () => {
+			try {
+				// Ensure there's always games to spectate by creating a bot match when no games are ongoing.
+				if (this.matchPool.size === 0 && this.bot && this.bot2 && this.bot.id && this.bot2.id)
+					this.matchUsers(
+						this.makeGameUserFromBot(this.bot, _.sample(config.gameModes)),
+						this.makeGameUserFromBot(this.bot2),
+					);
 
-			// Updates all matchs state
-			for (const [matchID, match] of this.matchPool) {
-				// Wait a bit before cleaning finished games
-				// (allows clients to update their local game state and handle game termination properly)
-				if (
-					["aborted", "finished"].includes(match.status) &&
-					(Date.now() - match.lastStatusUpdate) / 1000 < config.timeBeforeCleaningEndedGame
-				)
-					return;
+				// Updates all matchs state
+				for (const [matchID, match] of this.matchPool) {
+					// Wait a bit before cleaning finished games
+					// (allows clients to update their local game state and handle game termination properly)
+					if (
+						["aborted", "finished"].includes(match.status) &&
+						(Date.now() - match.lastStatusUpdate) / 1000 < config.timeBeforeCleaningEndedGame
+					)
+						continue;
 
-				// Cleanup aborted games
-				if (match.status === "aborted") {
-					// Delete match from pool
-					this.matchPool.delete(matchID);
+					// Cleanup aborted games
+					if (match.status === "aborted") {
+						// Delete match from pool
+						this.matchPool.delete(matchID);
 
-					[match.p1, match.p2].forEach((user: GameUser) => {
-						// Update user status
-						user.status = user.status === "disconnected" ? "disconnected" : "connected";
+						[match.p1, match.p2].forEach((user: GameUser) => {
+							// Update user status
+							user.status = user.status === "disconnected" ? "disconnected" : "connected";
 
-						// Remove users' stored references to terminated match
-						user.match = null;
-					});
+							// Remove users' stored references to terminated match
+							user.match = null;
+						});
 
-					// All done
-					return;
-				}
-
-				// Cleanup finished games
-				if (match.status === "finished") {
-					// Extract score
-					const score = match.game.score;
-
-					// Fetch users in database
-					const updatedUsers = [
-						await this.userService.findOne(match.p1.user.id),
-						await this.userService.findOne(match.p2.user.id),
-					];
-
-					// Ensure game isn't a draw
-					if (score.p1 !== score.p2) {
-						// Get winner and loser
-						const [winner, loser] =
-							score.p1 > score.p2
-								? [updatedUsers[0], updatedUsers[1]]
-								: [updatedUsers[1], updatedUsers[0]];
-
-						// Increase winner's win counter
-						winner.nb_win++;
-
-						// Increase loser's loss counter
-						loser.nb_loss++;
-
-						// Increase winner's ELO rating.
-						winner.elo = this.elo.updateRating(this.elo.getExpected(winner.elo, loser.elo), 1, winner.elo);
-
-						// Decrease loser's ELO rating.
-						loser.elo = this.elo.updateRating(this.elo.getExpected(loser.elo, winner.elo), 0, loser.elo);
+						// All done
+						continue;
 					}
 
-					// Increase user's game counter
-					updatedUsers.forEach((user: User) => {
-						user.nb_game++;
-						void this.userService.update(user.id, user);
-					});
+					// Cleanup finished games
+					if (match.status === "finished") {
+						// Extract score
+						const score = match.game.score;
 
-					// Erase game
-					this.matchPool.delete(match.id);
+						// Fetch users in database
+						const updatedUsers = [
+							await this.userService.findOne(match.p1.user.id),
+							await this.userService.findOne(match.p2.user.id),
+						];
 
-					[match.p1, match.p2].forEach((user: GameUser) => {
-						// Remove reference to terminated match
-						user.match = null;
+						// Ensure game isn't a draw
+						if (score.p1 !== score.p2) {
+							// Get winner and loser
+							const [winner, loser] =
+								score.p1 > score.p2
+									? [updatedUsers[0], updatedUsers[1]]
+									: [updatedUsers[1], updatedUsers[0]];
 
-						// Restore users status
-						user.status = "connected";
+							// Increase winner's win counter
+							winner.nb_win++;
 
-						// Update user data
-						user.user = updatedUsers.shift();
-					});
+							// Increase loser's loss counter
+							loser.nb_loss++;
 
-					// Save game in db
-					void this.storedGameService
-						.create({
-							id: 0,
-							score_first_player: score.p1,
-							score_second_player: score.p2,
-							user_one: match.p1.user,
-							user_two: match.p2.user,
-							finished: true,
-							type: match.type,
-							created_at: new Date(match.created_at),
-						} as GameEntity)
-						.catch((err: Error) => this.logger.error(`Failed to save finished game: ${err.toString()}`));
+							// Increase winner's ELO rating.
+							winner.elo = this.elo.updateRating(
+								this.elo.getExpected(winner.elo, loser.elo),
+								1,
+								winner.elo,
+							);
 
-					// All done.
-					return;
+							// Decrease loser's ELO rating.
+							loser.elo = this.elo.updateRating(
+								this.elo.getExpected(loser.elo, winner.elo),
+								0,
+								loser.elo,
+							);
+						}
+
+						// Increase user's game counter
+						updatedUsers.forEach((user: User) => {
+							user.nb_game++;
+							void this.userService.update(user.id, user);
+						});
+
+						// Erase game
+						this.matchPool.delete(match.id);
+
+						[match.p1, match.p2].forEach((user: GameUser) => {
+							// Remove reference to terminated match
+							user.match = null;
+
+							// Restore users status
+							user.status = "connected";
+
+							// Update user data
+							user.user = updatedUsers.shift();
+						});
+
+						// Save game in db
+						void this.storedGameService
+							.create({
+								id: 0,
+								score_first_player: score.p1,
+								score_second_player: score.p2,
+								user_one: match.p1.user,
+								user_two: match.p2.user,
+								finished: true,
+								type: match.type,
+								created_at: new Date(match.created_at),
+							} as GameEntity)
+							.then((game) => this.logger.log(`Saved finished game: ${game.id}:${matchID}`))
+							.catch((err: Error) =>
+								this.logger.error(`Failed to save finished game(${matchID}): ${err.toString()}`),
+							);
+
+						// All done.
+						continue;
+					}
+
+					// Set games that exceeded max duration as finished.
+					if ((Date.now() - match.created_at) / 1000 > config.maxGameDuration) {
+						// Set match to be terminated
+						match.status = "finished";
+
+						// Store update date.
+						match.lastStatusUpdate = Date.now();
+
+						continue;
+					}
+
+					// Wait a bit before starting the match in order to let clients prepare for it.
+					if (match.status === "creating" && Date.now() - match.lastStatusUpdate > config.timeBeforeGameStart)
+						match.status = "ongoing";
+
+					if (match.status === "ongoing") {
+						// Process player 1 inputs
+						if (match.p1.type !== "bot" && match.p1.gameEvents.up) match.game.eventQueue.add("upP1");
+						if (match.p1.type !== "bot" && match.p1.gameEvents.down) match.game.eventQueue.add("downP1");
+						if (match.p1.type !== "bot" && !(match.p1.gameEvents.down || match.p1.gameEvents.up))
+							match.game.eventQueue.add("stopP1");
+
+						// Process player 2 inputs
+						if (match.p2.type !== "bot" && match.p2.gameEvents.up) match.game.eventQueue.add("upP2");
+						if (match.p2.type !== "bot" && match.p2.gameEvents.down) match.game.eventQueue.add("downP2");
+						if (match.p2.type !== "bot" && !(match.p2.gameEvents.down || match.p2.gameEvents.up))
+							match.game.eventQueue.add("stopP2");
+
+						// Advance game state
+						match.game.update();
+
+						// Update status when game is finished.
+						if (match.game.ended) match.status = "finished";
+					}
 				}
-
-				// Set games that exceeded max duration as finished.
-				if ((Date.now() - match.created_at) / 1000 > config.maxGameDuration) {
-					// Set match to be terminated
-					match.status = "finished";
-
-					// Store update date.
-					match.lastStatusUpdate = Date.now();
-
-					return;
-				}
-
-				// Wait a bit before starting the match in order to let clients prepare for it.
-				if (match.status === "creating" && Date.now() - match.lastStatusUpdate > config.timeBeforeGameStart)
-					match.status = "ongoing";
-
-				if (match.status === "ongoing") {
-					// Process player 1 inputs
-					if (match.p1.type !== "bot" && match.p1.gameEvents.up) match.game.eventQueue.add("upP1");
-					if (match.p1.type !== "bot" && match.p1.gameEvents.down) match.game.eventQueue.add("downP1");
-					if (match.p1.type !== "bot" && !(match.p1.gameEvents.down || match.p1.gameEvents.up))
-						match.game.eventQueue.add("stopP1");
-
-					// Process player 2 inputs
-					if (match.p2.type !== "bot" && match.p2.gameEvents.up) match.game.eventQueue.add("upP2");
-					if (match.p2.type !== "bot" && match.p2.gameEvents.down) match.game.eventQueue.add("downP2");
-					if (match.p2.type !== "bot" && !(match.p2.gameEvents.down || match.p2.gameEvents.up))
-						match.game.eventQueue.add("stopP2");
-
-					// Advance game state
-					match.game.update();
-
-					// Update status when game is finished.
-					if (match.game.ended) match.status = "finished";
-				}
+			} catch (err) {
+				// Log any errors.
+				this.logger.error(err);
 			}
-		} catch (err) {
-			// Log any errors.
-			this.logger.error(err);
-		}
+		});
 	}
 
 	@Interval(0)

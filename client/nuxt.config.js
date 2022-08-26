@@ -104,6 +104,7 @@ export default {
 			"~/components/chat/popup",
 			"~/components/svg",
 			"~/components/game",
+			"~/components/settings",
 		],
 	},
 	// Disable broken SSR on chat
