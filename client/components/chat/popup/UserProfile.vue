@@ -60,16 +60,16 @@
 						watch the current game!
 					</button>
 					<!-- see the game history of user -->
-					<button class="button_profile" @click.prevent="seeGameHistory">
+					<NuxtLink :to="`/history?user=${user.id}`" class="button_profile">
 						{{ user.username }}'s game history!
-					</button>
+					</NuxtLink>
 				</div>
 			</div>
 			<!-- if the user is me, then simply add a link to my game history -->
 			<div v-else>
-				<button class="button_profile" @click.prevent="seeGameHistory">
+				<NuxtLink :to="`/history?user=${user.id}`" class="button_profile">
 					{{ user.username }}'s game history!
-				</button>
+				</NuxtLink>
 			</div>
 		</div>
 	</client-only>
@@ -189,10 +189,6 @@ export default Vue.extend({
 
 		watchGame() {
 			// TODO: watch the game of the user
-		},
-
-		seeGameHistory() {
-			// TODO: redirect to the game history of the user
 		},
 	},
 });
