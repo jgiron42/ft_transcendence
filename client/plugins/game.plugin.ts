@@ -7,6 +7,7 @@ class GamePlugin extends Vue {
 	mode = "";
 	spectating = false;
 	id = "";
+	isP1 = false;
 
 	constructor(ctx: Context) {
 		super();

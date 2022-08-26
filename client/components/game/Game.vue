@@ -105,6 +105,7 @@ export default Vue.extend({
 		syncInterval: {} as NodeJS.Timeout,
 		syncAmounts: 0,
 		spectating: false,
+		currentPlayer: "P1" as "P1" | "P2",
 	}),
 	async mounted() {
 		try {
@@ -372,36 +373,51 @@ export default Vue.extend({
 
 			// If there is only one local player, set all events to player 1
 			// Else, reset the keymap.
-			_.merge(
-				keyMap,
-				type === "online" || type === "bot"
-					? {
-							Up: { pressed: false, event: "upP1" },
-							ArrowUp: { pressed: false, event: "upP1" },
-							Down: { pressed: false, event: "downP1" },
-							ArrowDown: { pressed: false, event: "downP1" },
-							KeyZ: { pressed: false, event: "upP1" },
-							KeyW: { pressed: false, event: "upP1" },
-							KeyS: { pressed: false, event: "downP1" },
-							ClickLeftTop: { pressed: false, event: "upP1" },
-							ClickLeftBottom: { pressed: false, event: "downP1" },
-							ClickRightTop: { pressed: false, event: "upP1" },
-							ClickRightBottom: { pressed: false, event: "downP1" },
-					  }
-					: {
-							Up: { pressed: false, event: "upP2" },
-							ArrowUp: { pressed: false, event: "upP2" },
-							Down: { pressed: false, event: "downP2" },
-							ArrowDown: { pressed: false, event: "downP2" },
-							KeyZ: { pressed: false, event: "upP1" },
-							KeyW: { pressed: false, event: "upP1" },
-							KeyS: { pressed: false, event: "downP1" },
-							ClickLeftTop: { pressed: false, event: "upP1" },
-							ClickLeftBottom: { pressed: false, event: "downP1" },
-							ClickRightTop: { pressed: false, event: "upP2" },
-							ClickRightBottom: { pressed: false, event: "downP2" },
-					  },
-			);
+			let newKeymap = {
+				Up: { pressed: false, event: "upP2" },
+				ArrowUp: { pressed: false, event: "upP2" },
+				Down: { pressed: false, event: "downP2" },
+				ArrowDown: { pressed: false, event: "downP2" },
+				KeyZ: { pressed: false, event: "upP1" },
+				KeyW: { pressed: false, event: "upP1" },
+				KeyS: { pressed: false, event: "downP1" },
+				ClickLeftTop: { pressed: false, event: "upP1" },
+				ClickLeftBottom: { pressed: false, event: "downP1" },
+				ClickRightTop: { pressed: false, event: "upP2" },
+				ClickRightBottom: { pressed: false, event: "downP2" },
+			};
+
+			if (type === "bot")
+				newKeymap = {
+					Up: { pressed: false, event: "upP1" },
+					ArrowUp: { pressed: false, event: "upP1" },
+					Down: { pressed: false, event: "downP1" },
+					ArrowDown: { pressed: false, event: "downP1" },
+					KeyZ: { pressed: false, event: "upP1" },
+					KeyW: { pressed: false, event: "upP1" },
+					KeyS: { pressed: false, event: "downP1" },
+					ClickLeftTop: { pressed: false, event: "upP1" },
+					ClickLeftBottom: { pressed: false, event: "downP1" },
+					ClickRightTop: { pressed: false, event: "upP1" },
+					ClickRightBottom: { pressed: false, event: "downP1" },
+				};
+			else if (type === "online") {
+				this.currentPlayer = this.$game.isP1 ? "P1" : "P2";
+				const p = this.currentPlayer;
+				newKeymap = {
+					Up: { pressed: false, event: `up${p}` },
+					ArrowUp: { pressed: false, event: `up${p}` },
+					Down: { pressed: false, event: `down${p}` },
+					ArrowDown: { pressed: false, event: `down${p}` },
+					KeyZ: { pressed: false, event: `up${p}` },
+					KeyW: { pressed: false, event: `up${p}` },
+					KeyS: { pressed: false, event: `down${p}` },
+					ClickLeftTop: { pressed: false, event: `up${p}` },
+					ClickLeftBottom: { pressed: false, event: `down${p}` },
+					ClickRightTop: { pressed: false, event: `up${p}` },
+					ClickRightBottom: { pressed: false, event: `down${p}` },
+				};
+			}
 
 			switch (type) {
 				case "online":
@@ -425,6 +441,8 @@ export default Vue.extend({
 					modifier = DemoModifier;
 					break;
 			}
+
+			_.merge(keyMap, newKeymap);
 
 			// Return transformed game class.
 			return modifier(GameMode);
@@ -615,8 +633,8 @@ export default Vue.extend({
 
 				// Set the user events from the game keymap
 				Object.values(keyMap).forEach((key) => {
-					if (key.pressed && key.event === "upP1") data.up = true;
-					if (key.pressed && key.event === "downP1") data.down = true;
+					if (key.pressed && key.event === `up${this.currentPlayer}`) data.up = true;
+					if (key.pressed && key.event === `down${this.currentPlayer}`) data.down = true;
 				});
 
 				// Send the user inputs to the backend.
