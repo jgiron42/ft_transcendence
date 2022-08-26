@@ -66,7 +66,7 @@ class UserSingleton extends Vue {
 		const storedUser = this.user;
 
 		// Ensure stored user is valid, else fetch and return one from API
-		if (storedUser.id === null) return await this.fetch();
+		if (!storedUser.id) return await this.fetch();
 
 		// Return stored user
 		return this.user;

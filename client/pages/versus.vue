@@ -26,11 +26,14 @@ export default Vue.extend({
 		this.$gameSocket.clearMatchingEvents("matchmaking");
 
 		// Hangle game updates.
-		this.$gameSocket.on("game:updateStatus", (game: ClientMatch) => {
+		this.$gameSocket.on("game:updateStatus", async (game: ClientMatch) => {
 			// Redirect to game page when game has started.
 			if (game.status === "ongoing") {
 				// Format the game mode approriately.
 				this.$game.mode = "online:" + game.mode;
+
+				// Get the player side (P1 = left, P2 = right)
+				this.$game.isP1 = (await this.$user.getUser()).id === game.p1.id;
 
 				// Actually redirect to the game page.
 				this.$nuxt.$router.push("/game");

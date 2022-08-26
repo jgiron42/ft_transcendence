@@ -7,7 +7,7 @@
 			id="title"
 			class="items-center text-design_white h-8 justify-center top-1/2 flex w-full border-b-2 border-design_white text-center bg-design_blue"
 		>
-			<div class="inline-block align-center">HISTORY</div>
+			<div class="inline-block align-center uppercase">{{ userID }}'s HISTORY</div>
 		</div>
 		<!-- Loaded content -->
 		<div v-if="loaded" class="text-white overflow-y-scroll w-full h-full no-scrollbar items-center flex flex-col">
@@ -19,7 +19,7 @@
 				class="p-2 my-1 rounded-md bg-design_black flex flex-row justify-around font-mono items-center"
 			>
 				<!-- Player 1 ID -->
-				<p>{{ match.user_one.id }}</p>
+				<p class="match-user-id no-scrollbar">{{ match.user_one.id }}</p>
 
 				<!-- Player 1 picture -->
 				<object
@@ -43,7 +43,7 @@
 				</object>
 
 				<!-- Player 2 ID -->
-				<p>{{ match.user_two.id }}</p>
+				<p class="match-user-id no-scrollbar">{{ match.user_two.id }}</p>
 			</div>
 		</div>
 
@@ -72,6 +72,10 @@ export default Vue.extend({
 			type: Number,
 			default: () => 1,
 		},
+		userID: {
+			type: String,
+			required: true,
+		},
 	},
 	data: () => ({
 		matchList: [],
@@ -90,7 +94,7 @@ export default Vue.extend({
 		fetchPage(n: number) {
 			// Query nth games page from API
 			this.$axios
-				.get(`/users/smaccary/games`, { params: { page: n, per_page: this.per_page } })
+				.get(`/users/${this.userID}/games`, { params: { page: n, per_page: this.per_page } })
 				.then((response) => {
 					// Update displayer games
 					this.matchList = response.data;
@@ -133,5 +137,9 @@ export default Vue.extend({
 <style scoped>
 .page-button {
 	@apply hover:text-gray-500 mx-10 bg-design_black p-1 w-1/5 rounded-lg text-4xl font-mono m-1 h-full box-content text-center content-center items-center flex justify-center;
+}
+
+.match-user-id {
+	@apply w-1/6 overflow-scroll truncate;
 }
 </style>
