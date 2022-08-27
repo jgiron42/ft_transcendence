@@ -15,6 +15,14 @@ class GamePlugin extends Vue {
 		// https://nuxtjs.org/docs/internals-glossary/context/
 		this.ctx = ctx;
 	}
+
+	// Ensure this is called on game beforeDestroy().
+	reset() {
+		this.mode = "";
+		this.spectating = false;
+		this.id = "";
+		this.isP1 = false;
+	}
 }
 
 declare module "vue/types/vue" {

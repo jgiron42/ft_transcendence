@@ -47,7 +47,9 @@
 
 					<!-- displays Direct Message button -->
 					<button class="pl-3" @click.prevent="sendDm">
-						<DMLogo />
+						<!-- TODO: Component is missing for some reasons -->
+						<!-- <DMLogo /> -->
+						DM
 					</button>
 				</div>
 				<div class="flex flex-row font-mono">
