@@ -2,7 +2,7 @@
 	<client-only>
 		<div class="text-white flex flex-col pl-8 pr-8 gap-4">
 			<!-- displays username -->
-			<div class="pseudo">{{ user.username }}</div>
+			<div class="pseudo">{{ user.username }} - {{ userStatus.status }}</div>
 
 			<!-- displays stat about user -->
 			<div class="flex flex-row">
@@ -10,13 +10,13 @@
 				<div class="flex flex-col user_info">
 					<div>nb games : {{ user.nb_game }}</div>
 					<div>nb wins : {{ user.nb_win }}</div>
-					<div>nb loses : {{ loses }}</div>
-					<div>ratio : {{ ratio }}</div>
+					<div>nb loses : {{ user.nb_loss }}</div>
+					<div>elo : {{ user.elo }}</div>
 				</div>
 			</div>
 
 			<!-- displays action buttons if the profile is not mine -->
-			<div v-if="user.id !== me.id" class="flex flex-col">
+			<div v-if="user.id !== me.id" class="flex flex-col font-mono">
 				<div class="flex flex-row">
 					<!-- Friend request button -->
 					<!-- if is friend, displays remove friend button -->
@@ -47,10 +47,12 @@
 
 					<!-- displays Direct Message button -->
 					<button class="pl-3" @click.prevent="sendDm">
-						<DMLogo />
+						<!-- TODO: Component is missing for some reasons -->
+						<!-- <DMLogo /> -->
+						DM
 					</button>
 				</div>
-				<div class="flex flex-row">
+				<div class="flex flex-row font-mono">
 					<!-- displays invite button to invite user to a game only if isOnline -->
 					<button v-if="isOnline" class="button_profile" @click.prevent="gameInvite">
 						Invite {{ user.username }} to play a game!
@@ -67,7 +69,7 @@
 			</div>
 			<!-- if the user is me, then simply add a link to my game history -->
 			<div v-else>
-				<NuxtLink :to="`/history?user=${user.id}`" class="button_profile">
+				<NuxtLink :to="`/history?user=${user.id}`" class="button_profile font-mono">
 					{{ user.username }}'s game history!
 				</NuxtLink>
 			</div>
@@ -80,6 +82,7 @@ import Vue from "vue";
 import { Relation, RelationType } from "@/models/Relation";
 import { store } from "@/store";
 import { User } from "@/models/User";
+import { SerializedMatch } from "~/types/matchmaking-status";
 
 export default Vue.extend({
 	name: "PopupUser",
@@ -112,27 +115,23 @@ export default Vue.extend({
 				);
 			},
 
-			// get the ratio of the user
-			get ratio(): number {
-				return this.user.nb_win / this.user.nb_game;
-			},
+			isOnline: false,
+			isInGame: false,
 
-			// get if user is online or not
-			get isOnline(): boolean {
-				// TODO: get the status of the player and check if === ONLINE
-				return true;
-			},
-
-			// get if user is in game or not
-			get isInGame(): boolean {
-				// TODO: get the status of the player and check if === IN_GAME
-				return false;
-			},
+			userStatus: { status: "disconnected" } as Partial<{ status: string }>,
 		};
 	},
 	mounted() {
 		// if the user of the store is undefined, then close the popup
 		if (!this.user) this.$modal.hide("user_profile");
+		this.$axios
+			.get(`/status/${this.user.id}`)
+			.then((response) => {
+				this.userStatus = response.data;
+				this.isOnline = this.userStatus.status !== "game";
+				this.isInGame = this.userStatus.status === "game";
+			})
+			.catch((_) => (this.isOnline = false));
 	},
 	methods: {
 		// send friend request
@@ -188,7 +187,35 @@ export default Vue.extend({
 		},
 
 		watchGame() {
-			// TODO: watch the game of the user
+			this.$axios.get(`/status/${this.user.id}`).then((response) => {
+				const data = response.data;
+
+				if (!data.match) {
+					this.isInGame = false;
+					return;
+				}
+
+				// Request server to add the current connection to the match's spectators.
+				this.$gameSocket.emit("matchmaking:spectate", { id: data.match.id });
+
+				// Wait for the response event.
+				this.$gameSocket.on("matchmaking:spectateResponse", (match: SerializedMatch | undefined) => {
+					// Ensure match still exists.
+					if (match !== undefined) {
+						// Mark the game as spectating, so the game will listen to the right event and not process inputs.
+						this.$game.spectating = true;
+
+						// Store the match ID, this will be used to listen to the appropriate events. (game:spectateUpdate=match.id)
+						this.$game.id = match.id;
+
+						// Format the passed game mode.
+						this.$game.mode = "online:" + match.mode;
+
+						// Redirect to the game page.
+						this.$nuxt.$router.push("/game");
+					} else this.alert.emit({ title: "SPECTATE", message: `Match ${match} does not exist` });
+				});
+			});
 		},
 	},
 });
@@ -241,5 +268,7 @@ export default Vue.extend({
 	justify-content: center;
 	margin-left: auto;
 	margin-right: auto;
+
+	@apply font-mono;
 }
 </style>

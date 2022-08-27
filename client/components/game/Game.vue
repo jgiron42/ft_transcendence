@@ -29,20 +29,6 @@ type ImplementedEvents = "upP1" | "downP1" | "upP2" | "downP2" | "stopP1" | "sto
 type Point2D = TwoDimensionalInterface;
 // type Vector2D = TwoDimensionalInterface;
 
-const keyMap = {
-	Up: { pressed: false, event: "upP2" },
-	ArrowUp: { pressed: false, event: "upP2" },
-	Down: { pressed: false, event: "downP2" },
-	ArrowDown: { pressed: false, event: "downP2" },
-	KeyZ: { pressed: false, event: "upP1" },
-	KeyW: { pressed: false, event: "upP1" },
-	KeyS: { pressed: false, event: "downP1" },
-	ClickLeftTop: { pressed: false, event: "upP1" },
-	ClickLeftBottom: { pressed: false, event: "downP1" },
-	ClickRightTop: { pressed: false, event: "upP2" },
-	ClickRightBottom: { pressed: false, event: "downP2" },
-};
-
 // Interface defining player attributes safely accessible in this component.
 interface PlayerClientInterface {
 	pos: Point2D;
@@ -73,6 +59,29 @@ interface GameClientInterface {
 	cloneData: () => any;
 	setData: (_: any) => any;
 }
+
+// Ensure base keymap immutability by wrapping it in a pure fonction that clones the keymap.
+function getBaseKeyMap() {
+	return _.cloneDeep({
+		Up: { pressed: false, event: "upP2" },
+		ArrowUp: { pressed: false, event: "upP2" },
+		Down: { pressed: false, event: "downP2" },
+		ArrowDown: { pressed: false, event: "downP2" },
+		KeyZ: { pressed: false, event: "upP1" },
+		KeyW: { pressed: false, event: "upP1" },
+		KeyS: { pressed: false, event: "downP1" },
+		ClickLeftTop: { pressed: false, event: "upP1" },
+		ClickLeftBottom: { pressed: false, event: "downP1" },
+		ClickRightTop: { pressed: false, event: "upP2" },
+		ClickRightBottom: { pressed: false, event: "downP2" },
+	});
+}
+
+// Keymap type.
+type KeyMap = ReturnType<typeof getBaseKeyMap>;
+
+// Keys type.
+type HandledKeys = keyof KeyMap;
 
 // Type of data used for for rollbacks.
 type GameData = ReturnType<typeof Game.prototype.cloneData>;
@@ -106,6 +115,7 @@ export default Vue.extend({
 		syncAmounts: 0,
 		spectating: false,
 		currentPlayer: "P1" as "P1" | "P2",
+		keyMap: getBaseKeyMap(),
 	}),
 	async mounted() {
 		try {
@@ -156,7 +166,6 @@ export default Vue.extend({
 		} catch (err: any) {
 			// Log and display any error.
 			console.error("game:", err);
-			this.$nuxt.$emit("addAlert", { title: "GAME", message: err.toString() });
 			this.$nuxt.$router.push("/matchmaking");
 		}
 	},
@@ -170,8 +179,8 @@ export default Vue.extend({
 		// Stop listening to any game updates.
 		this.$gameSocket.clearMatchingEvents("game");
 
-		// Reset the stored game mode.
-		this.$game.mode = "";
+		// Reset the game plugin state.
+		this.$game.reset();
 	},
 	methods: {
 		initTouchScreenInput() {
@@ -183,7 +192,7 @@ export default Vue.extend({
 				"touchstart",
 				(ev) => {
 					// Create a temporary map to register any events caused by touches.
-					const localMap: Partial<Record<keyof typeof keyMap, boolean>> = {
+					const localMap: Partial<Record<HandledKeys, boolean>> = {
 						ClickLeftTop: false,
 						ClickLeftBottom: false,
 						ClickRightTop: false,
@@ -216,7 +225,7 @@ export default Vue.extend({
 
 					// Merge registered events with the game keymap.
 					Object.entries(localMap).forEach(([key, val]) => {
-						keyMap[key as keyof typeof localMap].pressed = val as boolean;
+						this.keyMap[key as HandledKeys].pressed = val as boolean;
 					});
 
 					// Send the new user input values to the backend.
@@ -230,7 +239,7 @@ export default Vue.extend({
 				"touchend",
 				(ev) => {
 					// Create a temporary map to register any events caused by touches.
-					const localMap: Partial<Record<keyof typeof keyMap, boolean>> = {
+					const localMap: Partial<Record<HandledKeys, boolean>> = {
 						ClickLeftTop: false,
 						ClickLeftBottom: false,
 						ClickRightTop: false,
@@ -273,7 +282,7 @@ export default Vue.extend({
 
 					// Merge the registered inputs with the game keymap.
 					Object.entries(localMap).forEach(([key, val]) => {
-						keyMap[key as keyof typeof localMap].pressed = val as boolean;
+						this.keyMap[key as HandledKeys].pressed = val as boolean;
 					});
 
 					// Send the updated user input to the backend.
@@ -442,7 +451,7 @@ export default Vue.extend({
 					break;
 			}
 
-			_.merge(keyMap, newKeymap);
+			_.merge(this.keyMap, newKeymap);
 
 			// Return transformed game class.
 			return modifier(GameMode);
@@ -543,7 +552,7 @@ export default Vue.extend({
 			this.hasStateBeenUpdated = 0;
 
 			// Add the game events from the users' inputs
-			const eventList = Object.values(keyMap)
+			const eventList = Object.values(this.keyMap)
 				.filter((key) => key.pressed === true)
 				.flatMap((key) => key.event);
 
@@ -632,7 +641,7 @@ export default Vue.extend({
 				const data = { up: false, down: false };
 
 				// Set the user events from the game keymap
-				Object.values(keyMap).forEach((key) => {
+				Object.values(this.keyMap).forEach((key) => {
 					if (key.pressed && key.event === `up${this.currentPlayer}`) data.up = true;
 					if (key.pressed && key.event === `down${this.currentPlayer}`) data.down = true;
 				});
@@ -645,9 +654,11 @@ export default Vue.extend({
 		// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code#:~:text=To%20ensure%20that%20keystrokes%20go%20to%20the%20sample%2C%20click%20or%20focus%20the%20output%20box%20below%20before%20pressing%20keys.
 		handleKeyPress(event: KeyboardEvent) {
 			// Ensure the user is using allowed keys and isn't a spectator.
-			if (!this.spectating && Object.prototype.hasOwnProperty.call(keyMap, event.code)) {
+			if (!this.spectating && Object.prototype.hasOwnProperty.call(this.keyMap, event.code)) {
+				const keyMap = this.keyMap;
+
 				// Register the key as pressed.
-				keyMap[event.code as keyof typeof keyMap].pressed = true;
+				keyMap[event.code as HandledKeys].pressed = true;
 
 				// Send the new user inputs to the backend.
 				this.updateUserInputInBackend();
@@ -655,9 +666,11 @@ export default Vue.extend({
 		},
 		handleKeyRelease(event: KeyboardEvent) {
 			// Ensure the user is using allowed keys and isn't a spectator.
-			if (!this.spectating && Object.prototype.hasOwnProperty.call(keyMap, event.code)) {
+			if (!this.spectating && Object.prototype.hasOwnProperty.call(this.keyMap, event.code)) {
+				const keyMap = this.keyMap;
+
 				// Register the key as not pressed.
-				keyMap[event.code as keyof typeof keyMap].pressed = false;
+				keyMap[event.code as HandledKeys].pressed = false;
 
 				// Send the new user inputs to the backend.
 				this.updateUserInputInBackend();
