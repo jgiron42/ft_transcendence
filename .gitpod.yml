@@ -1,7 +1,6 @@
 # Commands to start on workspace startup
 tasks:
-  - init: stat dev
-    command: bash start_dev.sh
+  - init: bash start_dev.sh --build
 # Ports to expose on workspace startup
 ports:
   - port: 80

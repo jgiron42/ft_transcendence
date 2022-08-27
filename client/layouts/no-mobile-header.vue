@@ -1,7 +1,7 @@
 <!-- Don't change widths and heights in this layout, trust me -->
 <template>
 	<div id="app" class="w-full h-full overflow-hidden flex flex-col">
-		<div class="fixed top-0 w-full">
+		<div class="absolute top-0 w-full">
 			<Header v-if="!$device.isMobile" />
 			<AlertManager />
 		</div>
