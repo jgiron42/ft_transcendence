@@ -679,4 +679,19 @@ export class GameService {
 		// Return found match ID.
 		return user.match.id;
 	}
+
+	getGameUser(userID: string) {
+		// Extract user from connected users pool.
+		const localUser = this.connectedPool.get(userID);
+
+		// Return disconnected status when user wasn't found.
+		if (!localUser) return null;
+
+		return {
+			user: localUser.user,
+			status: localUser.status as "connected" | "matchmaking" | "game",
+			// Filter everything but ids in sent match.
+			match: this.serializeMatch(localUser.match),
+		};
+	}
 }
