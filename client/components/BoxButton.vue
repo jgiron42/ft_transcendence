@@ -1,6 +1,6 @@
 <template>
 	<button
-		:class="`${font} m-1 p-4 py-6 ${color} break-words border-design_white border-4 rounded rounded-br-none ${size} text-design_white text-center ${
+		:class="`${font} m-1 p-4 ${color} break-words border-design_white border-4 rounded rounded-br-none ${size} text-design_white text-center ${
 			enableHover ? 'hover:text-gray-400' : 'cursor-default'
 		}`"
 	>

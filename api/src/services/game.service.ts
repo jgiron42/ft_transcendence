@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import { Catch, Injectable } from "@nestjs/common";
 import { Logger } from "@nestjs/common";
 import config from "@src/config/game.config";
@@ -9,14 +9,17 @@ import { User } from "@src/entities/user.entity";
 import { UserService } from "@services/user.service";
 import {
 	ClientMatch,
-	GameData,
+	GameID,
+	GameInvitation,
 	GameUser,
 	GameUserPool,
 	GameUserSet,
+	InvitationID,
 	Match,
 	MatchmakingPool,
 	MatchPool,
 	SerializedMatch,
+	UserID,
 	UserMatchmakingStatus,
 } from "@src/types/game";
 import { Game as GameEntity } from "@src/entities/game.entity";
@@ -27,24 +30,25 @@ import { modifier as demoModifier } from "@src/gamemodes/modifiers/demo";
 import _ from "lodash";
 import EloRank from "elo-rank";
 import { Mutex } from "async-mutex";
+import { TypeORMError } from "typeorm";
 import { StoredGameService } from "./stored-game.service";
 
-@Catch()
+@Catch(TypeORMError)
 @Injectable()
 export class GameService {
 	private logger: Logger = new Logger("GameService");
 
 	// Pool storing users that have at least one connected socket
-	private connectedPool: GameUserPool = new Map<string, GameUser>();
+	private connectedPool: GameUserPool = new Map<UserID, GameUser>();
 
 	// Pool storing fully disconnected users that had recently connected sockets
-	private disconnectedPool: GameUserPool = new Map<string, GameUser>();
+	private disconnectedPool: GameUserPool = new Map<UserID, GameUser>();
 
 	// Pool tracking users looking for a match
 	private matchmakingPool: MatchmakingPool = new Map<AllowedGameMode, GameUserSet>();
 
 	// Pool storing all matches, regardless of their modes
-	private matchPool: MatchPool = new Map<string, Match>();
+	private matchPool: MatchPool = new Map<GameID, Match>();
 
 	// Crocubot
 	private bot = {} as User;
@@ -147,7 +151,7 @@ export class GameService {
 		}
 	}
 
-	connectClient(client: Socket, userID: string) {
+	connectClient(client: Socket, userID: UserID) {
 		// Search user in disconnected pool
 		if (this.disconnectedPool.has(userID)) {
 			// Retrieve user from disconnected pool
@@ -181,6 +185,7 @@ export class GameService {
 				searchStartDate: 0,
 				lastSeenDate: 0,
 				gameEvents: { up: false, down: false },
+				invitations: new Map<InvitationID, GameInvitation>(),
 				gameMode: config.gameModes[0],
 				sockets: new Set<Socket>([client]),
 			};
@@ -199,7 +204,7 @@ export class GameService {
 		foundUser.sockets.add(client);
 	}
 
-	addUserToMatchmakingPool(userID: string, mode: AllowedGameMode) {
+	addUserToMatchmakingPool(userID: UserID, mode: AllowedGameMode) {
 		// Get user from connected users pool.
 		const foundUser: GameUser = this.connectedPool.get(userID);
 
@@ -219,7 +224,7 @@ export class GameService {
 		this.matchmakingPool.get(foundUser.gameMode).add(foundUser);
 	}
 
-	removeUserFromMatchmakingPool(userID: string) {
+	removeUserFromMatchmakingPool(userID: UserID) {
 		// Get user from connected users pool
 		const foundUser: GameUser = this.connectedPool.get(userID);
 
@@ -233,7 +238,7 @@ export class GameService {
 		this.matchmakingPool.get(foundUser.gameMode).delete(foundUser);
 	}
 
-	matchUserToBot(userID: string, mode: AllowedGameMode) {
+	matchUserToBot(userID: UserID, mode: AllowedGameMode) {
 		if (!this.bot) {
 			this.logger.warn("Can't match user to bot because it hasn't been found nor created");
 			return;
@@ -252,61 +257,65 @@ export class GameService {
 		const bot: User = this.bot;
 
 		// Match the bot and the player.
-		this.matchUsers(foundUser, this.makeGameUserFromBot(bot));
+		void this.matchUsers(foundUser, this.makeGameUserFromBot(bot));
 	}
 
-	matchUsers(p1: GameUser, p2: GameUser) {
+	async matchUsers(p1: GameUser, p2: GameUser): Promise<Match | null> {
 		// Set the gameID to a random UUID
 		const gameID = randomUUID();
+		let createdMatch = null;
 
-		import(`../gamemodes/${p1.gameMode}`)
-			.then((module) => {
-				let modifier = (mode: typeof Game) => mode;
+		try {
+			const module = (await import(`../gamemodes/${p1.gameMode}`)) as unknown as { Game: typeof Game };
 
-				if (p1.type === "bot" && p2.type === "bot") modifier = demoModifier;
-				else if (p2.type === "bot") modifier = PVEModifier;
+			let modifier = (mode: typeof Game) => mode;
 
-				const Mode = modifier((module as { Game: typeof Game }).Game);
+			if (p1.type === "bot" && p2.type === "bot") modifier = demoModifier;
+			else if (p2.type === "bot") modifier = PVEModifier;
 
-				const game = new Mode();
+			const Mode = modifier((module as { Game: typeof Game }).Game);
 
-				// Create new match
-				const newMatch = {
-					p1,
-					p2,
-					type: "ManVsMan",
-					status: "creating",
-					id: gameID,
-					created_at: Date.now(),
-					lastStatusUpdate: Date.now(),
-					mode: p1.gameMode,
-					game,
-					sockets: new Set<Socket>(),
-				} as Match;
+			const game = new Mode();
 
-				// Add the Match to the ingoing game pool
-				this.matchPool.set(gameID, newMatch);
+			// Create new match
+			const newMatch = {
+				p1,
+				p2,
+				type: "ManVsMan",
+				status: "creating",
+				id: gameID,
+				created_at: Date.now(),
+				lastStatusUpdate: Date.now(),
+				mode: p1.gameMode,
+				game,
+				sockets: new Set<Socket>(),
+			} as Match;
 
-				// Get pool corresponding to users selected game mode.
-				const pool = this.matchmakingPool.get(p1.gameMode);
+			// Add the Match to the ingoing game pool
+			this.matchPool.set(gameID, newMatch);
 
-				[p1, p2].forEach((user: GameUser) => {
-					// Delete participants from the matchmaking pool
-					pool.delete(user);
+			// Get pool corresponding to users selected game mode.
+			const pool = this.matchmakingPool.get(p1.gameMode);
 
-					// Update player status
-					user.status = "game";
+			[p1, p2].forEach((user: GameUser) => {
+				// Delete participants from the matchmaking pool
+				pool.delete(user);
 
-					// Register the match in the user.
-					user.match = newMatch;
-				});
+				// Update player status
+				user.status = "game";
 
-				// Debug logs
-				this.logger.log(`Matched: ${p1.user.id} vs ${p2.user.id}`);
-			})
-			.catch((err: Error) => {
-				this.logger.error(`Could not load game mode ${p1.gameMode}: ${err.toString()}`);
+				// Register the match in the user.
+				user.match = newMatch;
 			});
+
+			// Debug logs
+			this.logger.log(`Matched: ${p1.user.id} vs ${p2.user.id}`);
+			createdMatch = newMatch;
+		} catch (err: any) {
+			this.logger.error(`Could not load game mode ${p1.gameMode}: ${(err as Error).toString()}`);
+		}
+
+		return createdMatch;
 	}
 
 	@Interval(config.matchingJobInterval)
@@ -319,7 +328,7 @@ export class GameService {
 				const [p1, p2] = pool;
 
 				// Match first two users
-				this.matchUsers(p1, p2);
+				void this.matchUsers(p1, p2);
 			}
 		});
 	}
@@ -370,6 +379,7 @@ export class GameService {
 	updateConnectedUsers(): void {
 		// Send local user data back to every connected client
 		this.connectedPool.forEach((localUser: GameUser) => {
+			this.cleanUserDeadInvites(localUser);
 			// Filter data sent to user
 			const userStatus: UserMatchmakingStatus = {
 				user: localUser.user,
@@ -388,6 +398,7 @@ export class GameService {
 				connectedPool: Array.from(this.connectedPool.keys()),
 				searchDate: localUser.searchStartDate,
 				availableGameModes: config.gameModes,
+				invitations: localUser.invitations,
 				matchList: Array.from(this.matchPool)
 					.filter(([__, match]) => match.status === "ongoing")
 					.map(([__, match]) => this.serializeMatch(match)), // Send only ongoing games.
@@ -432,6 +443,7 @@ export class GameService {
 			searchStartDate: 0,
 			gameEvents: { up: false, down: false },
 			sockets: new Set<Socket>(),
+			invitations: new Map<InvitationID, GameInvitation>(),
 			match: null,
 		};
 	}
@@ -443,7 +455,7 @@ export class GameService {
 			try {
 				// Ensure there's always games to spectate by creating a bot match when no games are ongoing.
 				if (this.matchPool.size === 0 && this.bot && this.bot2 && this.bot.id && this.bot2.id)
-					this.matchUsers(
+					void this.matchUsers(
 						this.makeGameUserFromBot(this.bot, _.sample(config.gameModes)),
 						this.makeGameUserFromBot(this.bot2),
 					);
@@ -612,7 +624,7 @@ export class GameService {
 				id: match.id,
 				created_at: match.created_at,
 				lastStatusUpdate: match.lastStatusUpdate,
-				data: match.game.cloneData() as unknown as GameData, // TODO: FIX THIS
+				data: match.game.cloneData(),
 			};
 
 			// Send game data to players.
@@ -636,7 +648,7 @@ export class GameService {
 		});
 	}
 
-	updateUserInput(userID: string, events: GameUserInputDTO) {
+	updateUserInput(userID: UserID, events: GameUserInputDTO) {
 		// Get user from connected users pool.
 		const foundUser: GameUser = this.connectedPool.get(userID);
 
@@ -644,7 +656,7 @@ export class GameService {
 		Object.assign(foundUser.gameEvents, events);
 	}
 
-	spectateMatch(client: Socket, matchID: string): SerializedMatch | undefined {
+	spectateMatch(client: Socket, matchID: GameID): SerializedMatch | undefined {
 		// Extract the requested match from the ongoing matches pool.
 		const foundMatch = this.matchPool.get(matchID);
 
@@ -658,18 +670,7 @@ export class GameService {
 		return this.serializeMatch(foundMatch);
 	}
 
-	getUserStatus(userID: string): "connected" | "matchmaking" | "game" | "disconnected" {
-		// Extract user from connected users pool.
-		const user = this.connectedPool.get(userID);
-
-		// Return disconnected status when user wasn't found.
-		if (!user) return "disconnected";
-
-		// Return found user status.
-		return user.status;
-	}
-
-	getUserGameID(userID: string): string | null {
+	getUserGameID(userID: UserID): GameID | null {
 		// Extract user from connected users pool.
 		const user = this.connectedPool.get(userID);
 
@@ -680,18 +681,101 @@ export class GameService {
 		return user.match.id;
 	}
 
-	getGameUser(userID: string) {
+	cleanUserDeadInvites(user: UserID | GameUser) {
+		// Get user when ID was passed
+		if (typeof user === "string") user = this.connectedPool.get(user);
+
+		// Abort when user isn't connected.
+		if (!user) return;
+
+		// Remove invites from disconnected users.
+		user.invitations.forEach((invite, id, map) => {
+			if (!this.connectedPool.get(invite.from)) map.delete(id);
+		});
+	}
+
+	getUserStatus(userID: UserID) {
 		// Extract user from connected users pool.
 		const localUser = this.connectedPool.get(userID);
 
 		// Return disconnected status when user wasn't found.
 		if (!localUser) return null;
 
+		// Remove invites from disconnected users.
+		this.cleanUserDeadInvites(localUser);
+
 		return {
 			user: localUser.user,
 			status: localUser.status as "connected" | "matchmaking" | "game",
 			// Filter everything but ids in sent match.
 			match: this.serializeMatch(localUser.match),
+			invitations: Array.from(localUser.invitations),
 		};
+	}
+
+	acceptGameInvite(userID: UserID, invitationID: InvitationID): ReturnType<typeof GameService.prototype.matchUsers> {
+		// Find recipient in connected users by ID.
+		const recipient = this.connectedPool.get(userID);
+
+		// Helper function that determines whetever a user is in a matchable state.
+		const isPlayerMatchable = (p: GameUser | null) => p && p.status !== "game";
+
+		// Ensure recipient is matchable.
+		if (!isPlayerMatchable(recipient)) return null;
+
+		// Clean stale invitations.
+		this.cleanUserDeadInvites(recipient);
+
+		// Find requested invitation.
+		const invite = recipient.invitations.get(invitationID);
+
+		// Ensure invitation was found.
+		if (!invite) return null;
+
+		// Find sender in connected users by ID.
+		const sender = this.connectedPool.get(invite.from);
+
+		// Ensure sender is matchable.
+		if (!isPlayerMatchable(sender)) return null;
+
+		// Remove fullfilled invitation.
+		recipient.invitations.delete(invitationID);
+
+		// Set players' game mode.
+		[recipient, sender].forEach((p) => (p.gameMode = invite.mode));
+
+		// Create the match.
+		return this.matchUsers(recipient, sender);
+	}
+
+	addGameInvite(from: UserID, to: UserID, mode: AllowedGameMode): string {
+		// Ensure game mode is allowed and recipient is different from sender.
+		if (!config.gameModes.includes(mode) || from === to) return null;
+
+		// Get recipient from connected users.
+		const recipient = this.connectedPool.get(to);
+
+		// Ensure recipient is connected.
+		if (!recipient) return null;
+
+		// Create game key as a hash of invite's data (ensures no duplicate).
+		const key = createHash("sha256").update(`${to}${from}${mode}`).digest("hex");
+
+		// Store the invitation in the recipient's.
+		recipient.invitations.set(key, { from, mode });
+
+		// Return the invitation ID (hash).
+		return key;
+	}
+
+	removeGameInvite(user: UserID | GameUser, id: InvitationID): boolean {
+		// Get user when ID was passed
+		if (typeof user === "string") user = this.connectedPool.get(user);
+
+		// Abort when user doesn't exist
+		if (!user) return false;
+
+		// Delete the invitation.
+		return user.invitations.delete(id);
 	}
 }

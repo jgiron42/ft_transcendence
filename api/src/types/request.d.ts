@@ -1,6 +1,6 @@
-import * as express from "express";
-import { SessionT } from "@src/types/session";
-import { User } from "@entities/user.entity";
+import type * as express from "express";
+import type { SessionT } from "@src/types/session";
+import type { User } from "@entities/user.entity";
 
 /**
  * Express request type extended with a session attribute.

@@ -9,7 +9,7 @@
 		</div>
 		<br />
 
-		<!-- displays Friend request -->
+		<!-- displays Friend requests -->
 		<div id="invite-panel">
 			<ArrowDropdown name="invitations" :click="onShowInvitations" :state="showInvitations" />
 			<ListUsers
@@ -19,6 +19,19 @@
 				type="invitations"
 			/>
 			<div v-else-if="showInvitations" class="empty-text">No invitations.</div>
+		</div>
+		<hr />
+
+		<!-- displays game requests -->
+		<div id="game-invite-panel">
+			<ArrowDropdown name="game invitations" :click="onShowGameInvitations" :state="showInvitations" />
+			<ListUsers
+				v-if="showGameInvitations && gameInvitations.length"
+				:relations="gameInvitations"
+				:margin="true"
+				type="game-invitations"
+			/>
+			<div v-else-if="showGameInvitations" class="empty-text">No invitations.</div>
 		</div>
 		<hr />
 
@@ -41,7 +54,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Relation, RelationType } from "@/models/Relation";
+import { GameInviteRelation, Relation, RelationType } from "@/models/Relation";
 import { store } from "@/store";
 
 export default Vue.extend({
@@ -72,6 +85,8 @@ export default Vue.extend({
 					)
 			);
 		},
+		// get friend requests from the store
+		gameInvitations: [] as GameInviteRelation[],
 
 		// get friends from the store
 		get friends(): Relation[] {
@@ -86,16 +101,37 @@ export default Vue.extend({
 		// showInvitations is used to determine if the invitations list is shown or not.
 		showInvitations: true,
 
+		// showGameInvitations is used to determine if game the invitations list is shown or not.
+		showGameInvitations: true,
+
 		// showBlocked is used to determine if the blocked users list is shown or not.
 		showBlocked: true,
 
 		// showFriends is used to determine if the friends list is shown or not.
 		showFriends: true,
+
+		updateGameInviteInterval: {} as NodeJS.Timeout,
 	}),
+	mounted() {
+		this.updateGameInvites();
+		this.$on("social:updateGameInvites", this.updateGameInvites);
+		this.updateGameInviteInterval = setInterval(this.updateGameInvites, 5000);
+		this.$gameSocket.on("game:updateStatus", () => this.$nuxt.$router.push("/matchmaking"));
+	},
+	beforeDestroy() {
+		this.$off("social:updateGameInvites");
+		this.$gameSocket.clearMatchingEvents("game");
+		if (this.updateGameInviteInterval) clearInterval(this.updateGameInviteInterval);
+	},
 	methods: {
 		// onShowInvitations is used to show or hide the invitations list.
 		onShowInvitations() {
 			this.showInvitations = !this.showInvitations;
+		},
+
+		// onShowGameInvitations is used to show or hide the game invitations list.
+		onShowGameInvitations() {
+			this.showGameInvitations = !this.showGameInvitations;
 		},
 
 		// onShowBlocked is used to show or hide the blocked users list.
@@ -106,6 +142,44 @@ export default Vue.extend({
 		// onShowFriends is used to show or hide the friends list.
 		onShowFriends() {
 			this.showFriends = !this.showFriends;
+		},
+
+		updateGameInvites() {
+			// Game invite type
+			type GameInvite = { id: string; mode: string; from: string };
+
+			// Shorthand type for (invitationID, invitationData) returned from API call.
+			type InvitationList = [string, GameInvite][];
+
+			// Get current logged in user.
+			this.$user
+				.getUser()
+				.then((user) =>
+					// Get current user status.
+					this.$axios
+						.$get(`/status/${user.id}`)
+						.then((status: { invitations: InvitationList; status: string }) => {
+							// Convert invitations to Relation-like array.
+							this.gameInvitations = status.invitations.flatMap(
+								([id, invite]): GameInviteRelation => ({
+									id,
+									owner: { id: invite.from, username: invite.from },
+									target: user,
+									mode: invite.mode,
+									type: RelationType.GAME,
+									created_at: new Date(),
+								}),
+							);
+
+							// Open game window when user has been matched in a game.
+							// (e.g.: Their game invite has been accepted)
+							if (status.status === "game") this.$nuxt.$router.push("/matchmaking");
+						}),
+				)
+				.catch((err) =>
+					// Log and display the error.
+					this.alert.emit({ title: "INVITES", message: `Could not fetch game invites: ${err.toString()}` }),
+				);
 		},
 	},
 });

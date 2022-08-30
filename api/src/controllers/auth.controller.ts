@@ -9,11 +9,12 @@ import {
 	UseGuards,
 	Request as RequestDecorator,
 } from "@nestjs/common";
+
 import { AuthService } from "@services/auth.service";
 import { SessionGuard } from "@guards/session.guard";
 import { AuthGuard } from "@nestjs/passport";
-import { Request } from "@src/types/request.d";
-import { SessionT } from "@src/types/session";
+import type { Request } from "@src/types/request";
+import type { SessionT } from "@src/types/session";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
 import { DevelopmentGuard } from "@guards/development.guard";
 import config from "@config/api.config";

@@ -17,7 +17,6 @@
 	"dependencies": {
 		"@babel/eslint-parser": "^7.18.2",
 		"@chenfengyuan/vue-qrcode": "^1.0.2",
-		"@niyari/base32-ts": "^0.0.4",
 		"@nuxt/typescript-build": "^2.1.0",
 		"@nuxtjs/axios": "^5.13.6",
 		"@nuxtjs/device": "^2.1.0",
@@ -54,6 +53,7 @@
 	"devDependencies": {
 		"@nuxt/types": "^2.15.8",
 		"@types/uuid": "^8.3.4",
+		"postcss-import": "^14.1.0",
 		"prettier": "^2.5.1",
 		"sass": "^1.51.0",
 		"sass-loader": "^10.2.1",

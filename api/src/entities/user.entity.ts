@@ -1,7 +1,9 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
-import config from "@src/config/game.config";
+import { config as gameConfig } from "@config/game.config";
+import { config as userConfig } from "@config/user.config";
+import { Length } from "class-validator";
 
 // this entity is use to describe the users
 
@@ -17,7 +19,7 @@ export class User {
 		this.totp_key = "";
 		this.status = 0;
 		this.created_at = new Date();
-		this.elo = config.baseELO;
+		this.elo = gameConfig.baseELO;
 	}
 
 	@PrimaryColumn()
@@ -26,6 +28,7 @@ export class User {
 
 	// pseudo of the user
 	@Column({ unique: true })
+	@Length(userConfig.usernameMinLength, userConfig.usernameMaxLength)
 	@SetMode("cru")
 	username: string;
 
@@ -70,7 +73,7 @@ export class User {
 	created_at: Date;
 
 	// elo rating of the user
-	@Column({ default: config.baseELO })
+	@Column({ default: gameConfig.baseELO })
 	@SetMode("cru")
 	elo: number;
 }

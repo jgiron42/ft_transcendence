@@ -49,6 +49,7 @@ html, body, #__nuxt, #__layout {
 }
 
 /* Used to hide the selections arrow on number inputs */
+@tailwind utilities;
 @layer utilities {
 	input[type="number"]::-webkit-inner-spin-button,
 	input[type="number"]::-webkit-outer-spin-button {

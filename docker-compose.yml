@@ -8,6 +8,8 @@ services:
             context: client
             args:
                 NODE_ENV: ${NODE_ENV:-production}
+        labels:
+            autoheal: true
         expose:
             - 4000
         env_file:
@@ -30,6 +32,8 @@ services:
             context: api
             args:
                 NODE_ENV: ${NODE_ENV:-production}
+        labels:
+            autoheal: true
         expose:
             - 3000
         env_file:
@@ -49,6 +53,8 @@ services:
 
     db:
         image: postgres:14.1-alpine
+        labels:
+            autoheal: true
         restart: always
         env_file:
             - "db.env"
@@ -58,6 +64,8 @@ services:
 
     pgadmin:
         image: dpage/pgadmin4
+        labels:
+            autoheal: true
         environment:
             - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-smaccary@student.42.fr}
             - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-sonic}
@@ -72,6 +80,8 @@ services:
         volumes:
             - ./proxy/templates:/etc/nginx/templates
             - ./proxy/ssl:/etc/letsencrypt
+        labels:
+            autoheal: true
         ports:
             - "${DOCKER_PROXY_HTTP_PORT-80}:80"
             - "${DOCKER_PROXY_HTTPS_PORT-443}:443"
@@ -92,3 +102,12 @@ services:
             - SSL_NGINX_DHPARAM=/etc/letsencrypt/ssl-dhparams.pem
         restart: always
         depends_on: [client] # NGINX wont boot if client can't be resolved
+
+    autoheal:
+        image: willfarrell/autoheal
+        container_name: autoheal
+        volumes:
+        - '/var/run/docker.sock:/var/run/docker.sock'
+        environment:
+        - AUTOHEAL_INTERVAL=10
+        - CURL_TIMEOUT=30
