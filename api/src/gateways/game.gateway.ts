@@ -15,7 +15,7 @@ import { Socket } from "@src/types/socket";
 import { SessionGuard } from "@guards/session.guard";
 import { WebsocketSaveSession } from "@interceptors/websocket-save-session";
 import { UserService } from "@services/user.service";
-import { GameModeDTO } from "@dtos/GameModeDTO";
+import { GameModeDTO } from "@src/types/dtos/GameModeDTO";
 import { GameService } from "@src/services/game.service";
 import { GameUserInputDTO } from "@src/types/dtos/GameUserInput.dto";
 import { SpectateMatchDTO } from "@src/types/dtos/SpectateMatch.dto";

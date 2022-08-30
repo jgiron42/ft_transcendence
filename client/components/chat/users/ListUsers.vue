@@ -24,7 +24,6 @@
 				<b>{{ connection.user.username }}</b>
 			</button>
 		</div>
-
 		<!-- iterate through relations  -->
 		<div v-for="(relation, index) of relations" :key="index">
 			<!-- if the type of list is friend request -->
@@ -44,6 +43,28 @@
 						<VButtonLogo />
 					</button>
 					<button class="w-4 h-3" @click.prevent="declineFriendRequest(relation)">
+						<CrossLogo />
+					</button>
+				</div>
+			</div>
+
+			<!-- Display game invitations -->
+			<div v-else-if="type === 'game-invitations'" class="flex gap-3 items-center chan-name">
+				<!-- display the username of the request's owner -->
+				<button
+					class="user-button cut-text btn text-left"
+					:class="margin ? 'pad-left' : ''"
+					@click="showUserRelation(relation)"
+				>
+					<b>{{ relation.owner.username }}@{{ relation.mode }}</b>
+				</button>
+
+				<!-- display accept or decline logo -->
+				<div class="flex gap-1">
+					<button class="w-4 h-3" @click.prevent="acceptGameInvite(relation.id)">
+						<VButtonLogo />
+					</button>
+					<button class="w-4 h-3" @click.prevent="declineGameInvite(relation.id)">
 						<CrossLogo />
 					</button>
 				</div>
@@ -79,6 +100,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import _ from "lodash";
 import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Relation } from "@/models/Relation";
@@ -153,6 +175,32 @@ export default Vue.extend({
 		// decline friend request
 		declineFriendRequest(relation: Relation) {
 			store.relation.removeFriend(relation);
+		},
+
+		declineGameInvite(id: string) {
+			// DELETE the invite by ID, update invites on success or alert on error.
+			this.$axios
+				.$delete(`/game/invite/${id}`)
+				.then(() => this.$nuxt.$emit("social:updateGameInvites"))
+				.catch((err) =>
+					this.alert.emit({ title: "INVITE", message: `Couldn't decline invite: ${err.message}` }),
+				);
+		},
+
+		acceptGameInvite(id: string) {
+			// Replace method by debounced function to avoid same invite being submitted multiple time at once.
+			this.acceptGameInvite = _.debounce((id: string) => {
+				this.$axios
+					.$put(`/game/invite/${id}`)
+					.then(() => this.$router.push("/matchmaking"))
+					.catch((err) =>
+						this.alert.emit({ title: "INVITE", message: `Couldn't accept invite: ${err.message}` }),
+					);
+			}, 100);
+
+			// Call the replaced method.
+			// => Accepts the invite, creating a match on success => redirects to matchmaking.
+			this.acceptGameInvite(id);
 		},
 
 		// show a user profile based on a relation

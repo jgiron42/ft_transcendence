@@ -1,5 +1,4 @@
-FROM node:17.4.0
-
+FROM node:18.0.0
 ARG NODE_ENV=production
 
 WORKDIR /app
@@ -16,4 +15,4 @@ ENTRYPOINT ["bash", "entrypoint.sh"]
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=300s CMD curl --fail 127.0.0.1:3000 > /dev/null 2>&1 || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s CMD curl --fail 127.0.0.1:3000 > /dev/null 2>&1 || exit 1

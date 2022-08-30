@@ -8,12 +8,35 @@
 			<div class="flex flex-row">
 				<img :src="user.image_url" class="player_image" />
 				<div class="flex flex-col user_info">
-					<div>nb games : {{ user.nb_game }}</div>
-					<div>nb wins : {{ user.nb_win }}</div>
-					<div>nb loses : {{ user.nb_loss }}</div>
-					<div>elo : {{ user.elo }}</div>
+					<div>GAMES : {{ user.nb_game }}</div>
+					<div>WINS : {{ user.nb_win }}</div>
+					<div>LOSES : {{ user.nb_loss }}</div>
+					<div>ELO : {{ user.elo }}</div>
 				</div>
 			</div>
+
+			<!-- Game invite mode selection modal -->
+			<modal height="auto" name="invite-modal" classes="rounded-md p-6 text-center h-full items-center">
+				<!-- Modal title -->
+				<h1>SELECT GAME MODE:</h1>
+
+				<!-- Game mode select -->
+				<SelectMenu
+					id-prop="game-mode-select"
+					:options="gameModes"
+					:uppercase="true"
+					class="text-center hover:text-gray-300"
+				/>
+
+				<!-- Invite submit button -->
+				<button
+					class="cursor-pointer hover:text-gray-300 hover:bg-gray-900 mt-20 w-full bg-design_blue p-2 rounded border-2 border-white font-mono uppercase"
+					size="text-base"
+					@click="gameInvite()"
+				>
+					INVITE {{ user.username }}
+				</button>
+			</modal>
 
 			<!-- displays action buttons if the profile is not mine -->
 			<div v-if="user.id !== me.id" class="flex flex-col font-mono">
@@ -47,14 +70,12 @@
 
 					<!-- displays Direct Message button -->
 					<button class="pl-3" @click.prevent="sendDm">
-						<!-- TODO: Component is missing for some reasons -->
-						<!-- <DMLogo /> -->
-						DM
+						<DMLogo />
 					</button>
 				</div>
 				<div class="flex flex-row font-mono">
 					<!-- displays invite button to invite user to a game only if isOnline -->
-					<button v-if="isOnline" class="button_profile" @click.prevent="gameInvite">
+					<button v-if="isOnline" class="button_profile" @click.prevent="$modal.show('invite-modal')">
 						Invite {{ user.username }} to play a game!
 					</button>
 					<!-- Watch the game of the user if he's playing -->
@@ -117,18 +138,33 @@ export default Vue.extend({
 
 			isOnline: false,
 			isInGame: false,
-
 			userStatus: { status: "disconnected" } as Partial<{ status: string }>,
+			gameModes: [] as string[],
 		};
 	},
 	mounted() {
+		// Load game modes from API.
+		this.$axios
+			.$get("/game/modes")
+			.then((modes) => (this.gameModes = modes))
+			.catch((err) =>
+				this.alert.emit({ title: "INVITE", message: `Could not load game modes: ${err.toString()}` }),
+			);
+
 		// if the user of the store is undefined, then close the popup
 		if (!this.user) this.$modal.hide("user_profile");
+
+		// Get the live user status from API.
 		this.$axios
 			.get(`/status/${this.user.id}`)
 			.then((response) => {
+				// Update local user status.
 				this.userStatus = response.data;
+
+				// Update online flag
 				this.isOnline = this.userStatus.status !== "game";
+
+				// Update in game flag.
 				this.isInGame = this.userStatus.status === "game";
 			})
 			.catch((_) => (this.isOnline = false));
@@ -183,14 +219,44 @@ export default Vue.extend({
 		},
 
 		gameInvite() {
-			// TODO: send a game invite to the user
+			// Extract the select element.
+			const select = document.getElementById("game-mode-select") as HTMLSelectElement;
+
+			// Ensure the element was found.
+			if (!select) return;
+
+			// Exract selected game mode.
+			const mode = select.value;
+
+			// Create the invite payload.
+			const invite = { to: this.user.id, mode };
+
+			// Send the invite to API.
+			this.$axios
+				.$post("/game/invite", invite)
+				.then((_) =>
+					// Show the invite was received succesfully.
+					this.alert.emit({
+						title: "INVITE",
+						message: `Invite successfully sent to ${invite.to}.`,
+						isError: false,
+					}),
+				)
+				// Show and log the error.
+				.catch((err) => this.alert.emit({ title: "INVITE", message: err.toString() }));
+
+			// Hide the game mode selection modal.
+			this.$modal.hide("invite-modal");
 		},
 
 		watchGame() {
 			this.$axios.get(`/status/${this.user.id}`).then((response) => {
+				// Extract the response data.
 				const data = response.data;
 
+				// Ensure requested game still exists.
 				if (!data.match) {
+					// Game doesn't exist anymore, update watched user' status.
 					this.isInGame = false;
 					return;
 				}

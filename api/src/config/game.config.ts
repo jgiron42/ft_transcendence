@@ -58,4 +58,6 @@ type AllowedGameMode = typeof config.gameModes[number];
 
 export default config;
 
+export { config };
+
 export type { ImplementedGameMode, AllowedGameMode };

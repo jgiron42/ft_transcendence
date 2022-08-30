@@ -3,17 +3,28 @@ import { AllowedGameMode } from "@src/config/game.config";
 import { Game } from "@src/gamemodes/default";
 import { Socket } from "socket.io";
 
+export type UserID = string;
+export type GameID = string;
+export type InvitationID = string;
+
 // Type: Pool storing all matches, regardless of their modes
-export type MatchPool = Map<string, Match>;
+export type MatchPool = Map<UserID, Match>;
 
 // Type: Pool storing users, used as a matchmaking queue
 export type GameUserSet = Set<GameUser>;
 
 // Type: Pool storing users.
-export type GameUserPool = Map<string, GameUser>;
+export type GameUserPool = Map<UserID, GameUser>;
 
 // Type: Global pool containing all game modes pools
 export type MatchmakingPool = Map<AllowedGameMode, GameUserSet>;
+
+export interface GameInvitation {
+	from: UserID;
+	mode: AllowedGameMode;
+}
+
+export type InvitationMap = Map<InvitationID, GameInvitation>;
 
 export interface GameScore {
 	p1: number;
@@ -46,7 +57,7 @@ export interface Match {
 	status: "creating" | "ongoing" | "aborted" | "finished";
 	type: "ManVsMachine" | "ManVsMan" | "MachineVsMachine";
 	mode: AllowedGameMode;
-	id: string;
+	id: GameID;
 	created_at: number;
 	lastStatusUpdate: number;
 	game: Game;
@@ -62,18 +73,20 @@ export interface GameUser {
 	gameMode: AllowedGameMode;
 	match: Match | null;
 	gameEvents: { up: boolean; down: boolean };
+	invitations: InvitationMap;
 	sockets: Set<Socket>;
 }
 
-type SerializedMatch = { id: string; p1: string; p2: string; mode: string };
+export type SerializedMatch = { id: GameID; p1: UserID; p2: UserID; mode: AllowedGameMode };
 export interface UserMatchmakingStatus {
 	user: User;
 	status: "connected" | "matchmaking" | "game";
 	searchDate: number;
-	connectedPool: string[];
-	matchMakingPools: Record<AllowedGameMode, string[]>;
+	connectedPool: UserID[];
+	matchMakingPools: Record<AllowedGameMode, UserID[]>;
+	invitations: Record<keyof InvitationMap, InvitationMap[keyof InvitationMap]>;
 	match: SerializedMatch;
-	availableGameModes: string[];
+	availableGameModes: AllowedGameMode[];
 	matchList: SerializedMatch[];
 }
 
@@ -83,7 +96,7 @@ export interface ClientMatch {
 	status: "creating" | "ongoing" | "aborted" | "finished";
 	type: "ManVsMachine" | "ManVsMan" | "MachineVsMachine";
 	mode: AllowedGameMode;
-	id: string;
+	id: GameID;
 	created_at: number;
 	lastStatusUpdate: number;
 	data: GameData;

@@ -33,6 +33,15 @@ class SocketHub extends Vue implements SocketHubInterface {
 		return this.socket.on(event, listener);
 	}
 
+	// Wrapper of socket.on to remove stored evend and stop listening to it.
+	off(event: string, listener: (...args: any[]) => void): NuxtSocket {
+		// Register event
+		this.events.delete(event);
+
+		// Actually listen to the event
+		return this.socket.off(event, listener);
+	}
+
 	// Wrapper of emit to allow SocketHub to be used as a regular socket
 	emit(event: string, ...args: any[]): NuxtSocket {
 		return this.socket.emit(event, ...args);

@@ -89,7 +89,13 @@ export default {
 	},
 
 	// Build Configuration: https://go.nuxtjs.dev/config-build
-	build: {},
+	build: {
+		postcss: {
+			plugins: {
+				"postcss-import": true,
+			},
+		},
+	},
 
 	env: {
 		apiBaseUrl: process.env.API_BASE_URL || "http://localhost:3000",
@@ -107,6 +113,7 @@ export default {
 			"~/components/settings",
 		],
 	},
+
 	// Disable broken SSR on chat
 	serverMiddleware: [
 		{

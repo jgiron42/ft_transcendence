@@ -7,7 +7,7 @@
 			id="title"
 			class="items-center text-design_white h-8 justify-center top-1/2 flex w-full border-b-2 border-design_white text-center bg-design_blue"
 		>
-			<div class="inline-block align-center uppercase">{{ userID }}'s HISTORY</div>
+			<div class="inline-block align-center uppercase mt-1">{{ userID }}'s HISTORY</div>
 		</div>
 		<!-- Loaded content -->
 		<div v-if="loaded" class="text-white overflow-y-scroll w-full h-full no-scrollbar items-center flex flex-col">
@@ -45,6 +45,9 @@
 				<!-- Player 2 ID -->
 				<p class="match-user-id no-scrollbar">{{ match.user_two.id }}</p>
 			</div>
+			<p v-if="!matchList.length" class="flex justify-center content-center items-center h-full uppercase">
+				No games to display.
+			</p>
 		</div>
 
 		<!-- Spinny loader while requests responds -->
