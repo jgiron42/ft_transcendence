@@ -47,7 +47,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { User } from "~/models/User";
-import getUserPictureSrc from "~/utils/getUserPictureSrc";
 export default Vue.extend({
 	name: "GameVersus",
 	props: {
@@ -91,15 +90,8 @@ export default Vue.extend({
 			this.p2User = user;
 		});
 
-		// Get player 1's profile picture data.
-		getUserPictureSrc(this.$axios, this.p1)
-			.then((img) => (this.p1Img = img))
-			.catch(() => {});
-
-		// Get player 2's profile picture data.
-		getUserPictureSrc(this.$axios, this.p2)
-			.then((img) => (this.p2Img = img))
-			.catch((_) => {});
+		this.p1Img = this.$nuxt.$getPictureSrc(this.p1);
+		this.p2Img = this.$nuxt.$getPictureSrc(this.p2);
 	},
 });
 </script>

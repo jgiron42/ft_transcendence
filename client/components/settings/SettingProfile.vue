@@ -33,7 +33,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { User } from "~/models/User";
-import getUserPictureSrc from "@/utils/getUserPictureSrc";
 export default Vue.extend({
 	data() {
 		return {
@@ -54,9 +53,7 @@ export default Vue.extend({
 				this.user = user.data;
 
 				// Set displayed img src
-				getUserPictureSrc(this.$axios, this.user.id as string)
-					.catch()
-					.then((data: string) => (this.image = data));
+				this.image = this.$nuxt.$getPictureSrc(this.user.id as string);
 			})
 			.catch((err) =>
 				this.alert.emit({ title: "SETTINGS", message: `Could not fetch user data: ${err.toString()}` }),

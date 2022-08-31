@@ -8,8 +8,8 @@ source ~/.nvm/nvm-lazy.sh
 sudo chown -R 5050:5050 pgadmin/
 
 export NODE_ENV=development
-nvm install 17
-nvm use 17
+nvm install 18
+nvm use 18
 cd api ; npm i ; cd ..
 cd client ; npm i ; cd ..
 

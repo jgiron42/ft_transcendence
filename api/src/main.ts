@@ -5,7 +5,7 @@ import { AppModule } from "@modules/app.module";
 import helmet from "helmet";
 import morgan from "morgan";
 import config from "@config/api.config";
-import session from "express-session";
+import session, { MemoryStore } from "express-session";
 import { Container } from "typedi";
 import { useContainer } from "class-validator";
 import connect_pg_simple from "connect-pg-simple";
@@ -13,17 +13,20 @@ import { config as dbConfig } from "@config/db.config";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
-	const store = new (connect_pg_simple(session))({
-		conObject: {
-			host: dbConfig.host,
-			port: dbConfig.port,
-			user: dbConfig.username,
-			password: dbConfig.password,
-			database: dbConfig.database,
-		},
-		createTableIfMissing: true,
-		pruneSessionInterval: 60,
-	});
+	const store =
+		process.env.NODE_ENV === "production"
+			? new (connect_pg_simple(session))({
+					conObject: {
+						host: dbConfig.host,
+						port: dbConfig.port,
+						user: dbConfig.username,
+						password: dbConfig.password,
+						database: dbConfig.database,
+					},
+					createTableIfMissing: true,
+					pruneSessionInterval: 60,
+			  })
+			: new MemoryStore();
 
 	Container.set("SessionStore", store);
 

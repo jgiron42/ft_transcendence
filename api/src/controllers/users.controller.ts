@@ -251,14 +251,21 @@ export class UsersController {
 
 	@Get(":id/picture")
 	getImage(@Param("id") id: string, @Res() res: Response) {
-		if (!existsSync(join(config.uploadsPath, id))) id = "default.jpg";
-		new Magic(MAGIC_MIME_TYPE).detectFile(join(config.uploadsPath, id), (_err: Error, mime: string | string[]) => {
-			if (mime === "image/png" || mime === "image/jpeg") {
-				res.sendFile(join(config.uploadsPath, id), { headers: { "Content-Type": mime } });
-			} else
-				res.status(404).send(
-					"This is a ft_transcendence not a darkly you little fucker (last part was from copilot not me)",
-				);
-		});
+		if (!existsSync(join(config.uploadsPath, id))) {
+			if (config.defaultAvatar) res.redirect(config.defaultAvatar);
+			else res.sendStatus(404);
+			return;
+		} else
+			new Magic(MAGIC_MIME_TYPE).detectFile(
+				join(config.uploadsPath, id),
+				(_err: Error, mime: string | string[]) => {
+					if (mime === "image/png" || mime === "image/jpeg") {
+						res.sendFile(join(config.uploadsPath, id), { headers: { "Content-Type": mime } });
+					} else
+						res.status(404).send(
+							"This is a ft_transcendence not a darkly you little fucker (last part was from copilot not me)",
+						);
+				},
+			);
 	}
 }
