@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Check } from "typeorm";
 import { SetMode } from "@utils/set-mode";
+import { Length } from "class-validator";
 
 // entity use to describe the channel
 
@@ -17,6 +18,8 @@ export class Channel {
 	id: number;
 
 	// name of the channel
+	@Length(2, 10)
+	@Check("LENGTH(name) > 2 AND LENGTH(name) < 10")
 	@Column({ unique: true })
 	@SetMode("cru")
 	name: string;

@@ -8,6 +8,7 @@ import {
 	Session,
 	UseGuards,
 	Request as RequestDecorator,
+	UseFilters,
 } from "@nestjs/common";
 
 import { AuthService } from "@services/auth.service";
@@ -18,6 +19,7 @@ import type { SessionT } from "@src/types/session";
 import { SessionGuardFt } from "@guards/sessionFt.guard";
 import { DevelopmentGuard } from "@guards/development.guard";
 import config from "@config/api.config";
+import { OAuthErrorFilter } from "@filters/OAuthFilter";
 
 @Controller("auth")
 export class AuthController {
@@ -48,6 +50,7 @@ export class AuthController {
 	 */
 	@Get("42")
 	@UseGuards(AuthGuard("42"))
+	@UseFilters(OAuthErrorFilter)
 	@Redirect(config.webroot)
 	callback(@Session() ses: Record<string, any>, @Req() req: Request) {
 		ses.sessionUser = req.user;
@@ -68,7 +71,6 @@ export class AuthController {
 
 	/**
 	 * Route used in development only to set the current session without using the oauth nor totp
-	 * @param newSes the new value of session (must be of type SessionT)
 	 */
 	@Post("session")
 	@UseGuards(new DevelopmentGuard())

@@ -26,7 +26,6 @@ import { ChanInvitation } from "@entities/chan_invitation.entity";
 import { getPutPipeline } from "@utils/getPutPipeline";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
 import { SessionGuard } from "@guards/session.guard";
-import { DevelopmentGuard } from "@src/guards/development.guard";
 import { Date as myDate } from "@utils/Date";
 import { Page } from "@utils/Page";
 import { PerPage } from "@utils/PerPage";
@@ -128,7 +127,6 @@ export class ChannelsController {
 	}
 
 	@Post(":id/join")
-	@UseGuards(DevelopmentGuard)
 	async joinChannel(
 		@Param("id", ParseIntPipe) id: number,
 		@GetUser() user: User,
@@ -142,7 +140,6 @@ export class ChannelsController {
 	}
 
 	@Post(":id/leave")
-	@UseGuards(DevelopmentGuard)
 	async leaveChannel(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
 		return await this.chanConnectionService.getQuery().channel(id).user(user.id).notdm().notBan().remove();
 	}
@@ -242,7 +239,7 @@ export class ChannelsController {
 			.connection_chan_admin(user.id)
 			.channel(chanId)
 			.user(userId)
-			.update({ role: ChannelRole.BANNED });
+			.updateWithSave({ role: ChannelRole.BANNED });
 	}
 
 	/**
@@ -260,7 +257,7 @@ export class ChannelsController {
 			.connection_chan_admin(user.id)
 			.channel(chanId)
 			.user(userId)
-			.update({ mute_end: duration });
+			.updateWithSave({ mute_end: duration });
 	}
 
 	/**
@@ -278,6 +275,6 @@ export class ChannelsController {
 			.channel(chanId)
 			.user(userId)
 			.mute()
-			.update({ mute_end: null });
+			.updateWithSave({ mute_end: null });
 	}
 }
