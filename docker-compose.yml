@@ -42,6 +42,7 @@ services:
             - ".env"
         environment:
             - TZ=Europe/Paris
+            - API_DEFAULT_AVATAR=/_nuxt/assets/profile.png
         volumes:
             # Mount code to avoid rebuild container to refresh code
             - ./api/src:/app/src

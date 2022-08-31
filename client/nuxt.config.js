@@ -26,6 +26,7 @@ export default {
 		{ src: "@/plugins/vue-js-modal", mode: "client" },
 		{ src: "@/plugins/alert.plugin", mode: "client" },
 		{ src: "@/plugins/user.plugin", mode: "client" },
+		{ src: "@/plugins/picture.plugin", mode: "client" },
 		{ src: "@/plugins/socket-manager", mode: "client" },
 		{ src: "@/plugins/axios", mode: "all" },
 		{ src: "@/plugins/game.plugin", mode: "all" },

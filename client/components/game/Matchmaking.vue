@@ -94,12 +94,9 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
-import _ from "lodash";
-import type { NuxtAxiosInstance } from "@nuxtjs/axios";
 import { User } from "~/models/User";
 import type { SerializedMatch, UserMatchmakingStatus } from "@/types/matchmaking-status";
 import type SocketHubInterface from "~/types/socker-hub";
-import getUserPictureSrc from "~/utils/getUserPictureSrc";
 
 export default Vue.extend({
 	name: "Matchmaking",
@@ -177,24 +174,12 @@ export default Vue.extend({
 			this.matchmakingSocket.on("matchmaking:updateStatus", this.updateStatus);
 			this.syncTime();
 		},
-		loadUserPicture: _.once(
-			($axios: NuxtAxiosInstance, id: string) =>
-				new Promise((resolve, reject) =>
-					getUserPictureSrc($axios, id)
-						.then((src) => resolve(src))
-						.catch((err) => reject(err)),
-				),
-		),
 		updateStatus(status: UserMatchmakingStatus) {
 			// Get updated user
 			this.user = status.user;
 
 			// Get user picture from API
-			this.loadUserPicture(this.$axios, this.user.id)
-				.then((val) => {
-					if (val) this.userPictureSrc = val as string;
-				})
-				.catch(_);
+			this.userPictureSrc = this.$nuxt.$getPictureSrc(this.user.id);
 
 			// Display content available to authenticated users
 			this.authenticated = true;
