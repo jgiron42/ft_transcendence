@@ -1,7 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Check } from "typeorm";
 import { User } from "@entities/user.entity";
-import { Validate } from "class-validator";
-import { UserExistsRule } from "@src/validators/userExist.validator";
 import { setService } from "@utils/setFinalType.decorator";
 import { UserService } from "@services/user.service";
 import { SetMode } from "@utils/set-mode";
@@ -26,14 +24,12 @@ export class Game {
 	id: number;
 
 	// first player id
-	@Validate(UserExistsRule) // class-validator
 	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
 	@SetMode("cr")
 	user_one: User | string;
 
 	// second player id
-	@Validate(UserExistsRule)
 	@ManyToOne(() => User, (user) => user.id, { eager: true, onDelete: "CASCADE" })
 	@setService(UserService)
 	@SetMode("cr")

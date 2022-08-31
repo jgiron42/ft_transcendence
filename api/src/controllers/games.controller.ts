@@ -1,17 +1,6 @@
-import {
-	Controller,
-	Get,
-	Param,
-	ParseIntPipe,
-	Post,
-	UseFilters,
-	UseGuards,
-	UseInterceptors,
-	UsePipes,
-} from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
 import { StoredGameService } from "@services/stored-game.service";
 import { Game } from "@entities/game.entity";
-import { getValidationPipe } from "@utils/getValidationPipe";
 import { getPostPipeline } from "@utils/getPostPipeline";
 import { MyRequestPipe } from "@utils/myRequestPipe";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
@@ -53,7 +42,6 @@ export class GamesController {
 	 * create a new Game
 	 */
 	@Post()
-	@UsePipes(getValidationPipe(Game))
 	create(@MyRequestPipe(...getPostPipeline(Game)) game: Game, @GetUser() user: User) {
 		if ((game.user_one as User)?.id !== user.id && (game.user_two as User)?.id !== user.id)
 			throw new ValidationError("user must be in game creation");

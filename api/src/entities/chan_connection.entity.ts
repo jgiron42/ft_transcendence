@@ -1,7 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique, CreateDateColumn } from "typeorm";
 import { User } from "@entities/user.entity";
 import { Channel } from "@entities/channel.entity";
-import { Expose } from "class-transformer";
 import { SetMode } from "@utils/set-mode";
 //    This entity is use in order to know who have access to which channel
 
@@ -13,7 +12,6 @@ export enum ChannelRole {
 }
 
 @Entity()
-@Expose() // class-transformer
 @Unique("unique_connection", ["channel", "user"])
 export class ChanConnection {
 	@PrimaryGeneratedColumn()

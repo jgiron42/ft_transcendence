@@ -49,6 +49,21 @@
 			<ListUsers v-if="showBlocked && blocked.length !== 0" :relations="blocked" type="blocked" :margin="true" />
 			<div v-else-if="showBlocked" class="empty-text">No blocked users.</div>
 		</div>
+		<hr />
+
+		<!-- search users -->
+		<div id="search-panel">
+			<ArrowDropdown name="Search user" :click="onShowSearch" :state="showSearch" />
+			<SearchBar
+				v-if="showSearch"
+				:single="false"
+				autocomplete="off"
+				@update="(result) => (searchResult = result)"
+			/>
+			<div v-for="(user, index) in searchResult" :key="index" class="m-1">
+				<UserEntry :user="user" />
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -56,9 +71,12 @@
 import Vue from "vue";
 import { GameInviteRelation, Relation, RelationType } from "@/models/Relation";
 import { store } from "@/store";
+import SearchBar from "~/components/SearchBar.vue";
+import UserEntry from "~/components/chat/users/UserEntry.vue";
 
 export default Vue.extend({
 	name: "SocialPanel",
+	components: { UserEntry, SearchBar },
 	props: {
 		/*
 		 * selection is used to determine if the social panel is shown or not.
@@ -110,6 +128,8 @@ export default Vue.extend({
 		// showFriends is used to determine if the friends list is shown or not.
 		showFriends: true,
 
+		showSearch: true,
+
 		updateGameInviteInterval: {} as NodeJS.Timeout,
 	}),
 	mounted() {
@@ -142,6 +162,11 @@ export default Vue.extend({
 		// onShowFriends is used to show or hide the friends list.
 		onShowFriends() {
 			this.showFriends = !this.showFriends;
+		},
+
+		// onShowFriends is used to show or hide the friends list.
+		onShowSearch() {
+			this.showSearch = !this.showSearch;
 		},
 
 		updateGameInvites() {
