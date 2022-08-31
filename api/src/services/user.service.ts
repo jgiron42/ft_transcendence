@@ -21,6 +21,15 @@ export class UserService implements resourceService<User> {
 		return new UserQuery(this.usersRepository);
 	}
 
+	async complete(str: string): Promise<User[]> {
+		return await this.usersRepository
+			.createQueryBuilder("user")
+			.where("id LIKE :str", { str: `${str}%` })
+			.take(10)
+			.orderBy("id", "ASC")
+			.getMany();
+	}
+
 	findAll(page = 1, itemByPage = 10): Promise<User[]> {
 		return this.getQuery().paginate(page, itemByPage).getMany();
 	}

@@ -70,6 +70,11 @@ export class UsersController {
 		return this.userService.findAllAndCount(page, per_page);
 	}
 
+	@Get("complete/:query")
+	complete(@Param("query") query: string): Promise<User[]> {
+		return this.userService.complete(query);
+	}
+
 	/**
 	 * get the user designated by id
 	 * @param id
