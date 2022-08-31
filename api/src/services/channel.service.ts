@@ -55,8 +55,4 @@ export class ChannelService {
 	async save(channel: Channel): Promise<Channel> {
 		return await this.ChannelRepository.save(channel);
 	}
-
-	update(id: number, channel: Channel) {
-		return this.getQuery().update(channel, id);
-	}
 }

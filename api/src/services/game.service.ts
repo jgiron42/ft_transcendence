@@ -530,7 +530,7 @@ export class GameService {
 						// Increase user's game counter
 						updatedUsers.forEach((user: User) => {
 							user.nb_game++;
-							void this.userService.update(user.id, user);
+							void this.userService.getQuery().update(user, user.id);
 						});
 
 						// Erase game

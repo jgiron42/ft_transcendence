@@ -38,8 +38,4 @@ export class ChanInvitationService {
 	async save(chanInvitation: ChanInvitation): Promise<ChanInvitation> {
 		return await this.ChanInvitationRepository.save(chanInvitation);
 	}
-
-	update(id: number, chanInvitation: ChanInvitation) {
-		return this.getQuery().update(chanInvitation, id);
-	}
 }

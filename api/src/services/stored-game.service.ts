@@ -41,8 +41,4 @@ export class StoredGameService {
 	async save(game: Game): Promise<Game> {
 		return await this.GameRepository.save(game);
 	}
-
-	update(id: number, game: Game) {
-		return this.getQuery().update(game, id);
-	}
 }

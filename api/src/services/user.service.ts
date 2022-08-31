@@ -45,8 +45,4 @@ export class UserService implements resourceService<User> {
 	async save(user: User): Promise<User> {
 		return await this.usersRepository.save(user);
 	}
-
-	update(id: string, user: User) {
-		return this.getQuery().update(user, id);
-	}
 }

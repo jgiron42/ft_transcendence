@@ -35,10 +35,6 @@ export class ChanConnectionService {
 		return await this.ChanConnectionRepository.save(chanConnection);
 	}
 
-	update(id: number, chanConnection: ChanConnection) {
-		return this.getQuery().update(chanConnection, id);
-	}
-
 	async findByUser(id: string): Promise<ChanConnection[]> {
 		return this.getQuery().user(id).getMany();
 	}

@@ -4,7 +4,6 @@ import { Repository } from "typeorm";
 import { Relation } from "@src/entities/relation.entity";
 import { Container } from "typedi";
 import { RelationQuery } from "@src/queries/relationQuery";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { DeepPartial } from "typeorm/common/DeepPartial";
 
 @Injectable()
@@ -38,10 +37,6 @@ export class RelationService {
 
 	async save(relation: Relation): Promise<Relation> {
 		return await this.RelationRepository.save(relation);
-	}
-
-	update(id: number, relation: QueryDeepPartialEntity<Relation>) {
-		return this.getQuery().update(relation, id);
 	}
 
 	findByUser(id: string): Promise<Relation[]> {
