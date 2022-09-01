@@ -40,31 +40,41 @@ export default class InvitationStore extends VuexModule implements IInvitationSt
 
 	// Action used to retrieve all the channel invitations
 	@Action
-	async retrieveInvitations(page = 1) {
-		// if retrieving the first page, clear the list
-		if (page === 1) this.setInvitations([]);
+	async retrieveInvitations() {
+		// clear the invitations list
+		this.setInvitations([]);
 
-		await window.$nuxt.$axios
-			.get("/invitations", { params: { page, per_page: 100 } })
-			.then((response) => {
-				// push only the invitations the user didn't send
-				const invitations: ChanInvitation[] = response.data;
+		let page = 1;
+		let stop = false;
 
-				// check if invitations is not empty
-				if (invitations.length === undefined) return;
+		while (!stop) {
+			await window.$nuxt.$axios
+				.get("/invitations", { params: { page, per_page: 100 } })
+				.then((response) => {
+					// push only the invitations the user didn't send
+					const invitations: ChanInvitation[] = response.data;
 
-				this.pushFront(invitations.filter((invitation) => invitation.invited_by.id !== store.user.me.id));
+					// check if invitations is not empty
+					if (invitations.length === undefined) {
+						stop = true;
+						return;
+					}
 
-				// if there are more invitations, retrieve them
-				if (invitations.length === 100) this.retrieveInvitations(page + 1);
-			})
-			// if catch some error, add an alert
-			.catch(() => {
-				window.$nuxt.$emit("addAlert", {
-					title: "Error:",
-					message: "An error occured while retrieving invitations",
+					this.pushFront(invitations.filter((invitation) => invitation.invited_by.id !== store.user.me.id));
+					page++;
+
+					// if it's the last page, then stop the loop
+					if (invitations.length !== 100) stop = true;
+				})
+				// if catch some error, add an alert
+				.catch(() => {
+					window.$nuxt.$emit("addAlert", {
+						title: "Error:",
+						message: "An error occured while retrieving invitations",
+					});
+					stop = true;
 				});
-			});
+		}
 	}
 
 	// Action to retrieve a channel invitation by id

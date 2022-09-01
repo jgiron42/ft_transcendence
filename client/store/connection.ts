@@ -46,75 +46,92 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 
 	// Action used to retrieve all chanConnections of the current channel from api
 	@Action
-	retrieveChanConnections(page = 1) {
+	async retrieveChanConnections() {
 		// if we aren't on a channel, then simply return
 		if (store.channel.currentConnection.channel?.id === undefined) return;
 
-		// if retrieving the first page, clear the list
-		if (page === 1) this.clearChanConnections();
+		// clear the current channel connections
+		this.clearChanConnections();
 
-		window.$nuxt.$axios
-			.get(`/channels/${store.channel.currentConnection.channel.id}/chan_connections`, {
-				params: { page, per_page: 100 },
-			})
-			.then((response) => {
-				// get connections from data
-				const connections: ChanConnection[] = response.data;
+		let page = 1;
+		let stop = false;
 
-				// get my connection on the current channel
-				const myConnection = connections.find((c) => c.user.id === store.user.me.id);
+		while (!stop) {
+			await window.$nuxt.$axios
+				.get(`/channels/${store.channel.currentConnection.channel.id}/chan_connections`, {
+					params: { page, per_page: 100 },
+				})
+				.then((response) => {
+					// get connections from data
+					const connections: ChanConnection[] = response.data;
 
-				// if my connection is found, update my role on current channel and push the channel to my channels
-				if (myConnection) {
-					store.channel.setCurrentRole(myConnection.role);
-					store.user.pushConnections([myConnection]);
-				}
+					// get my connection on the current channel
+					const myConnection = connections.find((c) => c.user.id === store.user.me.id);
 
-				// push connections to the list
-				this.pushChanConnection(connections);
+					// if my connection is found, update my role on current channel and push the channel to my channels
+					if (myConnection) {
+						store.channel.setCurrentRole(myConnection.role);
+						store.user.pushConnections([myConnection]);
+					}
 
-				// if there are more connections, retrieve them
-				if (connections.length === 100) this.retrieveChanConnections(page + 1);
-			})
-			.catch(() => {
-				// if error occurs, add an alert
-				window.$nuxt.$emit("addAlert", {
-					title: "Error",
-					message: "Failed to retrieve channel connections",
+					// push connections to the list
+					this.pushChanConnection(connections);
+					page++;
+
+					// if it's the last page, then stop the loop
+					if (connections.length !== 100) stop = true;
+				})
+				.catch(() => {
+					// if error occurs, add an alert
+					window.$nuxt.$emit("addAlert", {
+						title: "Error",
+						message: "Failed to retrieve channel connections",
+					});
+					stop = true;
 				});
-			});
+		}
 	}
 
 	// Action used to retrieve all the channel connections of the current user
 	@Action
-	retrieveMyConnections(page = 1) {
-		// if retrieving the first page, clear the list
-		if (page === 1) store.user.clearConnections();
+	async retrieveMyConnections() {
+		// clear the my connections
+		store.user.clearConnections();
 
-		window.$nuxt.$axios
-			.get(`/users/${store.user.me.id}/chan_connections`, {
-				params: { page, per_page: 100 },
-			})
-			.then((response) => {
-				// get connections from response data
-				const connections: ChanConnection[] = response.data;
+		let page = 1;
+		let stop = false;
 
-				// check if connections is not empty
-				if (connections.length === undefined) return;
+		while (!stop) {
+			await window.$nuxt.$axios
+				.get(`/users/${store.user.me.id}/chan_connections`, {
+					params: { page, per_page: 100 },
+				})
+				.then((response) => {
+					// get connections from response data
+					const connections: ChanConnection[] = response.data;
 
-				// push channel of the connections to my channels
-				store.user.pushConnections(connections);
+					// check if connections is not empty
+					if (connections.length === undefined) {
+						stop = true;
+						return;
+					}
 
-				// if there are more connections, retrieve them
-				if (connections.length === 100) this.retrieveMyConnections(page + 1);
-			})
-			.catch(() => {
-				// if error occurs, add an alert
-				window.$nuxt.$emit("addAlert", {
-					title: "Error",
-					message: "Failed to retrieve user connections",
+					// push channel of the connections to my channels
+					store.user.pushConnections(connections);
+					page++;
+
+					// if it's the last page, then stop the loop
+					if (connections.length !== 100) stop = true;
+				})
+				.catch(() => {
+					// if error occurs, add an alert
+					window.$nuxt.$emit("addAlert", {
+						title: "Error",
+						message: "Failed to retrieve user connections",
+					});
+					stop = true;
 				});
-			});
+		}
 	}
 
 	// Action used to retrieve a connection by id
