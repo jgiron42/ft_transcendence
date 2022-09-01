@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Check } from "typeorm";
 import { SetMode } from "@utils/set-mode";
 import { config as userConfig } from "@config/user.config";
+import { config as channelConfig } from "@config/channel.config";
 
 // entity use to describe the channel
 
@@ -19,9 +20,10 @@ export class Channel {
 
 	// name of the channel
 	@Check(
-		`LENGTH(name) > ${userConfig.usernameMinLength * 2 + 3} AND LENGTH(name) < ${
-			userConfig.usernameMaxLength * 2 + 3
-		}`,
+		`LENGTH(name) > ${channelConfig.nameMinLength} AND LENGTH(name) < ${Math.max(
+			userConfig.usernameMaxLength * 2 + 3, // minimum length for dm channels
+			channelConfig.nameMinLength,
+		)}`,
 	)
 	@Column({ unique: true })
 	@SetMode("cru")
