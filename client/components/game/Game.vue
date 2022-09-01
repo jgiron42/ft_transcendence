@@ -125,17 +125,6 @@ export default Vue.extend({
 			// Abort when there's a problem
 			if (!wrapper) throw new Error("Could not find wrapper");
 
-			// Automatically set landscape fullscreen on mobile devices.
-			if (this.$device.isMobileOrTablet) {
-				try {
-					// Set fullscreen.
-					await document.documentElement.requestFullscreen();
-
-					// Set screen orientation to landscape.
-					await screen.orientation.lock("landscape");
-				} catch (_) {}
-			}
-
 			// Store element.
 			this.wrapper = wrapper;
 
@@ -163,6 +152,8 @@ export default Vue.extend({
 
 			// Setup game loop.
 			this.interval = setInterval(this.updateAndRedraw, 0);
+
+			this.setFullScreen();
 		} catch (err: any) {
 			// Log and display any error.
 			console.error("game:", err);
@@ -181,8 +172,34 @@ export default Vue.extend({
 
 		// Reset the game plugin state.
 		this.$game.reset();
+
+		this.unsetFullScreen();
 	},
 	methods: {
+		async unsetFullScreen() {
+			// Automatically set landscape fullscreen on mobile devices.
+			if (this.$device.isMobileOrTablet) {
+				try {
+					// Set fullscreen.
+					await document.exitFullscreen();
+
+					// Set screen orientation to landscape.
+					await screen.orientation.unlock();
+				} catch (_) {}
+			}
+		},
+		async setFullScreen() {
+			// Automatically set landscape fullscreen on mobile devices.
+			if (this.$device.isMobileOrTablet) {
+				try {
+					// Set fullscreen.
+					await document.documentElement.requestFullscreen();
+
+					// Set screen orientation to landscape.
+					await screen.orientation.lock("landscape");
+				} catch (_) {}
+			}
+		},
 		initTouchScreenInput() {
 			// Calculate the screen's middle positions
 			const [xMiddle, yMiddle] = [document.body.scrollWidth / 2, document.body.clientHeight / 2];
@@ -191,6 +208,7 @@ export default Vue.extend({
 			document.body.addEventListener(
 				"touchstart",
 				(ev) => {
+					this.setFullScreen();
 					// Create a temporary map to register any events caused by touches.
 					const localMap: Partial<Record<HandledKeys, boolean>> = {
 						ClickLeftTop: false,

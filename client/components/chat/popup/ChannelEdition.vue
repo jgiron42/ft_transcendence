@@ -9,7 +9,7 @@
 						<input
 							id="textarea-chan-name"
 							v-model="channel.name"
-							maxlength="10"
+							maxlength="20"
 							minlength="2"
 							class="message-txt bg-transparent border-none outline-none resize-none flex-auto"
 							placeholder="Enter channel name..."

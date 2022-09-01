@@ -49,6 +49,7 @@ services:
             - ./api/tsconfig.json:/app/tsconfig.json
             - ./api/tsconfig.build.json:/app/tsconfig.build.json
             - ./api/config.json:/app/config.json
+            - /uploads
         restart: unless-stopped
         depends_on: [db]
 
@@ -62,6 +63,8 @@ services:
             - ".env"
         expose:
           - 5432
+        volumes: 
+          - ./db:/var/lib/postgresql/data
 
     pgadmin:
         image: dpage/pgadmin4

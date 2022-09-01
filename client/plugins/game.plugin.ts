@@ -8,6 +8,8 @@ class GamePlugin extends Vue {
 	spectating = false;
 	id = "";
 	isP1 = false;
+	p1 = "";
+	p2 = "";
 
 	constructor(ctx: Context) {
 		super();
@@ -22,6 +24,8 @@ class GamePlugin extends Vue {
 		this.spectating = false;
 		this.id = "";
 		this.isP1 = false;
+		this.p1 = "";
+		this.p2 = "";
 	}
 }
 

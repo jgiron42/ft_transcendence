@@ -10,10 +10,10 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style scoped>
 body {
 	scroll-behavior: smooth;
 	background-color: bg-design_gray;
-	@apply bg-design_dgray;
+	@apply bg-design_dgray select-none;
 }
 </style>

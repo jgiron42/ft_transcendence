@@ -43,7 +43,7 @@
 						<div
 							v-for="match in matchList"
 							:key="match.id"
-							class="border-gray-400 border-2 hover:text-gray-400 cursor-pointer p-2"
+							class="border-gray-400 border-2 hover:text-gray-400 cursor-pointer p-2 font-mono"
 							@click="spectateMatch(match.id)"
 						>
 							{{ match.p1 }} / {{ match.p2 }}
@@ -58,7 +58,7 @@
 		<div
 			id="inputs"
 			:class="`text-design_white flex 
-				flex-row
+				flex-col
 			 w-full bg-design_blue border-t-4 border-white text-center p-2 justify-around`"
 		>
 			<div class="flex flex-col items-center">
@@ -291,6 +291,10 @@ export default Vue.extend({
 
 					// Format the passed game mode.
 					this.$game.mode = "online:" + match.mode;
+
+					// Store players ID.
+					this.$game.p1 = match.p1;
+					this.$game.p2 = match.p2;
 
 					// Redirect to the game page.
 					this.$nuxt.$router.push("/game");
