@@ -26,7 +26,7 @@
 			<p>Total losses : {{ user.nb_loss }}</p>
 			<p>ELO rating: {{ user.elo }}</p>
 		</div>
-		<NuxtLink class="uppercase" to="/history">See match history</NuxtLink>
+		<NuxtLink class="uppercase hover:text-gray-400" to="/history">See match history</NuxtLink>
 	</div>
 </template>
 

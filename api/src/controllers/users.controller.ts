@@ -226,7 +226,7 @@ export class UsersController {
 				},
 			}),
 			limits: {
-				fileSize: 1000000,
+				fileSize: config.maxAvatarSize,
 				files: 1,
 			},
 			fileFilter: (

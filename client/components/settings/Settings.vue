@@ -37,7 +37,7 @@
 			</button>
 		</div>
 		<!-- Content -->
-		<div id="content" class="text-design_white w-full h-full">
+		<div id="content" class="text-design_white w-full h-full overflow-y-scroll no-scrollbar">
 			<!-- Component to generate a TOTP QR code and plain secret -->
 			<SettingProfile2FA v-if="selection === '2FA'" />
 			<!-- Profile component with picture upload -->

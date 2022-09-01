@@ -1,5 +1,5 @@
 <template>
-	<div class="h-full w-full flex justify-center items-center text-center overflow-hidden">
+	<div class="h-full w-full flex justify-center items-center text-center overflow-hidden select-none">
 		<div class="h-full min-w-max w-full max-w-full">
 			<GameVersus v-if="status === 'creating' && p1.id" :p1="p1.id" :p2="p2.id" />
 			<BoxButton v-else class="h-5/6 w-11/12 uppercase" :enable-hover="false" :content="[status]" />

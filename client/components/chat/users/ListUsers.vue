@@ -312,4 +312,10 @@ export default Vue.extend({
 	background-color: #8c8c8c;
 	mask: url("~assets/invite.svg") no-repeat center;
 }
+
+/* Set button green on hover */
+.invite-icon:hover,
+.invite-icon:focus {
+	filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(100deg) brightness(104%) contrast(97%);
+}
 </style>

@@ -244,6 +244,9 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 		if (invitation.channel && invitation.user)
 			await window.$nuxt.$axios
 				.post(`/channels/${invitation.channel.id}/invite/${invitation.user.id}`)
+				.then((_) =>
+					window.$nuxt.alert.emit({ title: "CHANNEL", message: "Invite successfully sent.", isError: false }),
+				)
 				.catch(() => {
 					window.$nuxt.$emit("addAlert", {
 						title: "Error:",

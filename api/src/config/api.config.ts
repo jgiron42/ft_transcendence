@@ -15,6 +15,7 @@ const config = {
 	maxItemPerPage: Number(process.env.API_MAX_ITEM_PER_PAGE) || 100,
 	uploadsPath: process.env.API_UPLOADS_PATH || "/tmp/uploads", // absolute upload path
 	defaultAvatar: process.env.API_DEFAULT_AVATAR,
+	maxAvatarSize: Number(process.env.MAX_UPLOAD_SIZE) || 100000000, // in bytes
 };
 
 export default config;

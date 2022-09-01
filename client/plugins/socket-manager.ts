@@ -124,11 +124,6 @@ function initSocket(name: string, context: Context): SocketHubInterface {
 		window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: err.toString() });
 	});
 
-	// Log all event
-	// socket.onAny((event: any, ...args: any) => {
-	// 	console.debug("[WEBSOCKET][WS ANY]:", event, args);
-	// });
-
 	return new SocketHub(socket);
 }
 

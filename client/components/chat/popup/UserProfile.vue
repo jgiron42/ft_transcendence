@@ -277,6 +277,10 @@ export default Vue.extend({
 						// Format the passed game mode.
 						this.$game.mode = "online:" + match.mode;
 
+						// Store players ID.
+						this.$game.p1 = match.p1;
+						this.$game.p2 = match.p2;
+
 						// Redirect to the game page.
 						this.$nuxt.$router.push("/game");
 					} else this.alert.emit({ title: "SPECTATE", message: `Match ${match} does not exist` });

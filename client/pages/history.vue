@@ -1,5 +1,5 @@
 <template>
-	<div class="h-full w-full flex justify-center items-center text-center overflow-y-scroll">
+	<div class="h-full w-full flex justify-center items-center text-center overflow-y-scroll select-none">
 		<div :class="`${$device.isMobile ? 'w-full h-full' : 'h-5/6  w-1/2'} max-w-full min-w-max`">
 			<History v-if="id" :page-prop="$route.query.page || 1" :user-i-d="id" />
 			<div v-else class="w-full h-full items-center flex content-center">
