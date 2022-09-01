@@ -29,7 +29,7 @@ export class SessionGuardFt implements CanActivate {
 				// Throw an HTTP 401 error
 				throw new UnauthorizedException({
 					statusCode: 401,
-					error: "Unauthorized2",
+					error: "Unauthorized",
 					reason: "not authenticated",
 					authMethod: "42",
 				});
@@ -46,7 +46,7 @@ export class SessionGuardFt implements CanActivate {
 					if (socket.session.isTOTPIdentified) socket.session.isTOTPIdentified = false;
 				}
 				throw new WsException({
-					error: "Unauthorized3",
+					error: "Unauthorized",
 					reason: "not authenticated",
 					authMethod: "42",
 				});

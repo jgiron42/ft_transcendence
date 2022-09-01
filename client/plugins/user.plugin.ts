@@ -19,7 +19,7 @@ class UserSingleton extends Vue {
 
 	private get user(): User {
 		// Clone stored user.
-		return { ...store.user.me };
+		return _.cloneDeep(store.user.me);
 	}
 
 	async fetch(): Promise<User> {

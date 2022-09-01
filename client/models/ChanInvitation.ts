@@ -1,7 +1,8 @@
+import { StringifiableModel } from "./StringifiableModel";
 import { Channel } from "@/models/Channel";
 import { User } from "@/models/User";
 
-export class ChanInvitation {
+export class ChanInvitation extends StringifiableModel {
 	id: number;
 
 	user: User;

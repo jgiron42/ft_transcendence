@@ -1,3 +1,5 @@
+import { StringifiableModel } from "./StringifiableModel";
+
 // User type declaration identical to API's one.
 interface UserInterface {
 	id: string;
@@ -13,8 +15,9 @@ interface UserInterface {
 	elo: number;
 }
 
-export class User implements UserInterface {
+export class User extends StringifiableModel implements UserInterface {
 	constructor() {
+		super();
 		this.id = "";
 		this.username = "";
 		this.image_url = "";
