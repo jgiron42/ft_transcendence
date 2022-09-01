@@ -39,6 +39,7 @@
 <script lang="ts">
 import Vue from "vue";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
+import _ from "lodash";
 import { base32Encode } from "@/utils/base32";
 import { User } from "@/models/User";
 import randomKey from "@/utils/randomKey";
@@ -71,7 +72,7 @@ export default Vue.extend({
 		//  Set handler for "SAVE" button press
 		this.$nuxt.$on("saveSettings2FA", async () => {
 			// Clone user to avoid mutating the store object
-			this.user = { ...this.user, totp_enabled: true, totp_key: this.secret };
+			_.merge(this.user, { ...this.user, totp_enabled: true, totp_key: this.secret });
 
 			// Update user in store
 			this.$user.setUser(this.user);

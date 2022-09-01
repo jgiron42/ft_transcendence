@@ -1,3 +1,4 @@
+import { StringifiableModel } from "./StringifiableModel";
 import { User } from "@/models/User";
 import { Channel } from "@/models/Channel";
 
@@ -8,8 +9,9 @@ export enum ChannelRole {
 	OWNER,
 }
 
-export class ChanConnection {
+export class ChanConnection extends StringifiableModel {
 	constructor() {
+		super();
 		this.role = 0;
 		this.created_at = new Date();
 		this.channel = new Channel();

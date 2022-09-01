@@ -1,3 +1,4 @@
+import { StringifiableModel } from "./StringifiableModel";
 import { User } from "@/models/User";
 
 export enum RelationType {
@@ -21,8 +22,9 @@ export interface RelationInterface {
 	created_at: Date;
 }
 
-export class Relation implements RelationInterface {
+export class Relation extends StringifiableModel implements RelationInterface {
 	constructor() {
+		super();
 		this.created_at = new Date();
 	}
 

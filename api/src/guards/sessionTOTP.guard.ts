@@ -24,7 +24,7 @@ export class SessionGuardTOTP implements CanActivate {
 				// Throw an HTTP 401 error
 				throw new UnauthorizedException({
 					statusCode: 401,
-					error: "Unauthorized4",
+					error: "Unauthorized",
 					reason: "not authenticated",
 					authMethod: "TOTP",
 				});
@@ -35,7 +35,7 @@ export class SessionGuardTOTP implements CanActivate {
 					return true;
 				}
 				throw new WsException({
-					error: "Unauthorized5",
+					error: "Unauthorized",
 					reason: "not authenticated",
 					authMethod: "TOTP",
 				});

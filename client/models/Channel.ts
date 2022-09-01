@@ -1,3 +1,5 @@
+import { StringifiableModel } from "./StringifiableModel";
+
 export enum ChannelType {
 	PUBLIC,
 	PASSWORD,
@@ -5,7 +7,7 @@ export enum ChannelType {
 	DM,
 }
 
-export class Channel {
+export class Channel extends StringifiableModel {
 	id: number;
 	name: string;
 	type: ChannelType;
