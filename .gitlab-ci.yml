@@ -206,6 +206,7 @@ deploy_db:
   stage: deploy
   variables:
     APP_NAME: db
+  before_script: []
   script:
     - chmod 600 "$ID_RSA"
     - echo '' >> "$ID_RSA"
