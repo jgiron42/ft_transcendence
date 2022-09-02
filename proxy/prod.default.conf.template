@@ -14,6 +14,8 @@ server {
 	listen [::]:${NGINX_HTTPS_PORT} ssl;
 
 	server_name ${NGINX_PROD_HOST};
+	
+	client_max_body_size 800M;
 
 	location / {
 		proxy_pass http://${CLIENT_HOST}:${CLIENT_PORT}/;
