@@ -131,6 +131,8 @@ export default Vue.extend({
 		showSearch: true,
 
 		updateGameInviteInterval: {} as NodeJS.Timeout,
+
+		searchResult: "",
 	}),
 	mounted() {
 		this.updateGameInvites();
