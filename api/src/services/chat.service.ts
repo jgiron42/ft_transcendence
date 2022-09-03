@@ -84,7 +84,6 @@ export class ChatService {
 		throw new WsException({
 			error: "Unauthorized",
 			reason: error,
-			authMethod: "42",
 		});
 	}
 

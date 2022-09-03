@@ -65,7 +65,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("chat:JoinChannel")
-	async onJoinChannel(client: Socket, chan_id: number): Promise<void> {
+	async onJoinChannel(@ConnectedSocket() client: Socket, chan_id: number): Promise<void> {
 		// get user from pool
 		const user = this.chatService.getClient(client);
 
