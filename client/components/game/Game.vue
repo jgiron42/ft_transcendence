@@ -173,7 +173,12 @@ export default Vue.extend({
 		// Reset the game plugin state.
 		this.$game.reset();
 
+		// Get out of fullscreen mode.
 		this.unsetFullScreen();
+
+		// Stop handling touch events.
+		document.body.removeEventListener("touchstart", this.handleTouchStart, false);
+		document.body.removeEventListener("touchend", this.handleTouchEnd, false);
 	},
 	methods: {
 		async unsetFullScreen() {
@@ -200,114 +205,108 @@ export default Vue.extend({
 				} catch (_) {}
 			}
 		},
-		initTouchScreenInput() {
+		handleTouchStart(ev: TouchEvent) {
 			// Calculate the screen's middle positions
 			const [xMiddle, yMiddle] = [document.body.scrollWidth / 2, document.body.clientHeight / 2];
+			this.setFullScreen();
+			// Create a temporary map to register any events caused by touches.
+			const localMap: Partial<Record<HandledKeys, boolean>> = {
+				ClickLeftTop: false,
+				ClickLeftBottom: false,
+				ClickRightTop: false,
+				ClickRightBottom: false,
+			};
 
+			// Extract all touches.
+			const touchList = ev.touches;
+
+			// Register every events causes by current touches.
+			for (let index = 0; index < touchList.length; index++) {
+				// Get current touch
+				const touch = touchList[index];
+
+				// Ger current touch's position
+				const [x, y] = [touch.clientX, touch.clientY];
+
+				// Register clicks in the top left corner.
+				localMap.ClickLeftTop = localMap.ClickLeftTop || (x < xMiddle && y < yMiddle);
+
+				// Register clicks in the bottom left corner.
+				localMap.ClickLeftBottom = localMap.ClickLeftBottom || (x < xMiddle && y > yMiddle);
+
+				// Register clicks in the top right corner.
+				localMap.ClickRightTop = localMap.ClickRightTop || (x > xMiddle && y < yMiddle);
+
+				// Register clicks in the right bottom corner.
+				localMap.ClickRightBottom = localMap.ClickRightBottom || (x > xMiddle && y > yMiddle);
+			}
+
+			// Merge registered events with the game keymap.
+			Object.entries(localMap).forEach(([key, val]) => {
+				this.keyMap[key as HandledKeys].pressed = val as boolean;
+			});
+
+			// Send the new user input values to the backend.
+			this.updateUserInputInBackend();
+		},
+		handleTouchEnd(ev: TouchEvent) {
+			const [xMiddle, yMiddle] = [document.body.scrollWidth / 2, document.body.clientHeight / 2];
+
+			// Create a temporary map to register any events caused by touches.
+			const localMap: Partial<Record<HandledKeys, boolean>> = {
+				ClickLeftTop: false,
+				ClickLeftBottom: false,
+				ClickRightTop: false,
+				ClickRightBottom: false,
+			};
+
+			// Initialize list of all touches.
+			const touchList = [] as Touch[];
+
+			// Initialize list of all changed touches.
+			const changedList = [] as Touch[];
+
+			// Add every changed touches to the list
+			// (We have to do this because TouchList doesn't have iterators, only indexes)
+			for (let index = 0; index < ev.changedTouches.length; index++) changedList.push(ev.changedTouches[index]);
+
+			// Add every touches to the list
+			for (let index = 0; index < ev.touches.length; index++) touchList.push(ev.changedTouches[index]);
+
+			// Remove every ended touches from touch list, then register the remaining inputs.
+			touchList
+				.filter((touch) => changedList.find((found) => found.identifier === touch.identifier))
+				.forEach((touch) => {
+					// Get current touch position.
+					const [x, y] = [touch.clientX, touch.clientY];
+
+					// Register clicks in the top left corner.
+					localMap.ClickLeftTop = localMap.ClickLeftTop || !(x < xMiddle && y < yMiddle);
+
+					// Register clicks in the bottom left corner.
+					localMap.ClickLeftBottom = localMap.ClickLeftBottom || !(x < xMiddle && y > yMiddle);
+
+					// Register clicks in the top right corner.
+					localMap.ClickRightTop = localMap.ClickRightTop || !(x > xMiddle && y < yMiddle);
+
+					// Register clicks in the right bottom corner.
+					localMap.ClickRightBottom = localMap.ClickRightBottom || !(x > xMiddle && y > yMiddle);
+				});
+
+			// Merge the registered inputs with the game keymap.
+			Object.entries(localMap).forEach(([key, val]) => {
+				this.keyMap[key as HandledKeys].pressed = val as boolean;
+			});
+
+			// Send the updated user input to the backend.
+			this.updateUserInputInBackend();
+		},
+		initTouchScreenInput() {
 			// Register new touches.
-			document.body.addEventListener(
-				"touchstart",
-				(ev) => {
-					this.setFullScreen();
-					// Create a temporary map to register any events caused by touches.
-					const localMap: Partial<Record<HandledKeys, boolean>> = {
-						ClickLeftTop: false,
-						ClickLeftBottom: false,
-						ClickRightTop: false,
-						ClickRightBottom: false,
-					};
-
-					// Extract all touches.
-					const touchList = ev.touches;
-
-					// Register every events causes by current touches.
-					for (let index = 0; index < touchList.length; index++) {
-						// Get current touch
-						const touch = touchList[index];
-
-						// Ger current touch's position
-						const [x, y] = [touch.clientX, touch.clientY];
-
-						// Register clicks in the top left corner.
-						localMap.ClickLeftTop = localMap.ClickLeftTop || (x < xMiddle && y < yMiddle);
-
-						// Register clicks in the bottom left corner.
-						localMap.ClickLeftBottom = localMap.ClickLeftBottom || (x < xMiddle && y > yMiddle);
-
-						// Register clicks in the top right corner.
-						localMap.ClickRightTop = localMap.ClickRightTop || (x > xMiddle && y < yMiddle);
-
-						// Register clicks in the right bottom corner.
-						localMap.ClickRightBottom = localMap.ClickRightBottom || (x > xMiddle && y > yMiddle);
-					}
-
-					// Merge registered events with the game keymap.
-					Object.entries(localMap).forEach(([key, val]) => {
-						this.keyMap[key as HandledKeys].pressed = val as boolean;
-					});
-
-					// Send the new user input values to the backend.
-					this.updateUserInputInBackend();
-				},
-				false,
-			);
+			document.body.addEventListener("touchstart", this.handleTouchStart, false);
 
 			// Unregister ended touches.
-			document.body.addEventListener(
-				"touchend",
-				(ev) => {
-					// Create a temporary map to register any events caused by touches.
-					const localMap: Partial<Record<HandledKeys, boolean>> = {
-						ClickLeftTop: false,
-						ClickLeftBottom: false,
-						ClickRightTop: false,
-						ClickRightBottom: false,
-					};
-
-					// Initialize list of all touches.
-					const touchList = [] as Touch[];
-
-					// Initialize list of all changed touches.
-					const changedList = [] as Touch[];
-
-					// Add every changed touches to the list
-					// (We have to do this because TouchList doesn't have iterators, only indexes)
-					for (let index = 0; index < ev.changedTouches.length; index++)
-						changedList.push(ev.changedTouches[index]);
-
-					// Add every touches to the list
-					for (let index = 0; index < ev.touches.length; index++) touchList.push(ev.changedTouches[index]);
-
-					// Remove every ended touches from touch list, then register the remaining inputs.
-					touchList
-						.filter((touch) => changedList.find((found) => found.identifier === touch.identifier))
-						.forEach((touch) => {
-							// Get current touch position.
-							const [x, y] = [touch.clientX, touch.clientY];
-
-							// Register clicks in the top left corner.
-							localMap.ClickLeftTop = localMap.ClickLeftTop || !(x < xMiddle && y < yMiddle);
-
-							// Register clicks in the bottom left corner.
-							localMap.ClickLeftBottom = localMap.ClickLeftBottom || !(x < xMiddle && y > yMiddle);
-
-							// Register clicks in the top right corner.
-							localMap.ClickRightTop = localMap.ClickRightTop || !(x > xMiddle && y < yMiddle);
-
-							// Register clicks in the right bottom corner.
-							localMap.ClickRightBottom = localMap.ClickRightBottom || !(x > xMiddle && y > yMiddle);
-						});
-
-					// Merge the registered inputs with the game keymap.
-					Object.entries(localMap).forEach(([key, val]) => {
-						this.keyMap[key as HandledKeys].pressed = val as boolean;
-					});
-
-					// Send the updated user input to the backend.
-					this.updateUserInputInBackend();
-				},
-				false,
-			);
+			document.body.addEventListener("touchend", this.handleTouchEnd, false);
 		},
 		// Backend and browser's clocks are out of sync when run on different machines (which is always in production)
 		// So we need to sync them up back using the NTP algorithm.
