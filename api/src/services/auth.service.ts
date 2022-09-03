@@ -109,7 +109,7 @@ export class AuthService {
 	}
 
 	async updateOrCreateSessionUser(session: SessionT) {
-		session.user = await this.userService.findOne(session.sessionUser.id);
+		session.user = await this.userService.getQuery().getOne(session.sessionUser.id);
 		if (!session.user) {
 			session.user = await this.userService.create({
 				id: session.sessionUser.id,

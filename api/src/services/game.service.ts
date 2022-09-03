@@ -80,7 +80,6 @@ export class GameService {
 				.create({
 					id: "CrocuBot",
 					username: "Crocu",
-					image_url: "/",
 					nb_game: 0,
 					nb_win: 0,
 					totp_enabled: false,
@@ -98,7 +97,6 @@ export class GameService {
 				.create({
 					id: "RoBOTnix",
 					username: "Nix",
-					image_url: "/",
 					nb_game: 0,
 					nb_win: 0,
 					totp_enabled: false,
@@ -112,7 +110,8 @@ export class GameService {
 
 		// Find or create the first bot in DB.
 		this.userService
-			.findOne("CrocuBot")
+			.getQuery()
+			.getOneOrFail("CrocuBot")
 			.then((bot) => {
 				if (bot) this.bot = bot;
 				else void createFirstBot();
@@ -121,7 +120,8 @@ export class GameService {
 
 		// Find or create the second bot in DB.
 		this.userService
-			.findOne("RoBOTnix")
+			.getQuery()
+			.getOneOrFail("RoBOTnix")
 			.then((bot) => {
 				if (bot) this.bot2 = bot;
 				else void createSecondBot();
@@ -494,8 +494,8 @@ export class GameService {
 
 						// Fetch users in database
 						const updatedUsers = [
-							await this.userService.findOne(match.p1.user.id),
-							await this.userService.findOne(match.p2.user.id),
+							await this.userService.getQuery().getOne(match.p1.user.id),
+							await this.userService.getQuery().getOne(match.p2.user.id),
 						];
 
 						// Ensure game isn't a draw

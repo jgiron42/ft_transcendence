@@ -69,7 +69,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
 	@SubscribeMessage("authenticate")
 	async authenticate(@ConnectedSocket() client: Socket) {
 		// Get user from DB
-		client.session.user = await this.userService.findOne(client.session.sessionUser.id);
+		client.session.user = await this.userService.getQuery().is(client.session.sessionUser.id).getOne();
 
 		// Get user ID
 		const userID = client.session.user.id;

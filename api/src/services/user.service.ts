@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "@entities/user.entity";
@@ -33,12 +33,22 @@ export class UserService implements resourceService<User> {
 	findAll(page = 1, itemByPage = 10): Promise<User[]> {
 		return this.getQuery().paginate(page, itemByPage).getMany();
 	}
+
 	findAllAndCount(page = 1, itemByPage = 10): Promise<PaginatedResponse<User>> {
 		return this.getQuery().paginate(page, itemByPage).getManyAndCount();
 	}
-
-	findOne(id: string): Promise<User> {
-		return this.getQuery().getOne(id);
+	async findOne(id: string): Promise<User | undefined> {
+		const ret = Object.assign(
+			new User(),
+			(
+				(await this.usersRepository.query(
+					'SELECT * FROM (SELECT *, RANK() OVER (ORDER BY elo DESC) AS rank FROM "user") AS "user" WHERE "user".id = $1',
+					[id],
+				)) as User[]
+			)[0],
+		);
+		if (!ret) throw new NotFoundException("User not found");
+		return ret;
 	}
 
 	async remove(id: string): Promise<void> {
