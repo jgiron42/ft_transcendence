@@ -157,7 +157,7 @@ class Ball implements BallInterface {
 				pad.pos.y + pad.size.y * (2 / 3),
 			];
 
-			this.dir.x = game.config.players.baseSpeed * (isRight ? 1 : -1);
+			this.dir.x = Math.abs(this.dir.x) * (isRight ? 1 : -1);
 			// Handle hits on the top side.
 			if (intersection.y < middleUpBoundary)
 				this.dir.y =
