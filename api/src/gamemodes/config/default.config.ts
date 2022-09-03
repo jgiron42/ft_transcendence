@@ -10,10 +10,10 @@ const config = {
 	spectating: false,
 	collisionStep: 1 / 10,
 	ball: {
-		minSpeed: 0.7,
+		minSpeed: 0.6,
 		maxSpeed: 5,
 		baseAcceleration: 0.02,
-		initialDir: { x: 0.7, y: 0 },
+		initialDir: { x: 0.6, y: 0 },
 		initialPos: { x: (width - height * 0.02) / 2, y: (height - height * 0.02) / 2 },
 		width: height * 0.02,
 		height: height * 0.02,
