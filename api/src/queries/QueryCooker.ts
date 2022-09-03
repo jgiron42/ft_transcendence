@@ -37,6 +37,7 @@ export class QueryCooker<Entity extends EntityInterface> {
 
 	sort(sort: string, order?: "ASC" | "DESC", nulls?: "NULLS FIRST" | "NULLS LAST") {
 		this.query = this.query.orderBy(sort, order, nulls);
+		return this;
 	}
 
 	paginate(page: number | Date = 1, itemByPage = 10) {

@@ -48,7 +48,7 @@ export class AppController {
 			status: 0,
 			totp_key: "test",
 			created_at: new Date(),
-		} as User;
+		} as unknown as User;
 		await this.userService.create(usr);
 		ses.lastAuthDateFT = 9999999999999;
 		ses.isTOTPIdentified = true;

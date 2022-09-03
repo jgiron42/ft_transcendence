@@ -7,6 +7,7 @@ import {
 	Param,
 	Post,
 	Put,
+	Query,
 	Req,
 	Res,
 	UseFilters,
@@ -44,6 +45,7 @@ import multer from "multer";
 import config from "@config/api.config";
 import { Response } from "express";
 import { Magic, MAGIC_MIME_TYPE } from "mmmagic";
+import { ValidationError } from "@src/exceptions/validationError.exception";
 
 @Controller("users")
 @UseGuards(...SessionGuard)
@@ -66,8 +68,13 @@ export class UsersController {
 	 * get all visible users
 	 */
 	@Get()
-	getAll(@Page() page: number, @PerPage() per_page: number): Promise<PaginatedResponse<User>> {
-		return this.userService.findAllAndCount(page, per_page);
+	getAll(
+		@Page() page: number,
+		@PerPage() per_page: number,
+		@Query("sort") sort = "created_at",
+	): Promise<PaginatedResponse<User>> {
+		if (sort !== "created_at" && sort !== "elo") throw new ValidationError("sort must be created_at or elo");
+		return this.userService.getQuery().paginate(page, per_page).sort(`user.${sort}`, "DESC").getManyAndCount();
 	}
 
 	@Get("complete/:query")

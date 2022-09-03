@@ -89,7 +89,7 @@
 				</div>
 			</div>
 			<!-- if the user is me, then simply add a link to my game history -->
-			<div v-else>
+			<div v-else class="pb-3">
 				<NuxtLink :to="`/history?user=${user.id}`" class="button_profile font-mono">
 					{{ user.username }}'s game history!
 				</NuxtLink>
