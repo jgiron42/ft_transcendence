@@ -19,7 +19,8 @@ cp db.env.sample db.env
 
 # Automatically set env values when in a gitpod workspace
 if [ -n "$GITPOD_WORKSPACE_ID" ];then
-    export API_PORT=80
+    export DOCKER_PROXY_HTTP_PORT=80
+    export API_PORT=$DOCKER_PROXY_HTTP_PORT
     export GITPOD_WORKSPACE_HOST="$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST"
     echo "Running on a gitpod instance: $GITPOD_WORKSPACE_HOST"
     export API_BASE_URL=https://$API_PORT-$GITPOD_WORKSPACE_HOST/api
@@ -35,20 +36,31 @@ if [ -n "$GITPOD_WORKSPACE_ID" ];then
     echo BROWSER_BASE_URL="$BROWSER_BASE_URL" >> .env
 fi
 
+if [ -v INTRA42_PASSWORD ];then
+  TOKEN=$(curl -s -c cookies.txt -b cookies.txt 'https://signin.intra.42.fr/users/sign_in' --compressed)
+  TOKEN=$(echo "$TOKEN" | sed '/<meta name="csrf-token" content="/!d;s//&\n/;s/.*\n//;:a;/"/bb;$!{n;ba};:b;s//\n&/;P;D')
+  TOKEN=$(echo "$TOKEN" | sed 's/+/%2B/g' | sed 's/\//%2F/g' | sed 's/=/%3D/g')
+
+  curl -s -c cookies.txt -b cookies.txt 'https://signin.intra.42.fr/users/sign_in' \
+  --data-raw "utf8=%E2%9C%93&authenticity_token=$TOKEN&user%5Blogin%5D=$INTRA42_USERNAME&user%5Bpassword%5D=$INTRA42_PASSWORD&commit=Sign+in" \
+  --compressed > /dev/null
+else
+  echo WARN: Intra username or password was not provided.
+fi
+
+
 echo API_BASE_URL="$API_BASE_URL" >> api.env
 
-INTRA_SESSION=""
 INTRA_APP_ID=9598
 
-CSRF_TOKEN=$(curl "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" -H "cookie: _intra_42_session_production=$INTRA_SESSION" --compressed | grep csrf-token | awk -F '"' '{print $4}')
+CSRF_TOKEN=$(curl -s -c cookies.txt -b cookies.txt "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" $COOKIE_OPT --compressed | grep csrf-token | awk -F '"' '{print $4}')
 
-curl "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" \
+curl  -s -c cookies.txt -b cookies.txt "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundaryLFclr9aAe0GQip6L' \
-  -H "cookie: _intra_42_session_production=$INTRA_SESSION" \
   --data-raw $'------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="utf8"\r\n\r\n✓\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="_method"\r\n\r\npatch\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="authenticity_token"\r\n\r\n'$CSRF_TOKEN$'\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[name]"\r\n\r\ntrans\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[image_cache]"\r\n\r\n\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[image]"; filename=""\r\nContent-Type: application/octet-stream\r\n\r\n\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[description]"\r\n\r\ntrans\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[website]"\r\n\r\n\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[public]"\r\n\r\n0\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[scopes]"\r\n\r\npublic projects profile elearning tig forum\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="doorkeeper_application[redirect_uri]"\r\n\r\n'$API_BASE_URL$'/auth/42\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="scopes[]"\r\n\r\nprojects\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="scopes[]"\r\n\r\nprofile\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="scopes[]"\r\n\r\nelearning\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="scopes[]"\r\n\r\ntig\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="scopes[]"\r\n\r\nforum\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L\r\nContent-Disposition: form-data; name="commit"\r\n\r\nSubmit\r\n------WebKitFormBoundaryLFclr9aAe0GQip6L--\r\n' \
   --compressed
 
-response=$(curl "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" -H "cookie: _intra_42_session_production=$INTRA_SESSION" --compressed)
+response=$(curl -s -c cookies.txt -b cookies.txt "https://profile.intra.42.fr/oauth/applications/$INTRA_APP_ID" --compressed)
 
 INTRA_UID=$(grep -A10  UID <<< "$response" | grep data-app-uid | awk -F "'" '{print $4}')
 INTRA_SECRET=$(grep -A10 Secret <<< "$response" | grep data-app-secret| awk -F "'" '{print $4}')
