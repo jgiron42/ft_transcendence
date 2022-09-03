@@ -71,29 +71,39 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 
 	// function to retrieve from api all visible channels
 	@Action
-	async retrieveChannels(page = 1) {
-		// if retrieving the first page, then clear the channels
-		if (page === 1) this.clearChannels();
+	async retrieveChannels() {
+		// clear the channels map
+		this.clearChannels();
+
+		let page = 1;
+		let stop = false;
 
 		// getting channels from api
-		await window.$nuxt.$axios
-			.get("/channels", { params: { page, per_page: 100 } })
-			.then((response) => {
-				// check if the response data isn't empty
-				if (response.data.length === undefined) return;
+		while (!stop) {
+			await window.$nuxt.$axios
+				.get("/channels", { params: { page, per_page: 100 } })
+				.then((response) => {
+					// check if the response data isn't empty
+					if (response.data.length === undefined) {
+						stop = true;
+						return;
+					}
 
-				// push the channels to the store
-				this.pushChannels(response.data);
+					// push the channels to the store
+					this.pushChannels(response.data);
+					page++;
 
-				// if it's not the first page, then trying to retrieve the next page
-				if (response.data.length === 100) this.retrieveChannels(page + 1);
-			})
-			.catch(() => {
-				window.$nuxt.$emit("addAlert", {
-					title: "Error:",
-					message: "An error occured while retrieving channels.",
+					// if it's the last page, then stop the loop
+					if (response.data.length !== 100) stop = true;
+				})
+				.catch(() => {
+					window.$nuxt.$emit("addAlert", {
+						title: "Error:",
+						message: "An error occured while retrieving channels.",
+					});
+					stop = true;
 				});
-			});
+		}
 	}
 
 	// Action to retrieve a channel by id

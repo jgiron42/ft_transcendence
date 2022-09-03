@@ -39,29 +39,39 @@ export default class RelationStore extends VuexModule implements IRelationStore 
 
 	// Action to retrieve relations from api
 	@Action
-	async retrieveRelations(page = 1) {
-		// if retrieveing the first page, clear the relations
-		if (page === 1) this.setRelations([]);
+	async retrieveRelations() {
+		// clear relations
+		this.setRelations([]);
 
-		await window.$nuxt.$axios
-			.get("/relations", { params: { page, per_page: 100 } })
-			.then((response) => {
-				// ensure the response is not empty
-				if (response.data.length === undefined) return;
+		let page = 1;
+		let stop = false;
 
-				// add relations to store
-				this.pushFront(response.data);
+		while (!stop) {
+			await window.$nuxt.$axios
+				.get("/relations", { params: { page, per_page: 100 } })
+				.then((response) => {
+					// ensure the response is not empty
+					if (response.data.length === undefined) {
+						stop = true;
+						return;
+					}
 
-				// if there are more relations to retrieve, retrieve them
-				if (response.data.length === 100) this.retrieveRelations(page + 1);
-			})
-			// if catch some errors, add an alert
-			.catch(() => {
-				window.$nuxt.$emit("addAlert", {
-					type: "Error",
-					message: "Failed to retrieve relations.",
+					// add relations to store
+					this.pushFront(response.data);
+					page++;
+
+					// if there are more relations to retrieve, retrieve them
+					if (response.data.length !== 100) stop = true;
+				})
+				// if catch some errors, add an alert
+				.catch(() => {
+					window.$nuxt.$emit("addAlert", {
+						type: "Error",
+						message: "Failed to retrieve relations.",
+					});
+					stop = true;
 				});
-			});
+		}
 	}
 
 	// Action to retrieve a relation from api
