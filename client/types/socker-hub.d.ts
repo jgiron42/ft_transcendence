@@ -1,3 +1,4 @@
+import { Context } from "@nuxt/types";
 import { NuxtSocket } from "nuxt-socket-io";
 
 export default interface SocketHubInterface {
@@ -8,4 +9,5 @@ export default interface SocketHubInterface {
 	emit(event: string, ...args: any[]): NuxtSocket;
 	volatile: { emit(event: string, ...args: any[]): NuxtSocket };
 	clearMatchingEvents(prefix: string): number;
+	init(ctx: Context): void;
 }

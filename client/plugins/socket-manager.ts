@@ -11,10 +11,13 @@ declare module "vue/types/vue" {
 }
 
 class SocketHub extends Vue implements SocketHubInterface {
-	constructor(private socket: NuxtSocket) {
+	constructor(private name: string, context: Context) {
 		super();
 		this.events = new Set<string>();
+		this.init(context);
 	}
+
+	socket: NuxtSocket;
 
 	// Registered events
 	events: Set<string>;
@@ -73,58 +76,61 @@ class SocketHub extends Vue implements SocketHubInterface {
 		});
 		return count;
 	}
+
+	init(context: Context) {
+		const name = this.name;
+		this.socket = context.app.$nuxtSocket({
+			name,
+			channel: name,
+			reconnection: true,
+			reconnectionAttempts: Infinity,
+			reconnectionDelay: 1000,
+			reconnectionDelayMax: 5000,
+			timeout: 10000,
+			autoConnect: true,
+			transports: ["websocket"],
+			teardown: false,
+			forceNew: true,
+		});
+
+		this.socket.on("connect", () => {
+			console.debug("[WEBSOCKET]: connected", this.socket.id);
+		});
+
+		// Send session cookie to server in order to authenticate
+		this.socket.emit("authenticate", { token: context.app.$cookies.get("connect.sid") });
+
+		// Handle received websocket errors
+		this.socket.on("exception", (err: { authMethod: null | "42" | "totp" } | null) => {
+			console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
+
+			// Authenticate when server throws an authentication error
+			if (err && err.authMethod) {
+				switch (err.authMethod) {
+					case "42":
+						// Authenticate with 42 OAuth
+						window.location.href = `${context.$config.ft_api.url}/auth/42`;
+						return;
+					case "totp":
+						// Redirect to TOTP page
+						context.app.$router.push("/totp_authenticate");
+						return;
+				}
+			}
+
+			// Display un-handled error
+			window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: JSON.stringify(err) });
+		});
+
+		this.socket.on("connect_error", (err: any) => {
+			console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
+			window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: err.toString() });
+		});
+	}
 }
 
 function initSocket(name: string, context: Context): SocketHubInterface {
-	const socket = context.app.$nuxtSocket({
-		name,
-		channel: name,
-		reconnection: true,
-		reconnectionAttempts: Infinity,
-		reconnectionDelay: 1000,
-		reconnectionDelayMax: 5000,
-		timeout: 10000,
-		autoConnect: true,
-		transports: ["websocket"],
-		teardown: false,
-		forceNew: true,
-	});
-
-	socket.on("connect", () => {
-		console.debug("[WEBSOCKET]: connected", socket.id);
-	});
-
-	// Send session cookie to server in order to authenticate
-	socket.emit("authenticate", { token: context.app.$cookies.get("connect.sid") });
-
-	// Handle received websocket errors
-	socket.on("exception", (err: { authMethod: null | "42" | "totp" } | null) => {
-		console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
-
-		// Authenticate when server throws an authentication error
-		if (err && err.authMethod) {
-			switch (err.authMethod) {
-				case "42":
-					// Authenticate with 42 OAuth
-					window.location.href = `${context.$config.ft_api.url}/auth/42`;
-					return;
-				case "totp":
-					// Redirect to TOTP page
-					context.app.$router.push("/totp_authenticate");
-					return;
-			}
-		}
-
-		// Display un-handled error
-		window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: JSON.stringify(err) });
-	});
-
-	socket.on("connect_error", (err: any) => {
-		console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
-		window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: err.toString() });
-	});
-
-	return new SocketHub(socket);
+	return new SocketHub(name, context);
 }
 
 const SocketManager: Plugin = (context) => {

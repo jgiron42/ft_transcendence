@@ -36,6 +36,8 @@ if [ -n "$GITPOD_WORKSPACE_ID" ];then
     echo BROWSER_BASE_URL="$BROWSER_BASE_URL" >> .env
 fi
 
+echo "NODE_ENV=$NODE_ENV" > .env
+
 if [ -v INTRA42_PASSWORD ];then
   TOKEN=$(curl -s -c cookies.txt -b cookies.txt 'https://signin.intra.42.fr/users/sign_in' --compressed)
   TOKEN=$(echo "$TOKEN" | sed '/<meta name="csrf-token" content="/!d;s//&\n/;s/.*\n//;:a;/"/bb;$!{n;ba};:b;s//\n&/;P;D')
