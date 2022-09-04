@@ -36,7 +36,12 @@ export default Vue.extend({
 		async connect() {
 			try {
 				const response = await this.$axios.$post("/auth/totp", "code=" + this.input);
-				if (response.isTOTPIdentified) this.$router.push("/");
+				if (response.isTOTPIdentified) {
+					console.log("DESTROY");
+					this.$gameSocket.init(this.$nuxt.context);
+					this.$chatSocket.init(this.$nuxt.context);
+					this.$router.push("/");
+				}
 			} catch (err) {
 				this.$nuxt.$emit("addAlert", { title: "TOTP", message: err });
 			}
