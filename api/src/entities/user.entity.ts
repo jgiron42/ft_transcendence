@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryColumn, CreateDateColumn, Check } from "typeorm"
 import { SetMode } from "@utils/set-mode";
 import { config as gameConfig } from "@config/game.config";
 import { config as userConfig } from "@config/user.config";
+import { Length } from "class-validator";
 
 // this entity is use to describe the users
 
@@ -25,7 +26,8 @@ export class User {
 
 	// pseudo of the user
 	@Column({ unique: true })
-	@Check(`LENGTH(username) > ${userConfig.usernameMinLength} AND LENGTH(username) < ${userConfig.usernameMaxLength}`)
+	@Length(userConfig.usernameMinLength, userConfig.usernameMaxLength)
+	@Check(`LENGTH(username) >= ${userConfig.usernameMinLength} AND LENGTH(username) <= ${userConfig.usernameMaxLength}`)
 	@SetMode("cru")
 	username: string;
 
