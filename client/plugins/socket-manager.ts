@@ -102,29 +102,27 @@ class SocketHub extends Vue implements SocketHubInterface {
 
 		// Handle received websocket errors
 		this.socket.on("exception", (err: { authMethod: null | "42" | "totp" } | null) => {
-			console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
+			console.warn("[WEBSOCKET]: Warning:", JSON.stringify(err));
 
 			// Authenticate when server throws an authentication error
 			if (err && err.authMethod) {
-				switch (err.authMethod) {
+				switch (err.authMethod.toLowerCase()) {
 					case "42":
 						// Authenticate with 42 OAuth
 						window.location.href = `${context.$config.ft_api.url}/auth/42`;
 						return;
 					case "totp":
 						// Redirect to TOTP page
-						context.app.$router.push("/totp_authenticate");
+						window.$nuxt.$router.push("/totp");
 						return;
 				}
 			}
-
 			// Display un-handled error
 			window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: JSON.stringify(err) });
 		});
 
 		this.socket.on("connect_error", (err: any) => {
-			console.error("[WEBSOCKET]: ERROR:", JSON.stringify(err));
-			window.$nuxt.$emit("addAlert", { title: "WEBSOCKET ERROR", message: err.toString() });
+			console.warn("[WEBSOCKET]: Warning:", JSON.stringify(err));
 		});
 	}
 }

@@ -8,7 +8,7 @@ export default function ({ $axios, redirect, $config }: Context) {
 			// Ensure missing auth is TOTP
 			if (error.response.data.authMethod && error.response.data.authMethod === "totp")
 				// Handle missing TOTP auth in client
-				redirect("/totp_authenticate");
+				redirect("/totp");
 			// Ensure missing auth is 42 OAuth
 			else if (error.response.data.authMethod && error.response.data.authMethod === "42")
 				// Handle missing 42 OAuth by redirecting to the API handler

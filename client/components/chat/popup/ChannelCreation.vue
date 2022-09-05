@@ -83,9 +83,9 @@ export default Vue.extend({
 		},
 
 		// method to create the channel
-		async createChannel() {
+		createChannel() {
 			// call to api
-			await this.$nuxt.$axios
+			this.$nuxt.$axios
 				.post("/channels", this.channel)
 				.then((response) => {
 					// ensure the channel is valid in order to join it.

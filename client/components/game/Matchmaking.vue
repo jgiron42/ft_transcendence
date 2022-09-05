@@ -151,7 +151,7 @@ export default Vue.extend({
 		this.matchmakingSocket.clearMatchingEvents("matchmaking");
 	},
 	methods: {
-		async syncTime() {
+		syncTime() {
 			// the NTP algorithm
 			// t0 is the client's timestamp of the request packet transmission,
 			// t1 is the server's timestamp of the request packet reception,
@@ -160,11 +160,17 @@ export default Vue.extend({
 			// timeoffset is the offset between server and local clock.
 
 			const t0 = Date.now();
-			const response = await this.$axios.get("/ntp");
-			const serverTime = response.data as number;
-			const [t1, t2, t3] = [serverTime, serverTime, Date.now()];
+			this.$axios
+				.get("/ntp")
+				.then((response) => {
+					const serverTime = response.data as number;
+					const [t1, t2, t3] = [serverTime, serverTime, Date.now()];
 
-			this.timeOffset = (t1 - t0 + (t2 - t3)) / 2;
+					this.timeOffset = (t1 - t0 + (t2 - t3)) / 2;
+				})
+				.catch((err) =>
+					this.$nuxt.alert.emit({ title: "MATCHMAKING", message: `Could not sync time: ${err.toString()}` }),
+				);
 		},
 		initConnection() {
 			// Instantiate websocket

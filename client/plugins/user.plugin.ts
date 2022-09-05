@@ -52,7 +52,7 @@ class UserSingleton extends Vue {
 				// Handle missing TOTP auth.
 				if (err.response.data.authMethod === "TOTP") {
 					// Redirect to 2FA component.
-					this.ctx.redirect("/totp_authenticate");
+					this.ctx.redirect("/totp");
 				}
 			}
 
@@ -73,11 +73,8 @@ class UserSingleton extends Vue {
 	}
 
 	async save() {
-		// Get stored user
-		const user = this.user;
-
 		// Save stored user in database.
-		return await this.ctx.$axios.$put(`/users/${user.id}`, user);
+		return await this.ctx.$axios.$put(`/users/${this.user.id}`, this.user);
 	}
 
 	setUser(user: User) {

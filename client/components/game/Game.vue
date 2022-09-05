@@ -40,11 +40,6 @@ interface BallClientInterface {
 	pos: Point2D;
 	size: TwoDimensionalInterface;
 }
-// Interface defining game config attributes safely accessible in this component.
-interface ConfigClientInterface {
-	tickInterval: number;
-	displayGrowRatio: number;
-}
 
 // Interface defining every game attributes that are safely accessibles in this component.
 interface GameClientInterface {
@@ -94,28 +89,27 @@ export default Vue.extend({
 		ctx: {} as CanvasRenderingContext2D,
 		display: { width: 0, height: 0 },
 		game: {} as GameClientInterface,
-		config: {
-			displayGrowRatio: 0.98,
-			tickInterval: 1,
-		} as ConfigClientInterface,
+		displayGrowRatio: 0.98,
 		hasStateBeenUpdated: 0,
 		lastUpdate: Date.now(),
 		gameMode: "",
 		backendData: {} as GameData,
 		isDrawn: false,
-		interval: {} as NodeJS.Timeout,
+		updateInterval: {} as NodeJS.Timeout,
+		drawInterval: {} as NodeJS.Timeout,
 		timeOffset: 0,
 		online: false,
 		lastBackendUpdate: 0,
 		ping: 0,
 		lowestPing: 0,
 		averagePing: 0,
-		syncTimeInterval: 1500,
+		syncTimeInterval: 5000,
 		syncInterval: {} as NodeJS.Timeout,
 		syncAmounts: 0,
 		spectating: false,
 		currentPlayer: "P1" as "P1" | "P2",
 		keyMap: getBaseKeyMap(),
+		font: "roboto",
 	}),
 	async mounted() {
 		try {
@@ -151,18 +145,20 @@ export default Vue.extend({
 			this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
 			// Setup game loop.
-			this.interval = setInterval(this.updateAndRedraw, 0);
+			this.updateInterval = setInterval(this.update, 0);
+			this.drawInterval = setInterval(this.redraw, 15);
 
 			this.setFullScreen();
 		} catch (err: any) {
 			// Log and display any error.
-			console.error("game:", err);
+			console.warn("game:", err);
 			this.$nuxt.$router.push("/matchmaking");
 		}
 	},
 	beforeDestroy() {
 		// Stop the game loop
-		if (this.interval) clearInterval(this.interval);
+		if (this.updateInterval) clearInterval(this.updateInterval);
+		if (this.drawInterval) clearInterval(this.drawInterval);
 
 		// Stop the periodic time synchronization.
 		if (this.syncInterval) clearInterval(this.syncInterval);
@@ -311,7 +307,7 @@ export default Vue.extend({
 		// Backend and browser's clocks are out of sync when run on different machines (which is always in production)
 		// So we need to sync them up back using the NTP algorithm.
 		// https://stackoverflow.com/a/22969338/10124517
-		async syncTime() {
+		syncTime() {
 			// the NTP algorithm
 			// t0 is the client's timestamp of the request packet transmission,
 			// t1 is the server's timestamp of the request packet reception,
@@ -321,34 +317,37 @@ export default Vue.extend({
 			const t0 = Date.now();
 
 			// Query the server's date
-			const response = await this.$axios.get("/ntp");
-			const serverTime = response.data as number;
+			this.$axios
+				.get("/ntp")
+				.then((response) => {
+					const serverTime = response.data as number;
 
-			// Init timestamps
-			const [t1, t2, t3] = [serverTime, serverTime, Date.now()];
+					// Init timestamps
+					const [t1, t2, t3] = [serverTime, serverTime, Date.now()];
 
-			// Increment syncAmout (used for average)
-			this.syncAmounts++;
+					// Increment syncAmout (used for average)
+					this.syncAmounts++;
 
-			// Get client/server latency
-			this.ping = t3 - t0;
+					// Get client/server latency
+					this.ping = t3 - t0;
 
-			// Update the average ping
-			this.averagePing = (this.averagePing * (this.syncAmounts - 1) + this.ping) / this.syncAmounts;
+					// Update the average ping
+					this.averagePing = (this.averagePing * (this.syncAmounts - 1) + this.ping) / this.syncAmounts;
 
-			// If the ping is lower than previously recorded,
-			// Update the clock offset, as it is more accurate
-			// (current NTP usage assumes 1st packet transmission is instantaneous, which wrongfully increases timeout)
-			if (!this.lowestPing || this.ping < this.lowestPing) {
-				this.timeOffset = (t1 - t0 + (t2 - t3)) / 2;
-				this.lowestPing = this.ping;
-			}
+					// If the ping is lower than previously recorded,
+					// Update the clock offset, as it is more accurate
+					// (current NTP usage assumes 1st packet transmission is instantaneous, which wrongfully increases timeout)
+					if (!this.lowestPing || this.ping < this.lowestPing) {
+						this.timeOffset = (t1 - t0 + (t2 - t3)) / 2;
+						this.lowestPing = this.ping;
+					}
+				})
+				.catch((_) => {});
 		},
 		handleGameUpdate(game: ClientMatch) {
 			// Ensure game is still ongoing
 			if (game.data.ended || game.status === "finished" || game.status === "aborted") {
 				// Game is finished, redirect back to menu.
-				console.log("Game is finished, redirecting back to menu");
 				this.$router.push("/matchmaking");
 				return;
 			}
@@ -371,9 +370,9 @@ export default Vue.extend({
 				this.hasStateBeenUpdated = this.lastUpdate;
 			}
 		},
-		async initConnection() {
+		initConnection() {
 			// Synchronize browser and server clocks
-			await this.syncTime();
+			this.syncTime();
 
 			// Format the event depending if spectating or not.
 			const event = this.$game.spectating ? `game:spectateUpdate=${this.$game.id}` : "game:updateStatus";
@@ -451,7 +450,7 @@ export default Vue.extend({
 					this.online = true;
 
 					// Listen to game updates and synchronize clocks.
-					await this.initConnection();
+					this.initConnection();
 
 					// Set a periodic time synchronization.
 					this.syncInterval = setInterval(this.syncTime, this.syncTimeInterval);
@@ -486,8 +485,8 @@ export default Vue.extend({
 			const display = this.display;
 
 			// Resize display to fill the screen proportionally to the configured grow ration.
-			display.width = this.wrapper.scrollWidth * this.config.displayGrowRatio;
-			display.height = this.wrapper.scrollHeight * this.config.displayGrowRatio;
+			display.width = this.wrapper.scrollWidth * this.displayGrowRatio;
+			display.height = this.wrapper.scrollHeight * this.displayGrowRatio;
 
 			// Compute the maximum height and width while respecting virtual game area proportions.
 			if (display.height * (this.game.area.width / this.game.area.height) > display.width)
@@ -551,7 +550,7 @@ export default Vue.extend({
 			this.ctx.closePath();
 		},
 		// Rendering loop
-		updateAndRedraw() {
+		update() {
 			// Rollback the game state when a new state has been received from backend.
 			if (this.hasStateBeenUpdated) this.game.setData(_.cloneDeep(this.backendData));
 
@@ -561,7 +560,7 @@ export default Vue.extend({
 				this.game.ended ||
 				(this.online && this.lastBackendUpdate && Date.now() - this.lastBackendUpdate > 5000)
 			) {
-				console.log("Game ended or there haven't been any updates in 5s, redirecting back to menu");
+				console.warn("Game ended or there haven't been any updates in 5s, redirecting back to menu");
 				this.$nuxt.$router.push("/matchmaking");
 			}
 
@@ -584,9 +583,6 @@ export default Vue.extend({
 
 			// Advance the game state.
 			this.game.update();
-
-			// Render the new frame.
-			this.redraw();
 		},
 		redraw() {
 			// Resize the canvas before drawing
@@ -608,6 +604,9 @@ export default Vue.extend({
 		clear() {
 			// Ensure the elements exists
 			if (this.ctx && this.canvas) {
+				// Clear the canvas
+				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
 				// Redraw the background
 				this.ctx.beginPath();
 				this.ctx.fillStyle = "#000000";
@@ -620,7 +619,7 @@ export default Vue.extend({
 				const fontSize = 50 * (1 + Math.floor(this.display.width / 800));
 
 				// Format the font string.
-				this.ctx.font = `${fontSize}px roboto`;
+				this.ctx.font = `${fontSize}px ${this.font}`;
 
 				// Display player 1's score
 				this.ctx.fillText(
@@ -639,16 +638,18 @@ export default Vue.extend({
 				);
 
 				// Set small font to display network infos.
-				this.ctx.font = `10px roboto`;
+				this.ctx.font = `10px ${this.font}`;
 
 				// Display current latency.
-				this.ctx.fillText(this.ping.toString() + " ms", 5, 10);
+				this.ctx.fillText(`${this.ping} ms`, 5, 10);
 
 				// Display average latency
-				this.ctx.fillText(Math.floor(this.averagePing).toString() + " ms (avg)", 5, 25);
+				this.ctx.fillText(`${Math.floor(this.averagePing)} ms (avg)`, 5, 25);
 
 				// Display the middle separation line.
 				this.ctx.fillRect(this.display.width / 2, 0, this.display.height / 60, this.display.height);
+
+				this.ctx.stroke();
 			}
 		},
 		updateUserInputInBackend() {

@@ -77,21 +77,34 @@ export default Vue.extend({
 			} catch (_) {}
 		}
 
-		// Get the function to get user informations from database.
-		const getUser = async (id: string): Promise<User> => (await this.$axios.get(`/users/${id}`)).data;
+		const handleError = (err: any) => {
+			this.$router.push("/");
+			this.$nuxt.alert.emit({ title: "VERSUS", message: err.toString() });
+		};
 
-		// Get player 1's user.
-		getUser(this.p1).then((user: User) => {
-			this.p1User = user;
-		});
+		try {
+			// Get the function to get user informations from database.
+			const getUser = async (id: string): Promise<User> => (await this.$axios.get(`/users/${id}`)).data;
 
-		// Get player 2's user.
-		getUser(this.p2).then((user: User) => {
-			this.p2User = user;
-		});
+			// Get player 1's user.
+			getUser(this.p1)
+				.then((user: User) => {
+					this.p1User = user;
+				})
+				.catch(handleError);
 
-		this.p1Img = this.$nuxt.$getPictureSrc(this.p1);
-		this.p2Img = this.$nuxt.$getPictureSrc(this.p2);
+			// Get player 2's user.
+			getUser(this.p2)
+				.then((user: User) => {
+					this.p2User = user;
+				})
+				.catch(handleError);
+
+			this.p1Img = this.$nuxt.$getPictureSrc(this.p1);
+			this.p2Img = this.$nuxt.$getPictureSrc(this.p2);
+		} catch (err: any) {
+			handleError(err);
+		}
 	},
 });
 </script>
