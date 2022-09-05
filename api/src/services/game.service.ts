@@ -261,6 +261,13 @@ export class GameService {
 	}
 
 	async matchUsers(p1: GameUser, p2: GameUser): Promise<Match | null> {
+		// Ensures players are not the same. (should never happen)
+		if (p1.user.id === p2.user.id)
+		{
+			this.logger.error(`Tried to match ${p1.user.id} with themselves!!`);
+			return null;
+		}
+		
 		// Set the gameID to a random UUID
 		const gameID = randomUUID();
 		let createdMatch = null;
