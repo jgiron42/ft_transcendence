@@ -25,7 +25,6 @@ services:
             - ${DUMMY_MOUNT:-./client:/app/} # DUMMY_MOUNT allows to disable the volume
             # Ignore node_modules/
             - /app/node_modules
-            - /app/.nuxt
         restart: unless-stopped
 
     api:

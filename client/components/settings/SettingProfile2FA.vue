@@ -54,47 +54,65 @@ export default Vue.extend({
 		username: "none", // Displayed username
 		secret: randomKey(10), // Generated 2FA secret key
 	}),
-	async mounted() {
+	mounted() {
 		//  Get user
-		this.user = await this.$user.getUser();
+		this.$user
+			.getUser()
+			.then((user) => {
+				this.user = user;
 
-		// Set displayed username
-		this.username = this.user.id as string;
+				// Set displayed username
+				this.username = this.user.id as string;
 
-		// Set displayed 2FA status
-		this.is2FAEnabled = this.user.totp_enabled;
-		if (this.is2FAEnabled) {
-			// 2FA is already enabled so just display the current credentials
-			this.generating2FA = true;
-			this.secret = this.user.totp_key;
-		}
+				// Set displayed 2FA status
+				this.is2FAEnabled = this.user.totp_enabled;
+				if (this.is2FAEnabled) {
+					// 2FA is already enabled so just display the current credentials
+					this.generating2FA = true;
+					this.secret = this.user.totp_key;
+				}
 
-		//  Set handler for "SAVE" button press
-		this.$nuxt.$on("saveSettings2FA", async () => {
-			// Clone user to avoid mutating the store object
-			_.merge(this.user, { ...this.user, totp_enabled: true, totp_key: this.secret });
+				//  Set handler for "SAVE" button press
+				this.$nuxt.$on("saveSettings2FA", () => {
+					// Clone user to avoid mutating the store object
+					_.merge(this.user, { ...this.user, totp_enabled: true, totp_key: this.secret });
 
-			// Update user in store
-			this.$user.setUser(this.user);
+					// Update user in store
+					this.$user.setUser(this.user);
 
-			// Update user in database.
-			await this.$user
-				.save()
-				.then(() =>
-					this.alert.emit({
-						title: "SETTINGS",
-						message: "PROFILE SUCCESSFULLY UPDATED",
-						isError: false,
-					}),
-				)
-				.catch((err) => this.alert.emit({ title: "SETTINGS", message: err.toString() }));
+					// Update user in database.
+					this.$user
+						.save()
+						.then(() =>
+							this.alert.emit({
+								title: "SETTINGS",
+								message: "PROFILE SUCCESSFULLY UPDATED",
+								isError: false,
+							}),
+						)
+						.catch((err) => this.alert.emit({ title: "SETTINGS", message: err.toString() }));
 
-			// Fetch updated user
-			this.user = await this.$user.fetch();
+					// Fetch updated user
+					this.$user
+						.fetch()
+						.then((user) => {
+							// Update local user.
+							this.user = user;
 
-			// Update 2FA flag
-			this.is2FAEnabled = this.user.totp_enabled;
-		});
+							// Update 2FA flag
+							this.is2FAEnabled = this.user.totp_enabled;
+						})
+						.catch((err) =>
+							this.$nuxt.alert.emit({
+								title: "SETTINGS",
+								message: `Couldn't fetch user: ${err.toString()}`,
+							}),
+						);
+				});
+			})
+			.catch((err) =>
+				this.$nuxt.alert.emit({ title: "SETTINGS", message: `Couldn't fetch user: ${err.toString()}` }),
+			);
 	},
 	methods: {
 		regenerate2FA() {

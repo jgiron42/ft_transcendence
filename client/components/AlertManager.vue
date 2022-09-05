@@ -26,7 +26,7 @@ export default Vue.extend({
 			if (!this) return;
 
 			if (alert.isError === false) console.info("[ALERT]", alert.title, ":", alert.message);
-			else console.error("[ALERT]", alert.title, ":", alert.message);
+			else console.warn("[ALERT]", alert.title, ":", alert.message);
 
 			// Reset clear timer.
 			window.clearTimeout(this.nextClear);

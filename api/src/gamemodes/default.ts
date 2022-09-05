@@ -161,13 +161,15 @@ class Ball implements BallInterface {
 			// Handle hits on the top side.
 			if (intersection.y < middleUpBoundary)
 				this.dir.y =
-					this.minSpeed < game.config.players.baseSpeed
+					Math.abs(this.dir.y) < game.config.players.baseSpeed
 						? -game.config.players.baseSpeed * 1.2
-						: -this.minSpeed;
+						: -Math.abs(this.dir.y);
 			// Handle hits on the bottom side.
 			else if (intersection.y > middleDownBoundary)
 				this.dir.y =
-					this.minSpeed < game.config.players.baseSpeed ? game.config.players.baseSpeed * 1.2 : this.minSpeed;
+					Math.abs(this.dir.y) < game.config.players.baseSpeed
+						? game.config.players.baseSpeed * 1.2
+						: Math.abs(this.dir.y);
 			// Handle hits on the middle side.
 			else
 				Object.assign(this.dir, {

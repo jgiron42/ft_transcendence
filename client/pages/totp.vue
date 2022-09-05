@@ -26,25 +26,31 @@
 import Vue from "vue";
 export default Vue.extend({
 	name: "Index",
+	layout: "no-navigation",
 	data: () => ({
 		input: "",
 	}),
+	mounted() {
+		this.$user
+			.fetch()
+			.then((_) => this.$router.push("/"))
+			.catch((_) => {});
+	},
 	methods: {
 		updateInput(input: string) {
 			this.input = input;
 		},
-		async connect() {
-			try {
-				const response = await this.$axios.$post("/auth/totp", "code=" + this.input);
-				if (response.isTOTPIdentified) {
-					console.log("DESTROY");
-					this.$gameSocket.init(this.$nuxt.context);
-					this.$chatSocket.init(this.$nuxt.context);
-					this.$router.push("/");
-				}
-			} catch (err) {
-				this.$nuxt.$emit("addAlert", { title: "TOTP", message: err });
-			}
+		connect() {
+			this.$axios
+				.$post("/auth/totp", "code=" + this.input)
+				.then((response) => {
+					if (response.isTOTPIdentified) {
+						this.$gameSocket.init(this.$nuxt.context);
+						this.$chatSocket.init(this.$nuxt.context);
+						this.$router.push("/");
+					}
+				})
+				.catch((_) => this.alert.emit({ title: "2FA", message: "TOTP token has been rejected." }));
 		},
 	},
 });

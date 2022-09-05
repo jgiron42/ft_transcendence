@@ -58,7 +58,7 @@ export default Vue.extend({
 		},
 
 		// method called when validate
-		async validateInput() {
+		validateInput() {
 			let seconds = 0;
 
 			// depending on the unit, multiply the value by the corresponding factor
@@ -86,7 +86,7 @@ export default Vue.extend({
 			};
 
 			// call to api to update the connection
-			await this.$axios
+			this.$axios
 				.put(`/connections/${this.connection.id}`, newConnection)
 				// if call success
 				.then((response) => {

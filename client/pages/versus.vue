@@ -14,7 +14,6 @@ import { ClientMatch } from "~/types/game-status";
 
 export default Vue.extend({
 	layout: "game",
-	middleware: ["getUser"],
 	data: () => ({
 		status: "creating" as "creating" | "ongoing" | "finished" | "aborted",
 		p1: {} as User,
@@ -26,17 +25,25 @@ export default Vue.extend({
 		this.$gameSocket.clearMatchingEvents("matchmaking");
 
 		// Hangle game updates.
-		this.$gameSocket.on("game:updateStatus", async (game: ClientMatch) => {
+		this.$gameSocket.on("game:updateStatus", (game: ClientMatch) => {
 			// Redirect to game page when game has started.
 			if (game.status === "ongoing") {
 				// Format the game mode approriately.
 				this.$game.mode = "online:" + game.mode;
 
-				// Get the player side (P1 = left, P2 = right)
-				this.$game.isP1 = (await this.$user.getUser()).id === game.p1.id;
+				this.$user
+					.getUser()
+					.then((user) => {
+						// Get the player side (P1 = left, P2 = right)
+						this.$game.isP1 = user.id === game.p1.id;
 
-				// Actually redirect to the game page.
-				this.$nuxt.$router.push("/game");
+						// Actually redirect to the game page.
+						this.$nuxt.$router.push("/game");
+					})
+					.catch((err) =>
+						this.$nuxt.alert.emit({ title: "VERSUS", message: `Couldn't fetch user: ${err.toString()}` }),
+					);
+				return;
 			}
 
 			// Update displayed status

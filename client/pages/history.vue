@@ -16,7 +16,11 @@ export default Vue.extend({
 		id: "",
 	}),
 	async mounted() {
-		this.id = (this.$route.query.user as string) || (await this.$user.getUser()).id;
+		try {
+			this.id = (this.$route.query.user as string) || (await this.$user.getUser()).id;
+		} catch (err: any) {
+			this.$nuxt.alert.emit({ title: "HISTORY", message: `Couldn't fetch user: ${err.toString()}` });
+		}
 	},
 });
 </script>
