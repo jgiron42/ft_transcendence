@@ -57,7 +57,7 @@ export default Vue.extend({
 		});
 
 		// Redirect to matchmakig when no events were received in 5s
-		this.timeout = window.setTimeout(() => this.$nuxt.$router.push("/game"), 5000);
+		this.timeout = window.setTimeout(() => this.$nuxt.$router.push("/matchmaking"), 5000);
 	},
 	beforeDestroy() {
 		// Clear current game updates listeners.

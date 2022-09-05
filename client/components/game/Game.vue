@@ -582,7 +582,7 @@ export default Vue.extend({
 			eventList.forEach((event) => this.game.eventQueue.add(event as ImplementedEvents));
 
 			// Advance the game state.
-			this.game.update();
+			if (this.ping < 70 && this.averagePing < 70) this.game.update();
 		},
 		redraw() {
 			// Resize the canvas before drawing
