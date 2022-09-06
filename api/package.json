@@ -9,10 +9,15 @@
 		"build": "nest build",
 		"start": "NODE_ENV=development nest start",
 		"start:dev": "npm run build && NODE_ENV=development nest start --watch",
-		"start:prod": "NODE_ENV=production node dist/main",
+		"start:prod": "NODE_ENV=production node dist/src/main",
 		"lint": "eslint -c .eslintrc.js ./",
 		"lint:fix": "eslint '*/**/*.ts' --quiet --fix",
-		"test": "jest --coverage"
+		"test": "jest --coverage",
+		"typeorm": "ts-node --project ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli",
+		"typeorm:run-migrations": "npm run typeorm migration:run -- -d ./typeOrm.config.ts",
+		"typeorm:generate-migration": "npm run typeorm -- -d ./typeOrm.config.ts migration:generate ./migrations/$npm_config_name",
+		"typeorm:create-migration": "npm run typeorm -- migration:create ./migrations/$npm_config_name",
+		"typeorm:revert-migration": "npm run typeorm -- -d ./typeOrm.config.ts migration:revert"
 	},
 	"dependencies": {
 		"@nestjs/cli": "^9.1.1",
