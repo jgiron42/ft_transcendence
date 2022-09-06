@@ -26,9 +26,9 @@ class Player implements PlayerInterface {
 	readonly size: Vector2D = { x: config.players.width, y: config.players.height };
 
 	// Update fonction reserved for gamemodes to inject
-  gameModeUpdate = (g: Game) => {
-    void g;
-  };
+	gameModeUpdate = (g: Game) => {
+		void g;
+	};
 
 	// Data object reserved for gamemodes.
 	gameModeData: Record<string, unknown> = {};
