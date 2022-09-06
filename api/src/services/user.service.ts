@@ -37,18 +37,16 @@ export class UserService implements resourceService<User> {
 	findAllAndCount(page = 1, itemByPage = 10): Promise<PaginatedResponse<User>> {
 		return this.getQuery().paginate(page, itemByPage).getManyAndCount();
 	}
+
 	async findOne(id: string): Promise<User | undefined> {
-		const ret = Object.assign(
-			new User(),
-			(
-				(await this.usersRepository.query(
-					'SELECT * FROM (SELECT *, RANK() OVER (ORDER BY elo DESC) AS rank FROM "user") AS "user" WHERE "user".id = $1',
-					[id],
-				)) as User[]
-			)[0],
-		);
-		if (!ret) throw new NotFoundException("User not found");
-		return ret;
+		const user = (
+			(await this.usersRepository.query(
+				'SELECT * FROM (SELECT *, RANK() OVER (ORDER BY elo DESC) AS rank FROM "user") AS "user" WHERE "user".id = $1',
+				[id],
+			)) as User[]
+		)[0];
+		if (!user) throw new NotFoundException("User not found");
+		return Object.assign(new User(), user);
 	}
 
 	async remove(id: string): Promise<void> {
