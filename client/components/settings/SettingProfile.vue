@@ -45,7 +45,31 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
-		this.saveSettings = _.debounce(() => {
+		// Send file to API when save button is clicked
+		this.$nuxt.$on("saveSettingsProfile", this.saveSettings);
+
+		// Get user data from API
+		this.$axios
+			.get("/me")
+			.then((user) => {
+				this.user = user.data;
+
+				// Set displayed img src
+				this.image = this.$nuxt.$getPictureSrc(this.user.id as string);
+			})
+			.catch((err) =>
+				this.alert.emit({ title: "PROFILE", message: `Could not fetch user data: ${err.toString()}` }),
+			);
+	},
+	beforeDestroy() {
+		this.$nuxt.$off("saveSettingsProfile");
+	},
+	methods: {
+		onFileChange(e: any) {
+			const file = e.target.files[0];
+			this.url = URL.createObjectURL(file);
+		},
+		saveSettings() {
 			const input = document.getElementById("id-input") as HTMLInputElement;
 
 			if (input && input.value !== this.user.username) {
@@ -56,15 +80,15 @@ export default Vue.extend({
 					.save()
 					.then(() =>
 						this.alert.emit({
-							title: "SETTINGS",
+							title: "PROFILE",
 							message: "PROFILE SUCCESSFULLY UPDATED",
 							isError: false,
 						}),
 					)
 					.catch((err) => {
 						if (err.response && err.response.data)
-							this.alert.emit({ title: "SETTINGS", message: JSON.stringify(err.response.data) });
-						else this.alert.emit({ title: "SETTINGS", message: err.toString() });
+							this.alert.emit({ title: "PROFILE", message: JSON.stringify(err.response.data) });
+						else this.alert.emit({ title: "PROFILE", message: err.toString() });
 					});
 			}
 
@@ -89,42 +113,19 @@ export default Vue.extend({
 						})
 						.then(() =>
 							this.alert.emit({
-								title: "SETTINGS",
+								title: "PROFILE",
 								message: "PROFILE SUCCESSFULLY UPDATED",
 								isError: false,
 							}),
 						)
 						.catch((err) => {
 							if (err.response && err.response.data)
-								this.alert.emit({ title: "SETTINGS", message: JSON.stringify(err.response.data) });
-							else this.alert.emit({ title: "SETTINGS", message: err.toString() });
+								this.alert.emit({ title: "PROFILE", message: JSON.stringify(err.response.data) });
+							else this.alert.emit({ title: "PROFILE", message: err.toString() });
 						});
 				}
 			}
-		}, 100);
-
-		// Send file to API when save button is clicked
-		this.$nuxt.$on("saveSettingsProfile", this.saveSettings);
-
-		// Get user data from API
-		this.$axios
-			.get("/me")
-			.then((user) => {
-				this.user = user.data;
-
-				// Set displayed img src
-				this.image = this.$nuxt.$getPictureSrc(this.user.id as string);
-			})
-			.catch((err) =>
-				this.alert.emit({ title: "SETTINGS", message: `Could not fetch user data: ${err.toString()}` }),
-			);
-	},
-	methods: {
-		onFileChange(e: any) {
-			const file = e.target.files[0];
-			this.url = URL.createObjectURL(file);
 		},
-		saveSettings: () => {},
 	},
 });
 </script>
