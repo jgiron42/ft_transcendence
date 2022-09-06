@@ -6,11 +6,10 @@ import { Socket } from "@src/types/socket";
 import { Server } from "socket.io";
 import { WsException } from "@nestjs/websockets";
 import { ChannelService } from "@services/channel.service";
-import { ChanConnectionService } from "@services/chan_connection.service";
 
 @Injectable()
 export class ChatService {
-	constructor(private channelService: ChannelService, private chanConnectionService: ChanConnectionService) {
+	constructor(private channelService: ChannelService) {
 		this.clientMap = new Map<Socket, User>(); // map a socket to a user
 		this.channelMap = new Map<string, Channel>(); // map a socketId to a channel
 	}
@@ -89,16 +88,13 @@ export class ChatService {
 
 	// join a channel
 	async joinChannel(client: Socket, chan_id: number): Promise<void> {
-		// get the channel from the database
-		const channel = await this.channelService.findOne(chan_id);
+		try {
+			// get the channel from the database
+			const channel = await this.channelService
+				.getQuery()
+				.on_channel(client.session.user.id)
+				.getOneOrFail(chan_id);
 
-		// if channel doesn't exist, send error
-		if (!channel) this.sendError("Channel not found.");
-		// else if the user can't join the channel, send error
-		else if (!(await this.chanConnectionService.isOnChannel(client.session.sessionUser.id, channel.id)))
-			this.sendError("User not in channel.");
-		// else (if the user can join the channel)
-		else {
 			// leave the current room
 			await this.leaveChannel(client);
 
@@ -110,6 +106,8 @@ export class ChatService {
 
 			// tell the client that he successfully joined the channel
 			client.emit("chat:JoinChannel", chan_id);
+		} catch (e) {
+			this.sendError("Channel not found");
 		}
 	}
 
