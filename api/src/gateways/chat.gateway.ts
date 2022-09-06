@@ -1,4 +1,4 @@
-import { Logger, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Logger, UseGuards, UseInterceptors, ParseIntPipe } from "@nestjs/common";
 import {
 	SubscribeMessage,
 	WebSocketGateway,
@@ -6,6 +6,8 @@ import {
 	OnGatewayInit,
 	OnGatewayDisconnect,
 	ConnectedSocket,
+	MessageBody,
+	WsException,
 } from "@nestjs/websockets";
 import { UserService } from "@services/user.service";
 import { Server } from "socket.io";
@@ -65,7 +67,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("chat:JoinChannel")
-	async onJoinChannel(@ConnectedSocket() client: Socket, chan_id: number): Promise<void> {
+	async onJoinChannel(
+		@ConnectedSocket() client: Socket,
+		@MessageBody(
+			new ParseIntPipe({
+				exceptionFactory: (errors: string) => {
+					throw new WsException(errors);
+				},
+			}),
+		)
+		chan_id: number,
+	): Promise<void> {
 		// get user from pool
 		const user = this.chatService.getClient(client);
 

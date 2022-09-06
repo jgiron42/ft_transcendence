@@ -88,8 +88,6 @@ export default Vue.extend({
 		initialiseStores(this.$store);
 	},
 	mounted() {
-		this.$gameSocket.init(this.$nuxt.context);
-		this.$chatSocket.init(this.$nuxt.context);
 		// if load the chat page and the user already on a channel
 		if (this.isOnChannel) {
 			// simply tell the server we are back on the channel

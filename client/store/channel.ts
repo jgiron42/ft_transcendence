@@ -144,7 +144,7 @@ export default class ChannelStore extends VuexModule implements IChannelStore {
 				this.setCurrentConnection(response.data);
 
 				// emit a message through socket to inform the user has joined the channel
-				window.$nuxt.$chatSocket.getSocket()?.emit("chat:JoinChannel", channel.id);
+				window.$nuxt.$chatSocket.getSocket().emit("chat:JoinChannel", channel.id);
 
 				// retrieve the channel connections
 				store.connection.retrieveChanConnections();
