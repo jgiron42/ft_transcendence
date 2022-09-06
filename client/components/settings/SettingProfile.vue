@@ -17,6 +17,7 @@
 				type="text"
 				class="text-black box-content text-center font-mono mt-2"
 				:value="user.username"
+				maxlength="15"
 			/>
 		</div>
 		<!-- Player statistics -->
@@ -56,8 +57,11 @@ export default Vue.extend({
 				this.image = this.$nuxt.$getPictureSrc(this.user.id as string);
 			})
 			.catch((err) =>
-				this.alert.emit({ title: "SETTINGS", message: `Could not fetch user data: ${err.toString()}` }),
+				this.alert.emit({ title: "PROFILE", message: `Could not fetch user data: ${err.toString()}` }),
 			);
+	},
+	beforeDestroy() {
+		this.$nuxt.$off("saveSettingsProfile");
 	},
 	methods: {
 		onFileChange(e: any) {
@@ -65,9 +69,6 @@ export default Vue.extend({
 			this.url = URL.createObjectURL(file);
 		},
 		saveSettings() {
-			if (Date.now() - this.lastSave < 1000) return;
-
-			this.lastSave = Date.now();
 			const input = document.getElementById("id-input") as HTMLInputElement;
 
 			if (input && input.value !== this.user.username) {
@@ -78,12 +79,16 @@ export default Vue.extend({
 					.save()
 					.then(() =>
 						this.alert.emit({
-							title: "SETTINGS",
+							title: "PROFILE",
 							message: "PROFILE SUCCESSFULLY UPDATED",
 							isError: false,
 						}),
 					)
-					.catch((err) => this.alert.emit({ title: "SETTINGS", message: err.toString() }));
+					.catch((err) => {
+						if (err.response && err.response.data)
+							this.alert.emit({ title: "PROFILE", message: JSON.stringify(err.response.data) });
+						else this.alert.emit({ title: "PROFILE", message: err.toString() });
+					});
 			}
 
 			if (this.url) {
@@ -107,12 +112,16 @@ export default Vue.extend({
 						})
 						.then(() =>
 							this.alert.emit({
-								title: "SETTINGS",
+								title: "PROFILE",
 								message: "PROFILE SUCCESSFULLY UPDATED",
 								isError: false,
 							}),
 						)
-						.catch((err) => this.alert.emit({ title: "SETTINGS", message: err.toString() }));
+						.catch((err) => {
+							if (err.response && err.response.data)
+								this.alert.emit({ title: "PROFILE", message: JSON.stringify(err.response.data) });
+							else this.alert.emit({ title: "PROFILE", message: err.toString() });
+						});
 				}
 			}
 		},
