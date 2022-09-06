@@ -87,8 +87,9 @@ export class ChannelQuery extends QueryCooker<Channel> {
 	/**
 	 * select only the channels of type type
 	 */
-	type(type: ChannelType) {
-		this.query = this.query.andWhere("channel.type = :type", { type });
+	type(type: ChannelType, invert = false) {
+		if (!invert) this.query = this.query.andWhere("channel.type = :type", { type });
+		else this.query = this.query.andWhere("channel.type <> :type", { type });
 		return this;
 	}
 }
