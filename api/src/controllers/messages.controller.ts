@@ -1,5 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
-import { MessageExistGuard } from "@src/guards/message-exist.guard";
+import { Controller, Delete, Get, Param, ParseIntPipe, UseFilters, UseGuards, UseInterceptors } from "@nestjs/common";
 import { SessionGuard } from "@guards/session.guard";
 import { MessageService } from "@services/message.service";
 import { CrudFilterInterceptor } from "@interceptors/crud-filter.interceptor";
@@ -40,8 +39,12 @@ export class MessagesController {
 	 * get the message designated by id
 	 */
 	@Get(":id")
-	@UseGuards(MessageExistGuard)
 	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
 		return this.messageService.getQuery().see_message(user.id).getOne(id);
+	}
+
+	@Delete(":id")
+	remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
+		return this.messageService.getQuery().can_admin(user.id).remove(id);
 	}
 }

@@ -1,7 +1,7 @@
 import { Brackets, Repository } from "typeorm";
 import { QueryCooker } from "@src/queries/QueryCooker";
 import { Message } from "@entities/message.entity";
-import { ChannelRole } from "@entities/chan_connection.entity";
+import { ChanConnection, ChannelRole } from "@entities/chan_connection.entity";
 import { RelationType } from "@entities/relation.entity";
 
 export class MessageQuery extends QueryCooker<Message> {
@@ -49,6 +49,25 @@ export class MessageQuery extends QueryCooker<Message> {
 			.andWhere(
 				new Brackets((qb) => {
 					qb.where("relation.owner <> :userId3", { userId3: userId }).orWhere("relation IS NULL");
+				}),
+			);
+		return this;
+	}
+
+	can_admin(userId: string) {
+		const chan_connection_alias = `chan_connection${this.newId}`;
+		this.query = this.query
+			.leftJoin(
+				ChanConnection,
+				chan_connection_alias,
+				`${chan_connection_alias}.channelId = channel.id AND ${chan_connection_alias}.userId = :${this.newId}`,
+				{ [this.currentId]: userId },
+			)
+			.andWhere(
+				new Brackets((qb) => {
+					qb.where("user.id = :userId", { userId })
+						.orWhere(`${chan_connection_alias}.role = :ownerType`, { ownerType: ChannelRole.OWNER })
+						.orWhere(`${chan_connection_alias}.role = :adminType`, { adminType: ChannelRole.ADMIN });
 				}),
 			);
 		return this;
