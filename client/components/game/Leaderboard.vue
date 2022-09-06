@@ -41,6 +41,7 @@ export default Vue.extend({
 		topLadder: [] as User[],
 	}),
 	mounted() {
+		this.$modal.hide("user_profile");
 		this.fetchTopladder();
 	},
 	methods: {
