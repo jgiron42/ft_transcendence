@@ -10,6 +10,18 @@
 	</div>
 </template>
 
+<script>
+export default {
+	head() {
+		return {
+			titleTemplate: (titleChunk) => {
+				return titleChunk ? titleChunk + " - " + this.$route.name : this.$route.name;
+			},
+		};
+	},
+};
+</script>
+
 <style>
 body {
 	scroll-behavior: smooth;
