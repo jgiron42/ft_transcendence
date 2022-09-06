@@ -45,15 +45,14 @@
 		</div>
 		<!-- Save button -->
 		<div id="inputs" class="text-design_white flex flex-row h-12 w-full bg-design_blue border-t-4 border-white">
-			<button class="w-full text-center hover:text-gray-300" @click="$nuxt.$emit('saveSettings' + selection)">
-				SAVE
-			</button>
+			<button class="w-full text-center hover:text-gray-300" @click="save()">SAVE</button>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import _ from "lodash";
 
 export default Vue.extend({
 	props: {
@@ -67,6 +66,10 @@ export default Vue.extend({
 	}),
 	mounted() {
 		this.selection = this.selectionProp as "Profile" | "2FA";
+		this.save = _.debounce(() => this.$nuxt.$emit("saveSettings" + this.selection), 200);
+	},
+	methods: {
+		save: () => {},
 	},
 });
 </script>

@@ -16,7 +16,7 @@
 				<BoxButton class="w-full" size="" :content="['ENABLE', 'TOTP']" />
 			</div>
 			<!-- QR code and plaintext secret -->
-			<div v-else class="flex flex-col">
+			<div v-else class="flex flex-col items-center justify-center">
 				<!-- QR code usable with google authenticator -->
 				<qrcode
 					class="ml-2"
@@ -26,6 +26,9 @@
 				<br />
 				<!-- TOTP secret key in plaintext -->
 				<div class="p-1 mt-5 bg-white text-black box-border flex flex-row">
+					<button class="w-5 mx-1 cursor-pointer" @click="disable2FA()">
+						<CrossLogo />
+					</button>
 					<p class="overflow-scroll no-scrollbar">{{ convertSecret() }}</p>
 					<button class="w-5 mx-1 cursor-pointer" @click="regenerate2FA()">
 						<RedoButton />
@@ -54,6 +57,9 @@ export default Vue.extend({
 		username: "none", // Displayed username
 		secret: randomKey(10), // Generated 2FA secret key
 	}),
+	beforeDestroy() {
+		this.$nuxt.$off("saveSettings2FA");
+	},
 	mounted() {
 		//  Get user
 		this.$user
@@ -73,48 +79,54 @@ export default Vue.extend({
 				}
 
 				//  Set handler for "SAVE" button press
-				this.$nuxt.$on("saveSettings2FA", () => {
-					// Clone user to avoid mutating the store object
-					_.merge(this.user, { ...this.user, totp_enabled: true, totp_key: this.secret });
-
-					// Update user in store
-					this.$user.setUser(this.user);
-
-					// Update user in database.
-					this.$user
-						.save()
-						.then(() =>
-							this.alert.emit({
-								title: "SETTINGS",
-								message: "PROFILE SUCCESSFULLY UPDATED",
-								isError: false,
-							}),
-						)
-						.catch((err) => this.alert.emit({ title: "SETTINGS", message: err.toString() }));
-
-					// Fetch updated user
-					this.$user
-						.fetch()
-						.then((user) => {
-							// Update local user.
-							this.user = user;
-
-							// Update 2FA flag
-							this.is2FAEnabled = this.user.totp_enabled;
-						})
-						.catch((err) =>
-							this.$nuxt.alert.emit({
-								title: "SETTINGS",
-								message: `Couldn't fetch user: ${err.toString()}`,
-							}),
-						);
-				});
+				this.$nuxt.$on("saveSettings2FA", this.saveSettings);
 			})
 			.catch((err) =>
-				this.$nuxt.alert.emit({ title: "SETTINGS", message: `Couldn't fetch user: ${err.toString()}` }),
+				this.$nuxt.alert.emit({ title: "SECURITY", message: `Couldn't fetch user: ${err.toString()}` }),
 			);
 	},
 	methods: {
+		saveSettings() {
+			// Clone user to avoid mutating the store object
+			_.merge(this.user, { ...this.user, totp_enabled: this.generating2FA, totp_key: this.secret });
+
+			// Update user in store
+			this.$user.setUser(this.user);
+
+			// Update user in database.
+			this.$user
+				.save()
+				.then(() => {
+					this.alert.emit({
+						title: "SECURITY",
+						message: "PROFILE SUCCESSFULLY UPDATED",
+						isError: false,
+					});
+					this.is2FAEnabled = this.generating2FA;
+				})
+				.catch((err) => this.alert.emit({ title: "SECURITY", message: err.toString() }));
+
+			// Fetch updated user
+			this.$user
+				.fetch()
+				.then((user) => {
+					// Update local user.
+					this.user = user;
+
+					// Update 2FA flag
+					this.is2FAEnabled = this.user.totp_enabled;
+				})
+				.catch((err) =>
+					this.$nuxt.alert.emit({
+						title: "SECURITY",
+						message: `Couldn't fetch user: ${err.toString()}`,
+					}),
+				);
+		},
+		disable2FA() {
+			this.generating2FA = false;
+			this.is2FAEnabled = false;
+		},
 		regenerate2FA() {
 			this.generating2FA = false;
 			this.secret = randomKey(10);
