@@ -47,8 +47,10 @@ services:
             # Mount code to avoid rebuild container to refresh code
             - ./api/src:/app/src
             - ./api/tsconfig.json:/app/tsconfig.json
+            - ./api/typeOrm.config.ts:/app/typeOrm.config.ts
             - ./api/tsconfig.build.json:/app/tsconfig.build.json
             - ./api/config.json:/app/config.json
+            - ./api/package.json:/app/package.json
             - /uploads
         restart: unless-stopped
         depends_on: [db]
