@@ -96,7 +96,6 @@ export default Vue.extend({
 		backendData: {} as GameData,
 		isDrawn: false,
 		updateInterval: {} as NodeJS.Timeout,
-		drawInterval: {} as NodeJS.Timeout,
 		timeOffset: 0,
 		online: false,
 		lastBackendUpdate: 0,
@@ -110,6 +109,7 @@ export default Vue.extend({
 		currentPlayer: "P1" as "P1" | "P2",
 		keyMap: getBaseKeyMap(),
 		font: "roboto",
+		frame: 0,
 	}),
 	async mounted() {
 		try {
@@ -146,7 +146,7 @@ export default Vue.extend({
 
 			// Setup game loop.
 			this.updateInterval = setInterval(this.update, 0);
-			this.drawInterval = setInterval(this.redraw, 15);
+			this.frame = requestAnimationFrame(this.drawLoop);
 
 			this.setFullScreen();
 		} catch (err: any) {
@@ -158,7 +158,9 @@ export default Vue.extend({
 	beforeDestroy() {
 		// Stop the game loop
 		if (this.updateInterval) clearInterval(this.updateInterval);
-		if (this.drawInterval) clearInterval(this.drawInterval);
+
+		// Stop redrawing
+		cancelAnimationFrame(this.frame);
 
 		// Stop the periodic time synchronization.
 		if (this.syncInterval) clearInterval(this.syncInterval);
@@ -177,6 +179,10 @@ export default Vue.extend({
 		document.body.removeEventListener("touchend", this.handleTouchEnd, false);
 	},
 	methods: {
+		drawLoop() {
+			this.redraw();
+			requestAnimationFrame(this.drawLoop);
+		},
 		async unsetFullScreen() {
 			// Automatically set landscape fullscreen on mobile devices.
 			if (this.$device.isMobileOrTablet) {

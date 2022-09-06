@@ -164,6 +164,16 @@ export default Vue.extend({
 			// emit the selection event, (ensuring no modification on the selection will be done if user don't select / unselect any connection)
 			this.$emit("select", this.selected);
 		}
+
+		// Replace method by debounced function to avoid same invite being submitted multiple time at once.
+		this.acceptGameInvite = _.debounce((id: string) => {
+			this.$axios
+				.$put(`/game/invite/${id}`)
+				.then(() => this.$router.push("/matchmaking"))
+				.catch((err) =>
+					this.alert.emit({ title: "INVITE", message: `Couldn't accept invite: ${err.message}` }),
+				);
+		}, 100);
 	},
 	methods: {
 		// accept friend request
@@ -187,21 +197,7 @@ export default Vue.extend({
 				);
 		},
 
-		acceptGameInvite(id: string) {
-			// Replace method by debounced function to avoid same invite being submitted multiple time at once.
-			this.acceptGameInvite = _.debounce((id: string) => {
-				this.$axios
-					.$put(`/game/invite/${id}`)
-					.then(() => this.$router.push("/matchmaking"))
-					.catch((err) =>
-						this.alert.emit({ title: "INVITE", message: `Couldn't accept invite: ${err.message}` }),
-					);
-			}, 100);
-
-			// Call the replaced method.
-			// => Accepts the invite, creating a match on success => redirects to matchmaking.
-			this.acceptGameInvite(id);
-		},
+		acceptGameInvite(_id: string) {},
 
 		// show a user profile based on a relation
 		showUserRelation(relation: Relation) {

@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Check } from 
 import { SetMode } from "@utils/set-mode";
 import { config as userConfig } from "@config/user.config";
 import { config as channelConfig } from "@config/channel.config";
+import { Length } from "class-validator";
 
 // entity use to describe the channel
 
@@ -19,8 +20,9 @@ export class Channel {
 	id: number;
 
 	// name of the channel
+	@Length(channelConfig.nameMinLength, channelConfig.nameMaxLength)
 	@Check(
-		`LENGTH(name) > ${channelConfig.nameMinLength} AND LENGTH(name) < ${Math.max(
+		`LENGTH(name) >= ${channelConfig.nameMinLength} AND LENGTH(name) <= ${Math.max(
 			userConfig.usernameMaxLength * 2 + 3, // minimum length for dm channels
 			channelConfig.nameMinLength,
 		)}`,
