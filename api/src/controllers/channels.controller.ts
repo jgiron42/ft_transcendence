@@ -217,7 +217,7 @@ export class ChannelsController {
 		@Param("user_id") userId: string,
 		@GetUser() user: User,
 	): Promise<object> {
-		await this.channelService.getQuery().on_channel(user.id).getOneOrFail(chanId);
+		await this.channelService.getQuery().on_channel(user.id).type(ChannelType.DM, true).getOneOrFail(chanId);
 		return this.chanInvitationService.getQuery().findOrCreate({
 			user: { id: userId },
 			channel: { id: chanId },
