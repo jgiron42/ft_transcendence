@@ -100,6 +100,7 @@ export class UsersController {
 		@MyRequestPipe(...getPutPipeline(User)) user: User,
 		@GetUser() requestUser: User,
 	) {
+		user.initialized = true;
 		await this.userService.getQuery().is(requestUser.id).update(user, id);
 	}
 
