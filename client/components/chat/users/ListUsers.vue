@@ -88,7 +88,11 @@
 
 					<!-- else, if it's a list of friends, add a button to invite user in the current channel -->
 					<button
-						v-else-if="type === 'friends' && !isAlreadyOnCurrentChannel(other(relation))"
+						v-else-if="
+							type === 'friends' &&
+							!isAlreadyOnCurrentChannel(other(relation)) &&
+							currentChannel.type !== ChannelType.DM
+						"
 						class="w-12 h-6 invite-icon"
 						@click.prevent="inviteInCurrentChannel(other(relation))"
 					/>
@@ -105,6 +109,7 @@ import { store } from "@/store";
 import { ChanConnection, ChannelRole } from "@/models/ChanConnection";
 import { Relation } from "@/models/Relation";
 import { User } from "@/models/User";
+import { Channel, ChannelType } from "@/models/Channel";
 
 export default Vue.extend({
 	name: "ListUsers",
@@ -152,6 +157,16 @@ export default Vue.extend({
 			// get the current channel connections
 			get currentConnections(): ChanConnection[] {
 				return store.connection.chanConnectionTracker && Array.from(store.connection.chanConnections.values());
+			},
+
+			// get the current channel
+			get currentChannel(): Channel {
+				return store.channel.currentConnection.channel;
+			},
+
+			// get the ChannelType enum in order to use it in the template
+			get ChannelType(): typeof ChannelType {
+				return ChannelType;
 			},
 		};
 	},
