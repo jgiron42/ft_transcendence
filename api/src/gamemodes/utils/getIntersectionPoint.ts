@@ -99,17 +99,14 @@ const getIntersectionPointTest = () => {
 		const result = getIntersectionPoint(params[0], params[1]);
 		const resultInverse = getIntersectionPoint(params[1], params[0]);
 
-		console.log("got:", result, "exp:", expectedResult);
 		if (!result || !resultInverse || !result.equals(expectedResult) || !resultInverse.equals(expectedResult))
 			throw new Error(`getIntersectinSegmentsTest(): wrong result for ${JSON.stringify(params)}`);
 	});
 
 	nonIntersectingSegments.forEach((params) => {
-		const expectedResult: Point | undefined = undefined;
 		const result = getIntersectionPoint(params[0], params[1]);
 		const resultInverse = getIntersectionPoint(params[1], params[0]);
 
-		console.log("got:", result, "exp:", expectedResult);
 		if (result || resultInverse)
 			throw new Error(`getIntersectinSegmentsTest(): wrong result for ${JSON.stringify(params)}`);
 	});

@@ -406,8 +406,8 @@ export class GameService {
 				availableGameModes: config.gameModes,
 				invitations: localUser.invitations,
 				matchList: Array.from(this.matchPool)
-					.filter(([__, match]) => match.status === "ongoing")
-					.map(([__, match]) => this.serializeMatch(match)), // Send only ongoing games.
+					.filter(([, match]) => match.status === "ongoing")
+					.map(([, match]) => this.serializeMatch(match)), // Send only ongoing games.
 			};
 
 			// Send update data to every user's sockets.
