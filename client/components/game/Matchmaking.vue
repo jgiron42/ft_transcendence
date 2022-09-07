@@ -253,6 +253,9 @@ export default Vue.extend({
 			const selector = document.getElementById("matchmaking-mode-select") as HTMLSelectElement;
 			const selectedGameMode = selector.options[selector.selectedIndex].text;
 
+			// Reset game parameters.
+			this.$game.reset();
+
 			// Request server to create a match with you against a bot
 			if (this.selectedType === "onlineBot") {
 				this.matchBot();
