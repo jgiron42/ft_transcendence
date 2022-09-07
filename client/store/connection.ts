@@ -167,4 +167,10 @@ export default class ConnectionStore extends VuexModule implements IConnectionSt
 			});
 		});
 	}
+
+	// Action used to kick a connection
+	@Action
+	kickChanConnection(connection: ChanConnection) {
+		window.$nuxt.$axios.post(`/channels/${connection.channel.id}/kick/${connection.user.id}`);
+	}
 }

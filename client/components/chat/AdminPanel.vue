@@ -29,7 +29,7 @@
 						:margin="true"
 					/>
 					<!-- if the user is also the owner, then add the edition panel to manage admin users -->
-					<div v-if="isOwner">
+					<div v-if="isOwner && showAdmin">
 						<button v-if="!showEditAdmin" class="edit-button" @click="editAdmin">Manage admins</button>
 						<button v-if="showEditAdmin" class="edit-button" @click="saveEditAdmin">Save!</button>
 						<ListUsers
@@ -54,7 +54,7 @@
 					/>
 					<div v-else-if="showBanned" class="empty-text">No banned users.</div>
 					<!-- if the user is admin, add the edition panel to manage banned users -->
-					<div v-if="isAdmin">
+					<div v-if="isAdmin && showBanned">
 						<button v-if="!showEditBanned" class="edit-button" @click="editBanned">Manage banned</button>
 						<button v-if="showEditBanned" class="edit-button" @click="saveEditBanned">Save!</button>
 						<ListUsers
@@ -70,6 +70,35 @@
 					<div
 						v-if="
 							showEditBanned &&
+							showBanned &&
+							usersFilter((connection) => connection.role < ChannelRole.OWNER).length === 0
+						"
+						class="empty-text"
+					>
+						No users.
+					</div>
+				</div>
+				<hr />
+
+				<!-- displays the kick list edition panel -->
+				<div id="kick-list">
+					<ArrowDropdown name="kick users" :click="onShowKick" :state="showKick" />
+					<!-- if the user is admin, add the edition panel to manage kick users -->
+					<div v-if="isAdmin && showKick">
+						<button v-if="!showEditKick" class="edit-button" @click="editKick">Manage kick</button>
+						<button v-if="showEditKick" class="edit-button" @click="saveEditKick">Save!</button>
+						<ListUsers
+							v-if="showEditKick && chanConnections.length !== 0"
+							:connections="usersFilter((connection) => connection.role < ChannelRole.OWNER)"
+							:margin="true"
+							type="kick-selection"
+							@select="selectKick"
+						/>
+					</div>
+					<!-- if the list of user is empty, add text saying 'No users.' -->
+					<div
+						v-if="
+							showEditKick &&
 							usersFilter((connection) => connection.role < ChannelRole.OWNER).length === 0
 						"
 						class="empty-text"
@@ -91,9 +120,9 @@
 					/>
 					<div v-else-if="showMuted" class="empty-text">No muted users.</div>
 					<!-- is user is admin, displays mute edition panel -->
-					<div v-if="isAdmin">
+					<div v-if="isAdmin && showMuted">
 						<button v-if="!showEditMuted" class="edit-button" @click="editMuted">Manage muted</button>
-						<button v-if="showEditMuted" class="edit-button" @click="showEditMuted = false">Done!</button>
+						<button v-if="showEditMuted" class="edit-button" @click="showEditMuted = false">Save!</button>
 						<ListUsers
 							v-if="showEditMuted && chanConnections.length !== 0"
 							:connections="usersFilter((connection) => connection.role < ChannelRole.ADMIN)"
@@ -158,6 +187,7 @@ export default Vue.extend({
 		// selectedAdmins and selectedBanned are used to store the selected users when editing banned or admins users
 		selectedAdmins: [] as ChanConnection[],
 		selectedBanned: [] as ChanConnection[],
+		selectedKick: [] as ChanConnection[],
 		mutedConnections: [] as ChanConnection[],
 
 		// show / hide the properties of current channel
@@ -170,6 +200,10 @@ export default Vue.extend({
 		// show / hide the banned list and the banned list edition
 		showBanned: true,
 		showEditBanned: false,
+
+		// show / hide the kick list edition
+		showKick: true,
+		showEditKick: false,
 
 		// show / hide the muted list and the muted list edition
 		showMuted: true,
@@ -208,7 +242,7 @@ export default Vue.extend({
 		selectAdmin(connections: ChanConnection[]) {
 			this.selectedAdmins = connections;
 		},
-		// function called when the user click on the 'Done!' button
+		// function called when the user click on the 'Save!' button
 		saveEditAdmin() {
 			// for each connection in the admins connection which is not in the selectedAdmins list, remove the admin role
 			for (const connection of this.adminConnections) {
@@ -237,7 +271,7 @@ export default Vue.extend({
 		selectBanned(connections: ChanConnection[]) {
 			this.selectedBanned = connections;
 		},
-		// function called when the user click on the 'Done!' button
+		// function called when the user click on the 'Save!' button
 		saveEditBanned() {
 			// for each connection in the banned connection which is not in the selectedBanned list, remove the banned role
 			for (const connection of this.bannedConnections) {
@@ -256,6 +290,29 @@ export default Vue.extend({
 			// reset the selectedBanned list and hide the edition panel
 			this.selectedBanned = [...this.bannedConnections];
 			this.showEditBanned = false;
+		},
+
+		/* ****************************************************************** */
+		/*   Functions used to manage kick users                              */
+		/* ****************************************************************** */
+
+		// function called when the user click on the 'Manage kicked' button
+		editKick() {
+			this.showEditKick = true;
+		},
+		// function given to the ListUsers component to select kicked users in users list
+		selectKick(connections: ChanConnection[]) {
+			this.selectedKick = connections;
+		},
+		// function called when the user click on the 'Save!' button
+		saveEditKick() {
+			// for each connection in the selectedKick list, kick the chanConnection
+			for (const connection of this.selectedKick) {
+				if (connection.role < ChannelRole.OWNER) store.connection.kickChanConnection(connection);
+			}
+			// reset the selectedKick list and hide the edition panel
+			this.selectedKick = [];
+			this.showEditKick = false;
 		},
 
 		/* ****************************************************************** */
@@ -280,6 +337,9 @@ export default Vue.extend({
 		},
 		onShowBanned() {
 			this.showBanned = !this.showBanned;
+		},
+		onShowKick() {
+			this.showKick = !this.showKick;
 		},
 		onShowMuted() {
 			this.showMuted = !this.showMuted;
