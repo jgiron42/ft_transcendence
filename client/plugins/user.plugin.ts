@@ -11,7 +11,7 @@ class UserSingleton extends Vue {
 		// Nuxt context allowing you to access the store, runtimeConfig and configured axios.
 		// https://nuxtjs.org/docs/internals-glossary/context/
 		this.ctx = ctx;
-		this.fetch();
+		this.fetch().catch((_) => {});
 		initialiseStores(this.ctx.store);
 	}
 
