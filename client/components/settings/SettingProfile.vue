@@ -64,7 +64,7 @@ export default Vue.extend({
 	methods: {
 		onFileChange(e: any) {
 			const file = e.target.files[0];
-			this.url = URL.createObjectURL(file);
+			if (file) this.url = URL.createObjectURL(file);
 		},
 		saveSettings() {
 			const input = document.getElementById("id-input") as HTMLInputElement;
