@@ -3,7 +3,7 @@
 	<div id="app" class="w-full h-full overflow-hidden flex flex-col">
 		<div class="absolute top-0 w-full">
 			<Header v-if="!$device.isMobile" />
-			<AlertManager />
+			<div class="absolute w-full"><AlertManager /></div>
 		</div>
 		<div id="page" class="flex flex-col flex-grow min-h-0 min-w-0 overflow-x-auto w-full h-full">
 			<Nuxt />

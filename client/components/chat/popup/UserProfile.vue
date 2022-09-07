@@ -8,6 +8,7 @@
 			<div class="flex flex-row">
 				<img :src="$getPictureSrc(user.id)" class="player_image" />
 				<div class="flex flex-col user_info">
+					<div>ID : {{ user.id }}</div>
 					<div>GAMES : {{ user.nb_game }}</div>
 					<div>WINS : {{ user.nb_win }}</div>
 					<div>LOSES : {{ user.nb_loss }}</div>

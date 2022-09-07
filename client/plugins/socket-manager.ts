@@ -94,6 +94,7 @@ class SocketHub extends Vue implements SocketHubInterface {
 		});
 
 		this.socket.on("connect", () => {
+			// eslint-disable-next-line
 			console.debug("[WEBSOCKET]: connected", this.socket.id);
 		});
 
@@ -102,6 +103,7 @@ class SocketHub extends Vue implements SocketHubInterface {
 
 		// Handle received websocket errors
 		this.socket.on("exception", (err: { authMethod: null | "42" | "totp" } | null) => {
+			// eslint-disable-next-line
 			console.warn("[WEBSOCKET]: Warning:", JSON.stringify(err));
 
 			// Authenticate when server throws an authentication error
@@ -122,6 +124,7 @@ class SocketHub extends Vue implements SocketHubInterface {
 		});
 
 		this.socket.on("connect_error", (err: any) => {
+			// eslint-disable-next-line
 			console.warn("[WEBSOCKET]: Warning:", JSON.stringify(err));
 		});
 	}

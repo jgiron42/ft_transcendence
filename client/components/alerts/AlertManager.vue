@@ -25,7 +25,9 @@ export default Vue.extend({
 		this.$nuxt.$on("addAlert", (alert: Alert) => {
 			if (!this) return;
 
+			// eslint-disable-next-line
 			if (alert.isError === false) console.info("[ALERT]", alert.title, ":", alert.message);
+			// eslint-disable-next-line
 			else console.warn("[ALERT]", alert.title, ":", alert.message);
 
 			// Reset clear timer.
