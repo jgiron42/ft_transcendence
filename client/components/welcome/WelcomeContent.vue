@@ -1,33 +1,35 @@
 <template>
-	<div id="setting-profile" class="w-full h-full flex flex-col items-center justify-around bg-design_black py-5">
-		<div class="flex flex-col w-full items-center justify-around">
+	<div
+		id="setting-profile"
+		class="w-full h-full flex flex-col items-center justify-around bg-design_black py-5 uppercase"
+	>
+		<div class="flex flex-col w-full h-full items-center justify-evenly">
 			<!-- User profile picture -->
 			<div
 				id="profile-picture"
 				onclick="document.getElementById('selectedFile').click();"
-				class="flex h-1/3 w-1/3 items-center justify-center cursor-pointer user-img"
+				class="h-1/3 w-1/3 items-center justify-center cursor-pointer flex flex-col"
 			>
-				<img v-if="url" :src="url" class="rounded-full w-24 h-24" />
-				<img v-else-if="image" :src="image" class="rounded-full w-24 h-24" />
-				<img v-else src="~/assets/profile.png" class="rounded-full w-24 h-24" />
+				<h1>UPLOAD A PROFILE PICTURE:</h1>
+				<div class="user-img items-center ml-5">
+					<img v-if="url" :src="url" class="rounded-full w-24 h-24" />
+					<img v-else-if="image" :src="image" class="rounded-full w-24 h-24" />
+					<img v-else src="~/assets/profile.png" class="rounded-full w-24 h-24" />
+					(click me!)
+				</div>
 			</div>
 			<input id="selectedFile" class="box-border" type="file" style="display: none" @change="onFileChange" />
-			<input
-				id="id-input"
-				type="text"
-				class="text-black box-content text-center font-mono mt-2"
-				:value="user.username"
-				maxlength="15"
-			/>
+			<div class="flex flex-col w-1/2">
+				Choose your displayed username:
+				<input
+					id="id-input"
+					type="text"
+					class="text-black box-content text-center font-mono mt-2"
+					:value="user.username"
+					maxlength="15"
+				/>
+			</div>
 		</div>
-		<!-- Player statistics -->
-		<div class="flex flex-col">
-			<p>Total played games : {{ user.nb_game }}</p>
-			<p>Total victories : {{ user.nb_win }}</p>
-			<p>Total losses : {{ user.nb_loss }}</p>
-			<p>ELO rating: {{ user.elo }}</p>
-		</div>
-		<NuxtLink class="uppercase hover:text-gray-400" to="/history">See match history</NuxtLink>
 	</div>
 </template>
 
@@ -71,19 +73,20 @@ export default Vue.extend({
 		saveSettings() {
 			const input = document.getElementById("id-input") as HTMLInputElement;
 
-			if (input && input.value !== this.user.username) {
+			if (input && input.value) {
 				this.user.username = input.value;
 				this.$user.setUser(this.user);
 
 				this.$user
 					.save()
-					.then(() =>
+					.then(() => {
 						this.alert.emit({
 							title: "PROFILE",
 							message: "PROFILE SUCCESSFULLY UPDATED",
 							isError: false,
-						}),
-					)
+						});
+						this.$nuxt.$router.push("/");
+					})
 					.catch((err) => {
 						if (err.response && err.response.data)
 							this.alert.emit({ title: "PROFILE", message: JSON.stringify(err.response.data) });
@@ -110,13 +113,14 @@ export default Vue.extend({
 								"content-type": "multipart/form-data", // do not forget this
 							},
 						})
-						.then(() =>
+						.then(() => {
 							this.alert.emit({
 								title: "PROFILE",
 								message: "PROFILE SUCCESSFULLY UPDATED",
 								isError: false,
-							}),
-						)
+							});
+							this.$nuxt.$router.push("/");
+						})
 						.catch((err) => {
 							if (err.response && err.response.data)
 								this.alert.emit({ title: "PROFILE", message: JSON.stringify(err.response.data) });
@@ -128,6 +132,7 @@ export default Vue.extend({
 	},
 });
 </script>
+
 <style scoped>
 /* Set the cross red on hover */
 .user-img:hover,
