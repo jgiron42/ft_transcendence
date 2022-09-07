@@ -103,26 +103,9 @@ export default Vue.extend({
 						isError: false,
 					});
 					this.is2FAEnabled = this.generating2FA;
+					location.reload();
 				})
 				.catch((err) => this.alert.emit({ title: "SECURITY", message: err.toString() }));
-
-			// Fetch updated user
-			this.$user
-				.fetch()
-				.then((user) => {
-					// Update local user.
-					this.user = user;
-
-					// Update 2FA flag
-					this.is2FAEnabled = this.user.totp_enabled;
-				})
-				.catch((err) =>
-					this.$nuxt.alert.emit({
-						title: "SECURITY",
-						message: `Couldn't fetch user: ${err.toString()}`,
-					}),
-				);
-			location.reload();
 		},
 		disable2FA() {
 			this.generating2FA = false;
