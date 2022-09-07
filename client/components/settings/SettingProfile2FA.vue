@@ -122,6 +122,7 @@ export default Vue.extend({
 						message: `Couldn't fetch user: ${err.toString()}`,
 					}),
 				);
+			location.reload();
 		},
 		disable2FA() {
 			this.generating2FA = false;
