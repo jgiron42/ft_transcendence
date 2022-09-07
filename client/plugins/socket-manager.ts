@@ -78,7 +78,13 @@ class SocketHub extends Vue implements SocketHubInterface {
 	}
 
 	init(context: Context) {
+		// Reset events
+		if (this.socket) this.socket.close();
+
+		// Set name
 		const name = this.name;
+
+		// Init socket.
 		this.socket = context.app.$nuxtSocket({
 			name,
 			channel: name,

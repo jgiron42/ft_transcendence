@@ -18,10 +18,14 @@
 </template>
 
 <script lang="ts">
-export default {
+import Vue from "vue";
+export default Vue.extend({
 	name: "Index",
-	methods: {},
-};
+	mounted() {
+		this.$gameSocket.init(this.$nuxt.context);
+		this.$chatSocket.init(this.$nuxt.context);
+	},
+});
 </script>
 
 <style>
