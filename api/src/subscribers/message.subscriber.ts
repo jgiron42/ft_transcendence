@@ -16,7 +16,11 @@ export class MessageSubscriber implements EntitySubscriberInterface<Message> {
 		return Message;
 	}
 
-	afterInsert(event: InsertEvent<Message>) {
+	async afterInsert(event: InsertEvent<Message>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for message to me fully saved and fetchable
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessage(
 			"chat:newMessage",
 			{ id: event.entity.id, user: (event.entity.user as User).id },
