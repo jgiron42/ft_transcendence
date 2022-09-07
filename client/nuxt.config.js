@@ -40,6 +40,7 @@ export default {
 		// https://go.nuxtjs.dev/tailwindcss
 		"@nuxtjs/tailwindcss",
 		"@nuxtjs/device",
+		"@nuxtjs/pwa",
 	],
 
 	css: ["@/layouts/global.css"],
