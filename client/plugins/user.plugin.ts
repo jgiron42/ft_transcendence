@@ -32,6 +32,9 @@ class UserSingleton extends Vue {
 				// Store fetched user.
 				this.setUser(response.data);
 
+				// Prompt user to fill his infos
+				if (this.$user.user.initialized === false) this.ctx.redirect("/welcome");
+
 				// Return fetched user.
 				return response.data;
 			}

@@ -15,7 +15,7 @@ export class User {
 		this.nb_loss = 0;
 		this.totp_enabled = false;
 		this.totp_key = "";
-		this.status = 0;
+		this.initialized = false;
 		this.created_at = new Date();
 		this.elo = gameConfig.baseELO;
 	}
@@ -54,9 +54,9 @@ export class User {
 	totp_enabled: boolean;
 
 	// status of the user
-	@Column({ default: 0 })
-	@SetMode("cru")
-	status: number;
+	@Column({ default: false })
+	@SetMode("r")
+	initialized: boolean;
 
 	// totp key of the user in hexadecimal
 	@Column({ length: 40, default: "" })

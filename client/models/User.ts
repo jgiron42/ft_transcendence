@@ -13,6 +13,7 @@ interface UserInterface {
 	status: number;
 	created_at: Date;
 	elo: number;
+	initialized: boolean;
 }
 
 export class User extends StringifiableModel implements UserInterface {
@@ -29,6 +30,7 @@ export class User extends StringifiableModel implements UserInterface {
 		this.status = 0;
 		this.created_at = new Date();
 		this.elo = 0;
+		this.initialized = false;
 	}
 
 	id: string;
@@ -42,4 +44,5 @@ export class User extends StringifiableModel implements UserInterface {
 	totp_key: string;
 	created_at: Date;
 	elo: number;
+	initialized: boolean;
 }
