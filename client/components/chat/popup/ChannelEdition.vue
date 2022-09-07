@@ -9,8 +9,8 @@
 						<input
 							id="textarea-chan-name"
 							v-model="channel.name"
-							maxlength="20"
-							minlength="2"
+							:maxlength="maxLength"
+							:minlength="minLength"
 							class="message-txt bg-transparent border-none outline-none resize-none flex-auto"
 							placeholder="Enter channel name..."
 						/>
@@ -60,6 +60,7 @@
 import Vue from "vue";
 import { Channel, ChannelType } from "@/models/Channel";
 import { store } from "@/store";
+import { config } from "@/config/config";
 
 export default Vue.extend({
 	name: "ChannelCreation",
@@ -74,6 +75,12 @@ export default Vue.extend({
 
 		// Initialize the selected type to the current channel type
 		selectedType: store.channel.currentConnection.channel.type,
+
+		minLength: config.channelNameMinLength,
+		maxLength: Math.max(
+			config.usernameMaxLength * 2 + 3, // minimum length for dm channels
+			config.usernameMaxLength,
+		),
 
 		// selectedTypeName is used for mappiong the selected type to a value understandable by the select element
 		get selectedTypeName(): string {

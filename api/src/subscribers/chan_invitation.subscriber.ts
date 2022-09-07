@@ -15,11 +15,19 @@ export class ChanInvitationSubscriber implements EntitySubscriberInterface<ChanI
 		return ChanInvitation;
 	}
 
-	afterInsert(event: InsertEvent<ChanInvitation>) {
+	async afterInsert(event: InsertEvent<ChanInvitation>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for invitation to me fully saved and fetchable
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessageToClient("chat:newInvitation", event.entity.id, (event.entity.user as User).id);
 	}
 
-	beforeRemove(event: RemoveEvent<ChanInvitation>) {
+	async beforeRemove(event: RemoveEvent<ChanInvitation>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for invitation to me fully removed.
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessageToClient("chat:removeInvitation", event.entity, (event.entity.user as User).id);
 	}
 }

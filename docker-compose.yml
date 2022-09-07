@@ -24,6 +24,7 @@ services:
             # Mount code to avoid rebuild container to refresh code
             - ./client/assets:/app/assets
             - ./client/components:/app/components
+            - ./client/config:/app/config
             - ./client/Dockerfile:/app/Dockerfile
             - ./client/entrypoint.sh:/app/entrypoint.sh
             - ./client/gamemodes:/app/gamemodes

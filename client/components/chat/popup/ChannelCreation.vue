@@ -9,8 +9,8 @@
 						<input
 							id="textarea-chan-name"
 							v-model="channel.name"
-							maxlength="20"
-							minlength="2"
+							:minlength="minLength"
+							:maxlength="maxLength"
 							class="message-txt bg-transparent border-none outline-none resize-none flex-auto"
 							placeholder="Enter channel name..."
 						/>
@@ -52,23 +52,28 @@
 import Vue from "vue";
 import { Channel, ChannelType } from "@/models/Channel";
 import { store } from "@/store";
+import { config } from "@/config/config";
 
 export default Vue.extend({
 	name: "ChannelCreation",
-	data() {
-		return {
-			// get the ChannelType enum in order to use it in template
-			get ChannelType(): typeof ChannelType {
-				return ChannelType;
-			},
+	data: () => ({
+		// get the ChannelType enum in order to use it in template
+		get ChannelType(): typeof ChannelType {
+			return ChannelType;
+		},
 
-			// the channel to create
-			channel: { name: "", type: ChannelType.PUBLIC } as Channel,
+		// the channel to create
+		channel: { name: "", type: ChannelType.PUBLIC } as Channel,
 
-			// the type of channel selected by the user
-			selectedType: ChannelType.PUBLIC,
-		};
-	},
+		// the type of channel selected by the user
+		selectedType: ChannelType.PUBLIC,
+
+		minLength: config.channelNameMinLength,
+		maxLength: Math.max(
+			config.usernameMaxLength * 2 + 3, // minimum length for dm channels
+			config.usernameMaxLength,
+		),
+	}),
 	methods: {
 		// method to select the type of channel to create
 		selectCategory(event: Event) {

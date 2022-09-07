@@ -26,7 +26,8 @@
 					type="text"
 					class="text-black box-content text-center font-mono mt-2"
 					:value="user.username"
-					maxlength="15"
+					:minlength="minLength"
+					:maxlength="maxLength"
 				/>
 			</div>
 		</div>
@@ -35,16 +36,20 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { config } from "@/config/config";
 import { User } from "~/models/User";
 export default Vue.extend({
-	data() {
-		return {
-			user: {} as User,
-			url: "",
-			image: "",
-			lastSave: 0,
-		};
-	},
+	data: () => ({
+		user: {} as User,
+		url: "",
+		image: "",
+		lastSave: 0,
+		minLength: config.channelNameMinLength,
+		maxLength: Math.max(
+			config.usernameMaxLength * 2 + 3, // minimum length for dm channels
+			config.usernameMaxLength,
+		),
+	}),
 	mounted() {
 		// Send file to API when save button is clicked
 		this.$nuxt.$on("saveSettingsProfile", this.saveSettings);
