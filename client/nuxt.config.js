@@ -111,6 +111,8 @@ export default {
 			"~/components/svg",
 			"~/components/game",
 			"~/components/settings",
+			"~/components/welcome",
+			"~/components/alerts",
 		],
 	},
 
