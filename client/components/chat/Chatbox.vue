@@ -16,7 +16,7 @@
 						maxlength="1000"
 						class="message-txt bg-transparent border-none outline-none resize-none w-full flex-auto break-words"
 						placeholder="Enter message..."
-						@keydown.enter.prevent="sendMessage"
+						@keydown.enter="sendMessage"
 					/>
 				</div>
 
@@ -41,7 +41,9 @@ export default Vue.extend({
 	}),
 	methods: {
 		// send message to server
-		sendMessage() {
+		sendMessage(event: Event) {
+			if ((event as unknown as { shiftKey: boolean }).shiftKey) return;
+			else event.preventDefault();
 			// if the message is empty, do nothing
 			if (!(this.msgContent.length > 0)) return;
 
