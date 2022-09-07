@@ -11,7 +11,7 @@
 							v-model="password"
 							type="password"
 							maxlength="20"
-							class="message-txt bg-transparent border-none outline-none resize-none flex-auto"
+							class="message-txt bg-transparent border-none outline-none resize-none flex-auto w-full"
 							placeholder="Password..."
 							@keydown.enter.prevent="joinChannel"
 						/>

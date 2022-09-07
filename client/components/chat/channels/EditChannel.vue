@@ -4,7 +4,9 @@
 			<div class="flex flex-col">
 				<div id="chan-name">
 					<b>Name:</b>
-					<p>{{ currentConnection.channel.name }}</p>
+					<div class="w-full truncate">
+						{{ currentConnection.channel.name }}
+					</div>
 				</div>
 				<div id="chan-type">
 					<b>Type:</b>

@@ -11,7 +11,7 @@
 							v-model="channel.name"
 							:maxlength="maxLength"
 							:minlength="minLength"
-							class="message-txt bg-transparent border-none outline-none resize-none flex-auto"
+							class="message-txt bg-transparent border-none outline-none resize-none flex-auto w-full"
 							placeholder="Enter channel name..."
 						/>
 					</div>
@@ -40,7 +40,7 @@
 								v-model="channel.password"
 								type="password"
 								maxlength="20"
-								class="message-txt bg-transparent border-none outline-none resize-none flex-auto"
+								class="message-txt bg-transparent border-none outline-none resize-none flex-auto w-full"
 								placeholder="Password..."
 							/>
 						</div>
