@@ -141,7 +141,16 @@ export class ChannelsController {
 
 	@Post(":id/leave")
 	async leaveChannel(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return await this.chanConnectionService.getQuery().channel(id).user(user.id).notdm().notBan().remove();
+		const chanConnection = await this.chanConnectionService
+			.getQuery()
+			.channel(id)
+			.user(user.id)
+			.notdm()
+			.notBan()
+			.getOneOrFail();
+		if (chanConnection.role === ChannelRole.OWNER)
+			return await this.channelService.remove(chanConnection.channel.id);
+		else return await this.chanConnectionService.getQuery().remove(chanConnection.id);
 	}
 
 	/**

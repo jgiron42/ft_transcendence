@@ -63,6 +63,19 @@ export default class UserStore extends VuexModule implements IUserStore {
 		(this.connectionsTracker as number)++;
 	}
 
+	// Mutation to remove all connections relative to a channel
+	@Mutation
+	removeConnectionByChannel(channel: Channel) {
+		for (const connection of this.connections.values()) {
+			if (connection.channel.id === channel.id) {
+				this.connections.delete(connection.id);
+			}
+		}
+
+		// update connectionTracker in order to force dynamic rendering of connections
+		(this.connectionsTracker as number)++;
+	}
+
 	// Mutation to clear user's connections
 	@Mutation
 	clearConnections() {
