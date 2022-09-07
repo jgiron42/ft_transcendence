@@ -115,14 +115,10 @@ export default Vue.extend({
 				return store.popup.user;
 			},
 
-			// get my user from the store
-			get me(): User {
-				return store.user.me;
-			},
+			me: new User(),
 
 			// get relation betweeen me and the user
 			get relation(): Relation | undefined {
-				// simply find a relation between me and the user
 				return store.relation.relations.find(
 					(relation) =>
 						(relation.owner.id !== this.user.id && relation.target.id === this.user.id) ||
@@ -144,6 +140,11 @@ export default Vue.extend({
 		};
 	},
 	mounted() {
+		this.$user
+			.getUser()
+			.then((user) => (this.me = user))
+			.catch((err) => this.alert.emit({ title: "POPUP", message: `Could not fetch user: ${err.toString()}` }));
+
 		// Load game modes from API.
 		this.$axios
 			.$get("/game/modes")

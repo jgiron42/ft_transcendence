@@ -5,11 +5,11 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN npm install
+RUN npm install --log-level=error --no-update-notifier 2>/dev/null
 
 COPY . .
 
-RUN npm run build
+RUN npm run build --log-level=error 2>/dev/null
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
 
