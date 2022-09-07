@@ -1,6 +1,6 @@
 import { Context } from "@nuxt/types";
 
-export default function ({ $axios, redirect, $config }: Context) {
+export default function ({ $axios, $config }: Context) {
 	// Handle all 401 errors to redirect to required authentication handler
 	$axios.onError((error) => {
 		// Ensure error code is 401
@@ -8,7 +8,7 @@ export default function ({ $axios, redirect, $config }: Context) {
 			// Ensure missing auth is TOTP
 			if (error.response.data.authMethod && error.response.data.authMethod === "totp")
 				// Handle missing TOTP auth in client
-				redirect("/totp");
+				window.$nuxt.$router.push("/totp");
 			// Ensure missing auth is 42 OAuth
 			else if (error.response.data.authMethod && error.response.data.authMethod === "42")
 				// Handle missing 42 OAuth by redirecting to the API handler
