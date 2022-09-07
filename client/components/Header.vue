@@ -1,5 +1,5 @@
 <template>
-	<div class="h-full bg-design_black">
+	<div class="bg-design_black">
 		<div id="header" class="bg-design_black text-design_white flex flex-row md:h-16">
 			<NuxtLink class="header-item selection_menu" to="/">
 				<Logo />
@@ -22,7 +22,9 @@
 					@click.self="showMenu = false"
 				>
 					<div class="relative w-40 h-full bg-design_black ml-auto">
-						<p class="block mt-auto mb-auto pr-2 w-full text-center font-mono">{{ username }}</p>
+						<p class="block mt-auto mb-auto pr-2 w-full text-center font-mono bg-design_lgray">
+							{{ username }}
+						</p>
 						<div class="flex flex-col" @click="showMenu = false">
 							<NuxtLink class="selection_menu" to="/matchmaking">Pong</NuxtLink>
 							<NuxtLink class="selection_menu" to="/chat">Social Network</NuxtLink>

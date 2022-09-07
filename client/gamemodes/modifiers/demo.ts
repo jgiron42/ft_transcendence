@@ -1,5 +1,6 @@
 import { Point } from "line-intersect";
 import { Game } from "../default";
+// eslint-disable-next-line
 import getIntersectionPoint from "../utils/getIntersectionPoint";
 
 // Modifier to make both players IAs (local only)

@@ -22,9 +22,27 @@ services:
             - WSS_BASE_URL=${WSS_BASE_URL-ws://localhost/}
         volumes:
             # Mount code to avoid rebuild container to refresh code
-            - ${DUMMY_MOUNT:-./client:/app/} # DUMMY_MOUNT allows to disable the volume
-            # Ignore node_modules/
-            - /app/node_modules
+            - ./client/assets:/app/assets
+            - ./client/components:/app/components
+            - ./client/Dockerfile:/app/Dockerfile
+            - ./client/entrypoint.sh:/app/entrypoint.sh
+            - ./client/gamemodes:/app/gamemodes
+            - ./client/jsconfig.json:/app/jsconfig.json
+            - ./client/layouts:/app/layouts
+            - ./client/middleware:/app/middleware
+            - ./client/models:/app/models
+            - ./client/nuxt.config.js:/app/nuxt.config.js
+            - ./client/package.json:/app/package.json
+            - ./client/package-lock.json:/app/package-lock.json
+            - ./client/pages:/app/pages
+            - ./client/plugins:/app/plugins
+            - ./client/static:/app/static
+            - ./client/store:/app/store
+            - ./client/stylelint.config.js:/app/stylelint.config.js
+            - ./client/tailwind.config.js:/app/tailwind.config.js
+            - ./client/tsconfig.json:/app/tsconfig.json
+            - ./client/types:/app/types
+            - ./client/utils:/app/utils
         restart: unless-stopped
 
     api:

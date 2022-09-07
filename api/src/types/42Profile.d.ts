@@ -25,4 +25,7 @@ export declare type ftProfile = {
 			value: string;
 		};
 	};
+	_json: {
+		usual_first_name: string;
+	};
 };

@@ -151,7 +151,8 @@ export default Vue.extend({
 			this.setFullScreen();
 		} catch (err: any) {
 			// Log and display any error.
-			console.warn("game:", err);
+			// eslint-disable-next-line
+			console.warn("Game caught an error:", err);
 			this.$nuxt.$router.push("/matchmaking");
 		}
 	},
@@ -566,6 +567,7 @@ export default Vue.extend({
 				this.game.ended ||
 				(this.online && this.lastBackendUpdate && Date.now() - this.lastBackendUpdate > 5000)
 			) {
+				// eslint-disable-next-line
 				console.warn("Game ended or there haven't been any updates in 5s, redirecting back to menu");
 				this.$nuxt.$router.push("/matchmaking");
 			}
