@@ -14,7 +14,7 @@
 						id="textarea"
 						v-model="msgContent"
 						maxlength="1000"
-						class="message-txt bg-transparent border-none outline-none resize-none w-full flex-auto"
+						class="message-txt bg-transparent border-none outline-none resize-none w-full flex-auto break-words"
 						placeholder="Enter message..."
 						@keydown.enter.prevent="sendMessage"
 					/>

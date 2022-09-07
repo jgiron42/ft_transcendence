@@ -14,7 +14,7 @@
 					</span>
 				</div>
 				<!-- if the message is mine, then add dynamically the class 'mine' and display the content -->
-				<div class="message-text break-all" :class="message.user.id == me.id ? 'mine' : ''">
+				<div class="message-text break-words" :class="message.user.id == me.id ? 'mine' : ''">
 					<div class="items-center w-95">
 						{{ message.content }}
 					</div>
