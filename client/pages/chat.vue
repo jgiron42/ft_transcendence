@@ -149,6 +149,10 @@ export default Vue.extend({
 		this.$chatSocket.on("chat:updateChannel", (chan: Channel) => {
 			store.channel.pushChannel(chan);
 		});
+		this.$chatSocket.on("chat:removeChannel", (chan: Channel) => {
+			store.channel.removeChannel(chan);
+			store.user.removeConnectionByChannel(chan);
+		});
 		this.$chatSocket.on("chat:newMessage", (message: Message) => {
 			if (!store.relation.relations.find((r) => r.target.id === message.user && r.type === RelationType.BLOCK))
 				store.message.retrieveMessage(message.id);
