@@ -169,6 +169,9 @@ export default Vue.extend({
 		// Stop listening to any game updates.
 		this.$gameSocket.clearMatchingEvents("game");
 
+		// Reset the game socket.
+		this.$gameSocket.init(this.$nuxt.context);
+
 		// Reset the game plugin state.
 		this.$game.reset();
 

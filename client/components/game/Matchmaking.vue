@@ -285,6 +285,9 @@ export default Vue.extend({
 			this.matchmakingSocket.emit("matchmaking:matchBot", { mode: this.selectedPool });
 		},
 		spectateMatch(match: string) {
+			// Reset the game parameters.
+			this.$game.reset();
+
 			// Request server to add the current connection to the match's spectators.
 			this.matchmakingSocket.emit("matchmaking:spectate", { id: match });
 
@@ -306,6 +309,7 @@ export default Vue.extend({
 					this.$game.p2 = match.p2;
 
 					// Redirect to the game page.
+					this.matchmakingSocket.clearMatchingEvents("matchmaking");
 					this.$nuxt.$router.push("/game");
 				} else this.alert.emit({ title: "SPECTATE", message: `Match ${match} does not exist` });
 			});
