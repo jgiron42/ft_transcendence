@@ -252,6 +252,24 @@ export class ChannelsController {
 	}
 
 	/**
+	 * kick a user from a channel if the current user is admin on this channel
+	 */
+	@Post(":chan_id/kick/:user_id")
+	async kick(
+		@Param("chan_id", ParseIntPipe) chanId: number,
+		@Param("user_id") userId: string,
+		@GetUser() user: User,
+	): Promise<void> {
+		await this.chanConnectionService
+			.getQuery()
+			.connection_chan_admin(user.id)
+			.channel(chanId)
+			.user(userId)
+			.notBan()
+			.remove();
+	}
+
+	/**
 	 * mute a user on a channel if the current user is admin on this channel
 	 */
 	@Post(":chan_id/mute/:user_id")

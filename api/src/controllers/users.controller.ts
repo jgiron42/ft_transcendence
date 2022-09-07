@@ -101,7 +101,7 @@ export class UsersController {
 		@GetUser() requestUser: User,
 	) {
 		user.initialized = true;
-		await this.userService.getQuery().is(requestUser.id).update(user, id);
+		return await this.userService.getQuery().is(requestUser.id).updateWithSave(user, id);
 	}
 
 	/**

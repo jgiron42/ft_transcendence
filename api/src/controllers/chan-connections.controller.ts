@@ -49,6 +49,6 @@ export class ChanConnectionsController {
 
 	@Delete(":id")
 	remove(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return this.chanConnectionService.getQuery().user(user.id).remove(id);
+		return this.chanConnectionService.getQuery().connection_chan_admin(user.id).remove(id);
 	}
 }
