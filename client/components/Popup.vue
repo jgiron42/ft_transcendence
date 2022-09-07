@@ -1,7 +1,6 @@
 <template>
 	<modal :name="name">
-		<div class="v-full h-full flex flex-col">
-			<button class="text-white ml-auto mr-2 mt-1" @click="$modal.hide(name)">X</button>
+		<div class="w-full h-full mt-3">
 			<slot />
 		</div>
 	</modal>
