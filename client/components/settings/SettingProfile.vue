@@ -35,14 +35,12 @@
 import Vue from "vue";
 import { User } from "~/models/User";
 export default Vue.extend({
-	data() {
-		return {
-			user: {} as User,
-			url: "",
-			image: "",
-			lastSave: 0,
-		};
-	},
+	data: () => ({
+		user: {} as User,
+		url: "",
+		image: "",
+		lastSave: 0,
+	}),
 	mounted() {
 		// Send file to API when save button is clicked
 		this.$nuxt.$on("saveSettingsProfile", this.saveSettings);

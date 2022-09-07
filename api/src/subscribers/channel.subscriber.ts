@@ -14,17 +14,29 @@ export class ChannelSubscriber implements EntitySubscriberInterface<Channel> {
 		return Channel;
 	}
 
-	afterInsert(event: InsertEvent<Channel>) {
+	async afterInsert(event: InsertEvent<Channel>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for message to me fully saved and fetchable
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		if (event.entity.type !== ChannelType.DM) {
 			this.chatService.sendMessage("chat:newChannel", event.entity, "realm");
 		}
 	}
 
-	afterUpdate(event: UpdateEvent<Channel>) {
+	async afterUpdate(event: UpdateEvent<Channel>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for message to me fully saved and fetchable
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessage("chat:updateChannel", event.entity, "realm");
 	}
 
-	beforeRemove(event: RemoveEvent<Channel>) {
+	async beforeRemove(event: RemoveEvent<Channel>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for message to me fully saved and fetchable
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessage("chat:removeChannel", event.entity, "realm");
 	}
 }

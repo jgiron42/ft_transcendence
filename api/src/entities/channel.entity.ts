@@ -20,7 +20,13 @@ export class Channel {
 	id: number;
 
 	// name of the channel
-	@Length(channelConfig.nameMinLength, channelConfig.nameMaxLength)
+	@Length(
+		channelConfig.nameMinLength,
+		Math.max(
+			userConfig.usernameMaxLength * 2 + 3, // minimum length for dm channels
+			channelConfig.nameMinLength,
+		),
+	)
 	@Check(
 		`LENGTH(name) >= ${channelConfig.nameMinLength} AND LENGTH(name) <= ${Math.max(
 			userConfig.usernameMaxLength * 2 + 3, // minimum length for dm channels

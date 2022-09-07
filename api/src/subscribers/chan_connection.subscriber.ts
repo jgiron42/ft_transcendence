@@ -16,7 +16,11 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 		return ChanConnection;
 	}
 
-	afterInsert(event: InsertEvent<ChanConnection>) {
+	async afterInsert(event: InsertEvent<ChanConnection>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for chan connection to me fully saved and fetchable
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessage("chat:newConnection", event.entity, `channel:${event.entity.channel.id}`);
 		this.chatService.sendMessageToClient("chat:newConnection", event.entity, event.entity.user.id);
 		if (event.entity.channel.type === ChannelType.DM) {
@@ -25,11 +29,19 @@ export class ChanConnectionSubscriber implements EntitySubscriberInterface<ChanC
 	}
 
 	async beforeRemove(event: RemoveEvent<ChanConnection>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for chan connection to me fully removed
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		this.chatService.sendMessage("chat:removeConnection", event.entity, `channel:${event.entity.channel.id}`);
 		await this.chatService.removeChanConnection(event.entity);
 	}
 
 	async afterUpdate(event: UpdateEvent<ChanConnection>) {
+		// https://stackoverflow.com/questions/62887344/queries-in-afterupdate-are-not-working-as-expected-in-typeorm?rq=1
+		// Wait for message to me fully updated.
+		await event.queryRunner.commitTransaction();
+		await event.queryRunner.startTransaction();
 		if (event.entity.role === ChannelRole.BANNED)
 			await this.chatService.removeChanConnection(event.entity as ChanConnection, false);
 		this.chatService.sendMessage(
