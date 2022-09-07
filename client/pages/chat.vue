@@ -158,8 +158,8 @@ export default Vue.extend({
 				store.message.retrieveMessage(message.id);
 		});
 		this.$chatSocket.on("chat:JoinChannel", (id: number) => this.$nuxt.$emit("JoinedChannel", id));
-		this.$chatSocket.on("chat:addRelation", (rel: Relation) => {
-			store.relation.pushRelation(rel);
+		this.$chatSocket.on("chat:addRelation", async (rel: Relation) => {
+			await store.relation.retrieveRelation(rel.id);
 			if (rel.type === RelationType.BLOCK && this.isOnChannel) {
 				store.message.setMessages([]);
 				store.message.retrieveMessages(this.currentChannel.id);
