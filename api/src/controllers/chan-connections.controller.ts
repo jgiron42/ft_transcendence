@@ -30,7 +30,7 @@ export class ChanConnectionsController {
 
 	@Get(":id")
 	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User) {
-		return this.chanConnectionService.getQuery().see_connection(user.id).getOne(id);
+		return this.chanConnectionService.getQuery().see_connection(user.id).getOneOrFail(id);
 	}
 
 	@Put(":id")

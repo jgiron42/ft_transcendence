@@ -51,7 +51,7 @@ export class RelationsController {
 	 */
 	@Get(":id")
 	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
-		return this.relationService.getQuery().see_relation(user.id).getOne(id);
+		return this.relationService.getQuery().see_relation(user.id).getOneOrFail(id);
 	}
 
 	/**

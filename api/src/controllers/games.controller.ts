@@ -35,7 +35,7 @@ export class GamesController {
 	 */
 	@Get(":id")
 	getOne(@Param("id", ParseIntPipe) id: number): Promise<object> {
-		return this.gameService.getQuery().getOne(id);
+		return this.gameService.getQuery().getOneOrFail(id);
 	}
 
 	/**

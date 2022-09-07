@@ -65,7 +65,7 @@ export class ChannelsController {
 	 */
 	@Get(":id")
 	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<Channel> {
-		return this.channelService.getQuery().see_channel(user.id).getOne(id);
+		return this.channelService.getQuery().see_channel(user.id).getOneOrFail(id);
 	}
 
 	/**

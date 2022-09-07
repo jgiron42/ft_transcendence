@@ -41,7 +41,7 @@ export class MessagesController {
 	 */
 	@Get(":id")
 	@UseGuards(MessageExistGuard)
-	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
-		return this.messageService.getQuery().see_message(user.id).getOne(id);
+	async getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
+		return await this.messageService.getQuery().see_message(user.id).getOneOrFail(id);
 	}
 }

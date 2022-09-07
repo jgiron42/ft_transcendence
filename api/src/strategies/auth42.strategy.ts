@@ -26,7 +26,6 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 		profile: ftProfile,
 		done: (error: string, user: SessionUser) => any,
 	): any {
-		console.log(profile);
 		const user: SessionUser = {
 			accessToken,
 			refreshToken,

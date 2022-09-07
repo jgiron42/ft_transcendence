@@ -53,7 +53,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayDisconnect {
 	@SubscribeMessage("authenticate")
 	async authenticate(@ConnectedSocket() client: Socket) {
 		// Get user from DB
-		client.session.user = await this.userService.getQuery().is(client.session.sessionUser.id).getOne();
+		client.session.user = await this.userService.getQuery().is(client.session.sessionUser.id).getOneOrFail();
 
 		// Add user to pool
 		this.chatService.connectClient(client, client.session.user);
