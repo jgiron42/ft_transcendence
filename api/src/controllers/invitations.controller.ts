@@ -46,7 +46,7 @@ export class InvitationsController {
 	 */
 	@Get(":id")
 	getOne(@Param("id", ParseIntPipe) id: number, @GetUser() user: User): Promise<object> {
-		return this.chanInvitationService.getQuery().in_invitation(user.id).getOne(id);
+		return this.chanInvitationService.getQuery().in_invitation(user.id).getOneOrFail(id);
 	}
 
 	/**

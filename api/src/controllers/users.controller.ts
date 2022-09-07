@@ -139,27 +139,20 @@ export class UsersController {
 	}
 
 	/**
-	 * get all games of an user
+	 * get all games of a user
 	 */
 	@Get(":id/dm")
 	async dm(@Param("id") id: string, @GetUser() user: User): Promise<Channel> {
-		let chan = await this.channelService
+		const chan = await this.channelService
 			.getQuery()
-			.on_channel(id)
-			.on_channel(user.id)
-			.type(ChannelType.DM)
-			.getOne();
-		// if the chan does not exist yet, create it and put the users in it
-		if (!chan) {
-			chan = await this.channelService.getQuery().create({ type: ChannelType.DM, name: `${user.id} - ${id}` });
-			await this.chanConnectionService.getQuery().create({ channel: chan, user: { id: user.id } });
-			await this.chanConnectionService.getQuery().create({ channel: chan, user: { id } });
-		}
+			.findOrCreate({ type: ChannelType.DM, name: `${user.id} - ${id}` });
+		await this.chanConnectionService.getQuery().findOrCreate({ channel: chan, user: { id: user.id } });
+		await this.chanConnectionService.getQuery().findOrCreate({ channel: chan, user: { id } });
 		return chan;
 	}
 
 	/**
-	 * get all games of an user
+	 * get all games of a user
 	 */
 	@Get(":id/games")
 	getGames(
