@@ -25,7 +25,7 @@ export class Message {
 	channel: Channel | number;
 
 	// content of the messsage
-	@Column()
+	@Column({ length: 10000 })
 	@SetMode("cru")
 	content: string;
 
