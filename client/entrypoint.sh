@@ -11,7 +11,6 @@ then
 	then
 		export "RUN_SCRIPT=start"
 	else
-		npm i
 		export "RUN_SCRIPT=dev"
 	fi
 fi
