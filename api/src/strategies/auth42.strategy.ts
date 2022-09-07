@@ -16,7 +16,7 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 		super({
 			clientID: intraConfig.uid,
 			clientSecret: intraConfig.secret,
-			callbackURL: `${config.baseUrl}/auth/42`,
+			callbackURL: `${config.baseUrl}auth/42`,
 		});
 	}
 
