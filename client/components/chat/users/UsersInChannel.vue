@@ -2,7 +2,12 @@
 	<div v-if="selection == 0" id="user-selection" class="h-full flex flex-col gap-2">
 		<div id="title">
 			<hr />
-			<div id="chan-name" class="panel-title">Channel: {{ currentChannel.name }}</div>
+			<div id="chan-name" class="panel-title">
+				Channel:
+				<div class="w-full truncate">
+					{{ currentChannel.name }}
+				</div>
+			</div>
 			<hr />
 		</div>
 		<br />
